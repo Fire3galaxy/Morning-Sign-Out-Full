@@ -1,0 +1,32 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/mso_blue</item>
+        <item name="android:actionBarSize">45dp</item>
+    </style>
+
+    <style name="MsoActionBarTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    </style>
+
+    <!-- Attempted to use this to italicize/customize article actionbar title without custom textView. No italics. -->
+    <style name="ArticleAppTheme" parent="Theme.AppCompat.Light">
+        <item name="colorPrimary">@color/mso_blue</item>
+        <item name="android:actionBarSize">45dp</item>
+        <item name="android:actionBarStyle">@style/ArticleActionBarAppTheme</item>
+    </style>
+
+    <style name="ArticleActionBarAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:titleTextStyle">@style/ArticleTitleFont</item>
+    </style>
+
+    <style name="ArticleTitleFont" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/bright_foreground_material_dark</item>
+        <item name="android:textStyle">bold|italic</item>
+        <item name="android:textSize">16dp</item>
+    </style>
+
+</resources>
+

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_layout"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
+    <!--For the articles-->
+    <LinearLayout
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/container_category"
+        android:clickable="true">
+    </LinearLayout>
+
+    <!--For the category swipe menu-->
+    <ListView
+        android:id="@+id/listView_slide"
+        android:layout_height="match_parent"
+        android:layout_width="240dp"
+        android:layout_gravity="start"
+        android:choiceMode="singleChoice"
+        android:divider="#C1C1C1"
+        android:dividerHeight="1dp"
+        android:listSelector="@drawable/list_selector"
+        android:background="@color/background_white"/>
+</android.support.v4.widget.DrawerLayout>

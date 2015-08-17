@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Morning Sign Out</string>
+    <string name="action_settings">Settings</string>
+    <string name="good_morning">Good Morning!</string>
+    <string name="img_description">Here!</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="latest_articles">Latest articles and images</string>
+    <string name="article_image">Article Image</string>
+    <string name="author">The author of the journals</string>
+    <string name="article">A flash of blinding light engulfs all of Gravity Falls. Then, everything comes down to earth. The portal, now a mess of tangled wires and metal, glows bright blue. A figure emerges from the portal. The blue light fades behind him. He walks forward, placing a six-fingered hand on the cover of the first journal, then picks it up and places it into the inside pocket of a long, dark coat.</string>
+
+    <string name="action_style">Style!</string>
+    <string name="action_search">Search</string>
+
+    <string name="title_activity_category">CategoryActivity</string>
+    <string name="title_activity_article">ArticleActivity</string>
+    <!-- In menu_main.xml, we can add items to the action bar! Set showAsAction to strings like never, ifRoom, etc to show!-->
+    <string name="title_activity_search">SearchResultsActivity</string>
+    <string name="title_contentDescription">app home button</string>
+    <string name="title_slide_menu">Categories menu</string>
+
+    <string name="search_hint">Search MorningSignOut</string>
+
+    <string name="error">Something went wrong. Please report this bug to the developers in the play
+        store comment section.</string>
+
+    <string-array name ="descriptions">
+        <item>description 1</item>
+        <item>description 2</item>
+        <item>description 3</item>
+        <item>description 4</item>
+    </string-array>
+
+    <string-array name ="categories">
+        <item>Latest</item>
+        <item>Featured</item>
+        <item>Research</item>
+        <item>Wellness</item>
+        <item>Humanities</item>
+        <item>Medicine</item>
+        <item>Public Health</item>
+        <item>Healthcare</item>
+    </string-array>
+
+    <string-array name ="categories_for_url">
+        <item>latest</item>
+        <item>featured</item>
+        <item>research</item>
+        <item>wellness</item>
+        <item>humanities</item>
+        <item>medicine</item>
+        <item>public-health</item>
+        <item>healthcare</item>
+    </string-array>
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background_white">#FFFFFF</color>
+    <color name="background_dark">#000000</color>
+
+    <color name="mso_blue">#81bfff</color>
+    <color name="single_row_black">#121F1F</color>
+
+</resources>

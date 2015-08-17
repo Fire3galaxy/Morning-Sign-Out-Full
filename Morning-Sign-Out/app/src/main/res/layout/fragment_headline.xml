@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/listview_headline"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="0dp"
+    android:paddingRight="0dp"
+    android:paddingTop="0dp"
+    android:paddingBottom="0dp"
+    android:background="@android:color/white">
+
+    <ImageButton xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/imageButton_headline"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/latest_articles"
+        android:layout_gravity="center_horizontal"
+        android:scaleType="fitXY"
+        style="?android:attr/borderlessButtonStyle"
+        android:baselineAlignBottom="false"
+        android:background="@android:color/white" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar_headline"
+        android:layout_gravity="center" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView_headline"
+        android:layout_gravity="left|bottom"
+        android:singleLine="false"
+        android:enabled="false"
+        android:background="#ff73b3e2"
+        android:textSize="@dimen/activity_horizontal_margin"
+        android:textColor="@android:color/white"
+        android:paddingLeft="7dp"
+        android:paddingRight="9dp"
+        android:visibility="invisible" />
+</FrameLayout>
