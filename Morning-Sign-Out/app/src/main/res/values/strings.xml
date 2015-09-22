@@ -38,18 +38,28 @@
         <item>Featured</item>
         <item>Research</item>
         <item>Wellness</item>
-        <item>Humanities</item>
         <item>Medicine</item>
         <item>Public Health</item>
         <item>Healthcare</item>
+        <item>Meet the Team</item>
     </string-array>
+
+    <array name="categories_icons">
+        <item>@drawable/category_latest</item>
+        <item>@drawable/category_latest</item>
+        <item>@drawable/category_research</item>
+        <item>@drawable/category_wellness</item>
+        <item>@drawable/category_medicine</item>
+        <item>@drawable/category_public_health</item>
+        <item>@drawable/category_healthcare</item>
+        <item>@drawable/category_wellness</item>
+    </array>
 
     <string-array name ="categories_for_url">
         <item>latest</item>
         <item>featured</item>
         <item>research</item>
         <item>wellness</item>
-        <item>humanities</item>
         <item>medicine</item>
         <item>public-health</item>
         <item>healthcare</item>

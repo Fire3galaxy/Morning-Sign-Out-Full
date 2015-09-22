@@ -4,5 +4,4 @@
     android:contentDescription="@string/title_contentDescription"
     android:src="@drawable/mso_square_white"
     android:scaleType="centerInside"
-    android:background="@android:color/transparent"
-    android:onClick="returnToParent" />
+    android:background="@android:color/transparent" />

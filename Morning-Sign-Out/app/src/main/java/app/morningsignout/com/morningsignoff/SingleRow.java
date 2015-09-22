@@ -30,12 +30,12 @@ class SingleRow{
     }
 
     static SingleRow newInstance(Article article) {
-        String author;
-        if (article.getAuthor() == null) author = "";
-        else author = "By " + article.getAuthor();
+        String mDescription;
+        if (article.getAuthor() == null) mDescription = "";
+        else mDescription = article.getAuthor();
 
         return new SingleRow(article.getTitle(),
-                author,
+                mDescription,
                 article.getImageURL(),
                 article.getLink());
     }

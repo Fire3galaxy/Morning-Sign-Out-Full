@@ -6,15 +6,22 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Toast;
+import android.content.res.TypedArray;
+
+import java.util.ArrayList;
 
 // Category page activity
 public class CategoryActivity extends ActionBarActivity {
@@ -28,6 +35,10 @@ public class CategoryActivity extends ActionBarActivity {
             categories_titles;          // ... for Title usage
     private int position;               // position in category array
 
+    private TypedArray navMenuIcons;
+    private ArrayList<NavDrawerItem> navDrawerItems;
+    private NavDrawerListAdapter adapter;
+
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView parent, View view, int position, long id) {
@@ -39,7 +50,7 @@ public class CategoryActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Use the ListView layout from fragmment_category_main.xml,
+        // Use the ListView layout from fragment_category_main.xml,
         setContentView(R.layout.activity_category);
 
         categories_titles = getResources().getStringArray(R.array.categories);
@@ -49,15 +60,43 @@ public class CategoryActivity extends ActionBarActivity {
         // Set up title
         if (getIntent() != null)
             position = getIntent().getIntExtra(Intent.EXTRA_TITLE, -1);
-        setupActivityTitle();
+//        setupActivityTitle();
 
-        // For DrawerLayout (no fragment)
+
+
+//        // For DrawerLayout (no fragment)
+//        mDrawerList = (ListView) findViewById(R.id.listView_slide);
+//        ArrayAdapter<String> mAdapter = new ArrayAdapter<String>(this,
+//                R.layout.list_items_slide,
+//                categories_titles);
+//
+//        mDrawerList.setAdapter(mAdapter); // Set up adapter for listview
+//        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+
+        // nav drawer icons from resources
+        navMenuIcons = getResources()
+                .obtainTypedArray(R.array.categories_icons);
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.listView_slide);
-        ArrayAdapter<String> mAdapter = new ArrayAdapter<String>(this,
-                R.layout.list_items_slide,
-                categories_titles);
 
-        mDrawerList.setAdapter(mAdapter); // Set up adapter for listview
+        navDrawerItems = new ArrayList<NavDrawerItem>();
+
+        // adding nav drawer items to array
+        navDrawerItems.add(new NavDrawerItem(categories_titles[0], navMenuIcons.getResourceId(0, -1)));
+        navDrawerItems.add(new NavDrawerItem(categories_titles[1], navMenuIcons.getResourceId(1, -1)));
+        navDrawerItems.add(new NavDrawerItem(categories_titles[2], navMenuIcons.getResourceId(2, -1)));
+        navDrawerItems.add(new NavDrawerItem(categories_titles[3], navMenuIcons.getResourceId(3, -1)));
+        navDrawerItems.add(new NavDrawerItem(categories_titles[4], navMenuIcons.getResourceId(4, -1)));
+        navDrawerItems.add(new NavDrawerItem(categories_titles[5], navMenuIcons.getResourceId(5, -1)));
+        navDrawerItems.add(new NavDrawerItem(categories_titles[6], navMenuIcons.getResourceId(6, -1)));
+        navDrawerItems.add(new NavDrawerItem(categories_titles[7], navMenuIcons.getResourceId(7, -1)));
+
+        navMenuIcons.recycle();
+        adapter = new NavDrawerListAdapter(getApplicationContext(),
+                navDrawerItems);
+        mDrawerList.setAdapter(adapter);
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         // Change up button of actionbar to 3 horizontal bars for slide
@@ -65,7 +104,7 @@ public class CategoryActivity extends ActionBarActivity {
         // Set up button to open/close drawer and change title of current activity
         setDrawerListenerToActionBarToggle();
 
-        Log.d("CategoryActivity", "mTitle = " + mTitle.toLowerCase());
+//        Log.d("CategoryActivity", "mTitle = " + mTitle.toLowerCase());
 
         // For CategoryFragment
         CategoryFragment fragment = new CategoryFragment();
@@ -83,14 +122,39 @@ public class CategoryActivity extends ActionBarActivity {
                     .add(R.id.container_category, new ErrorFragment())
                     .commit();
         }
+
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null);
+        ib.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent categoryPageIntent = new Intent(getApplicationContext(), CategoryActivity.class);
+                categoryPageIntent.putExtra(Intent.EXTRA_TITLE, 0);
+                finish();
+                startActivity(categoryPageIntent);
+            }
+        });
+        ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);
+        this.getSupportActionBar().setCustomView(ib, params);
+
+        this.getSupportActionBar().setDisplayShowCustomEnabled(true);
+    }
+
+    @Override
+    public void onBackPressed() {
+        return;
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+//        getMenuInflater().inflate(R.menu.menu_category, menu);
         getMenuInflater().inflate(R.menu.menu_category, menu);
+//        return super.onCreateOptionsMenu(menu);
         return true;
     }
+
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -116,13 +180,18 @@ public class CategoryActivity extends ActionBarActivity {
             return true;
         }
 
+        if (id == R.id.title) {
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void setTitle(CharSequence title) {
         mTitle = title.toString();
-        getSupportActionBar().setTitle(title);
+
+//        getSupportActionBar().setDisplayShowHomeEnabled(false);
     }
 
     @Override
@@ -159,6 +228,7 @@ public class CategoryActivity extends ActionBarActivity {
     }
 
     void setDrawerListenerToActionBarToggle() {
+
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,

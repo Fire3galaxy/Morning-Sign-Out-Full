@@ -16,6 +16,7 @@
 
 package app.morningsignout.com.morningsignoff;
 
+import android.content.Intent;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -70,6 +71,13 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d("onCreate", "at onCreate");
+
+        Log.e("MainPageFragment", "category_category");
+        Intent categoryPageIntent = new Intent(this, CategoryActivity.class);
+        //categoryPageIntent.putExtra(Intent.EXTRA_TITLE, stringAdapter.getItem(position));
+
+        categoryPageIntent.putExtra(Intent.EXTRA_TITLE, 0);
+        startActivity(categoryPageIntent);
 
         setContentView(R.layout.activity_main);
 
