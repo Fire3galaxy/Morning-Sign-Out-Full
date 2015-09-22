@@ -7,21 +7,29 @@
     android:layout_height="match_parent"
     tools:context="app.morningsignout.com.morningsignoff.ArticleActivity"
     tools:ignore="MergeRootFrame"
-    android:background="@android:color/white" >
+    android:background="@android:color/transparent"
+    android:animateLayoutChanges="true">
 
-    <app.morningsignout.com.morningsignoff.CustomWebView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:id="@+id/webView_article"
-        android:layout_gravity="center"
-        android:layout_weight="9" />
+        android:layout_weight="9">
+
+        <app.morningsignout.com.morningsignoff.CustomWebView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/webView_article"
+            android:layout_gravity="center" />
+    </LinearLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"
+        android:layout_weight="0"
         android:id="@+id/container_articleBar"
         android:layout_gravity="center_horizontal"
-        android:background="@color/mso_blue">
+        android:background="@color/mso_blue"
+        android:visibility="visible">
 
         <ImageButton
             android:layout_width="wrap_content"

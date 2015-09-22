@@ -1,5 +1,7 @@
 package app.morningsignout.com.morningsignoff;
 
+import android.animation.AnimatorInflater;
+import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.app.SearchManager;
@@ -24,6 +26,8 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -34,7 +38,11 @@ import java.util.Map;
 // Activity class created in FetchListArticleTask when user clicks on an article from the ListView
 public class ArticleActivity extends ActionBarActivity {
     private String category;
-    private int lastSavedY;
+    private Integer lastSavedY;
+    ObjectAnimator showArticleBar;
+    ObjectAnimator hideArticleBar;
+
+    private RelativeLayout relativeLayout;
 
     private WebView webView;
     private ArticleWebViewClient webViewClient;
@@ -76,6 +84,49 @@ public class ArticleActivity extends ActionBarActivity {
             webViewClient = new ArticleWebViewClient(this);
             webView.setWebViewClient(webViewClient);
 
+            // Setting relativeLayout
+            relativeLayout = (RelativeLayout) findViewById(R.id.container_articleBar);
+
+            // Setting up objectAnimators for articleBar's show/hide animation
+            showArticleBar = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.show_article_bar);
+            showArticleBar.setTarget(relativeLayout);
+            hideArticleBar = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.hide_article_bar);
+            hideArticleBar.setTarget(relativeLayout);
+
+            LinearLayout container = (LinearLayout) findViewById(R.id.container_article);
+            LayoutTransition customTransition = new LayoutTransition();
+//            customTransition.enableTransitionType(LayoutTransition.CHANGING);
+//            customTransition.disableTransitionType(LayoutTransition.CHANGE_APPEARING);
+//            customTransition.disableTransitionType(LayoutTransition.CHANGE_DISAPPEARING);
+            customTransition.setAnimator(LayoutTransition.APPEARING, showArticleBar);
+            customTransition.setAnimator(LayoutTransition.DISAPPEARING, hideArticleBar);
+            customTransition.setStartDelay(LayoutTransition.APPEARING, 0);
+            customTransition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
+            customTransition.setStartDelay(LayoutTransition.DISAPPEARING, 0);
+            customTransition.setStartDelay(LayoutTransition.CHANGE_DISAPPEARING, 0);
+//            customTransition.setStartDelay(LayoutTransition.CHANGING, 0);
+            customTransition.setDuration(LayoutTransition.APPEARING, showArticleBar.getDuration());
+            customTransition.setDuration(LayoutTransition.CHANGE_APPEARING, showArticleBar.getDuration());
+            customTransition.setDuration(LayoutTransition.DISAPPEARING, hideArticleBar.getDuration());
+            customTransition.setDuration(LayoutTransition.CHANGE_DISAPPEARING, hideArticleBar.getDuration());
+//            customTransition.setDuration(LayoutTransition.APPEARING, showArticleBar.getDuration());
+
+            container.setLayoutTransition(customTransition);
+
+            // Setting up share intent for first web page
+            shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.putExtra(Intent.EXTRA_TEXT, getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT));
+
+            // Setting up share button
+            ImageButton shareButton = (ImageButton) findViewById(R.id.button_share);
+            shareButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    shareIntent.setType("text/plain");
+                    startActivity(Intent.createChooser(shareIntent, "Share using"));
+                }
+            });
+
             // Setting up "tumblr" scroll button
             ImageButton scrollButton = (ImageButton) findViewById(R.id.button_scroll);
             scrollButton.setOnClickListener(new View.OnClickListener() {
@@ -113,10 +164,6 @@ public class ArticleActivity extends ActionBarActivity {
         ComponentName componentName = new ComponentName(this, SearchResultsActivity.class);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
 
-        // Setting up share intent for first web page
-        shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT));
-
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -132,10 +179,6 @@ public class ArticleActivity extends ActionBarActivity {
                     webView.goBack();
                 else                     // Return to front page (without recreating parent)
                     returnToParent(null);
-                return true;
-            case R.id.action_share:
-                shareIntent.setType("text/plain");
-                startActivity(Intent.createChooser(shareIntent, "Share using"));
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -189,7 +232,8 @@ public class ArticleActivity extends ActionBarActivity {
             // 3. App has not loaded its first article yet
         else if (intentUrl != null) new URLToMobileArticle(webView).execute(intentUrl);
 
-        getSupportActionBar().collapseActionView(); // collapse search bar on return from search
+        if (getSupportActionBar() != null)
+            getSupportActionBar().collapseActionView(); // collapse search bar on return from search
     }
 
     // view parameter needed for title.xml onClick()
@@ -199,31 +243,54 @@ public class ArticleActivity extends ActionBarActivity {
         intent.putExtra(Intent.EXTRA_TITLE, category);
         NavUtils.navigateUpTo(this, intent);
     }
-    public void resetLastSavedY() {
+    synchronized public void resetLastSavedY() {
         lastSavedY = 0;
     }
     public void setShareIntent(Intent shareIntent) {
         this.shareIntent = shareIntent;
+    }
+    public void showArticleBar() {
+        if (relativeLayout.getVisibility() != RelativeLayout.VISIBLE) {
+            relativeLayout.setVisibility(RelativeLayout.VISIBLE);
+        }
+    }
+    public void hideArticleBar() {
+        if (relativeLayout.getVisibility() != RelativeLayout.GONE) {
+            relativeLayout.setVisibility(RelativeLayout.GONE);
+        }
     }
 }
 
 
 // Create a customized webview client to disable website navigation bar
 class ArticleWebViewClient extends WebViewClient {
+    static final String LOG_NAME = "ArticleWebViewClient";
     static final String mimeType = "text/html";
     static final String encoding = "gzip"; // Find encoding https://en.wikipedia.org/wiki/HTTP_compression
-
-    final String LOG_NAME = "ArticleWebViewClient";
-    final String ERROR_404_FILE = "error_404.html";
-
-    final int CURRENTYEAR = Calendar.getInstance().get(Calendar.YEAR);
     static final int MINYEAR = 2014;
+    final int CURRENTYEAR = Calendar.getInstance().get(Calendar.YEAR);
 
     Context c;
 
     public ArticleWebViewClient(Context c) {
         super();
         this.c = c;
+    }
+
+    @Override
+    public void onPageFinished(WebView webView, String url) {
+        // Removes bottom bar
+        if (isArticle(url))
+            ((ArticleActivity) c).showArticleBar();
+        else
+            ((ArticleActivity) c).hideArticleBar();
+
+        // Reset tumblr scroll button (If new page is loaded)
+        ((ArticleActivity) c).resetLastSavedY();
+
+        Log.d(LOG_NAME, "onPageFinished");
+
+        super.onPageFinished(webView, url);
     }
 
     @Override
@@ -243,6 +310,8 @@ class ArticleWebViewClient extends WebViewClient {
     @SuppressWarnings("deprecation")
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView wb, String url) {
+        Log.d(LOG_NAME, url);
+
         WebResourceResponse wbresponse = super.shouldInterceptRequest(wb, url);
         Uri requestUrl = Uri.parse(url);
 
@@ -301,94 +370,23 @@ class ArticleWebViewClient extends WebViewClient {
                 encoding,
                 bais);
 
-        // Reset tumblr scroll button (If new page is loaded)
-        // FIXME: does not reset if you click an image link
-        ((ArticleActivity) c).resetLastSavedY();
-
         return wbresponse;
     }
 
-    // Requires API 21
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    @Override
-    public WebResourceResponse shouldInterceptRequest(WebView wb, WebResourceRequest wbrequest) {
-//        if (wbrequest.getUrl().getPathSegments().get(0).matches(".*\\.[a-zA-Z]+"))
-//            Log.d(LOG_NAME, wbrequest.getMethod() + ", " + wbrequest.getUrl());
-//        for (String s : wbrequest.getRequestHeaders().keySet()) {
-//            Log.d(LOG_NAME, s + " - " + wbrequest.getRequestHeaders().get(s));
-//        }
-        Log.d(LOG_NAME, wbrequest.getUrl().toString());
+    boolean isArticle(String url) {
+        Uri requestUrl = Uri.parse(url);
 
-        WebResourceResponse wbresponse = super.shouldInterceptRequest(wb, wbrequest);
-        Uri requestUrl = wbrequest.getUrl();
-
-        /* Not from morningsignout, e.g. googleapis, gstatic, or gravatar
-         * or an image/theme/plugin from wordpress
-         * or a .* file, e.g. favicon.ico
-         */
+        // image/etc.
         if (!requestUrl.getHost().endsWith("morningsignout.com")
                 || requestUrl.getPathSegments().get(0).equals("wp-content")
                 || requestUrl.getPathSegments().get(0).matches(".*\\.[a-zA-Z]+"))
-            return wbresponse;
+            return false;
 
-        Map<String, String> responseHeaders = new HashMap<>(); // Finish responseHeaders for other accept types "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
-        responseHeaders.put("Content-Language", "en");
-        responseHeaders.put("URI", requestUrl.toString());
-
-        String html = null;
-        ByteArrayInputStream bais = null;
-
-        // Article Page
-        if (wbrequest.getUrl().getPathSegments().size() == 1) {
-            Log.d(LOG_NAME, "changing webresponse to article page");
-            html = URLToMobileArticle.getArticle(requestUrl.toString());
-
-            // Change share intent to new article
-            Intent shareIntent = new Intent();
-            shareIntent.setAction(Intent.ACTION_SEND)
-                    .putExtra(Intent.EXTRA_TEXT, requestUrl.toString());
-            ((ArticleActivity) c).setShareIntent(shareIntent);
-        }
-        // Author, Tag, Date pages (tag/dermatitis, tag/dermatitis/page/2)
-        else if (requestUrl.getPathSegments().size() == 2 || requestUrl.getPathSegments().size() == 4) {
-            String pathSeg0 = requestUrl.getPathSegments().get(0);
-            int pathYear = -1;
-            try {
-                pathYear = Integer.parseInt(pathSeg0);
-            } catch (NumberFormatException nfe) {
-                // do nothing, basically throw the exception
-            }
-
-            if (pathSeg0.equals("author") ||
-                    pathSeg0.equals("tag") ||
-                    (pathYear >= MINYEAR && pathYear <= CURRENTYEAR)) {
-                Log.d(LOG_NAME, "changing webresponse to other kind of page");
-                try {
-                    html = URLToMobileArticle.getOther(requestUrl.toString());
-                } catch (IOException e) {
-                    Log.e(LOG_NAME, e.getMessage());
-                }
-            }
-        }
-
-        // Let webView load default action (either webpage w/o mobile view, or webpage not found)
-        if (html == null)
-            return wbresponse;
-
-        // New Page loads successfully
-        bais = new ByteArrayInputStream(html.getBytes());
-
-        wbresponse = new WebResourceResponse(mimeType,
-                encoding,
-                200,
-                "Download html of valid url (from App team!)",
-                responseHeaders,
-                bais);
-
-        // Reset tumblr scroll button (If new page is loaded)
-        // FIXME: does not reset if you click an image link
-        ((ArticleActivity) c).resetLastSavedY();
-
-        return wbresponse;
+        // article
+        if (requestUrl.getPathSegments().size() == 1)
+            return true;
+            // date/author/tag
+        else
+            return false;
     }
 }

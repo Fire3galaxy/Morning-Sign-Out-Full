@@ -8,7 +8,10 @@ import android.webkit.WebView;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
+import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
+import org.jsoup.select.NodeVisitor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,25 +19,31 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class URLToMobileArticle extends AsyncTask<String, Void, String> {
-	static final String LOG_NAME = "URLToMobileArticle";
-	static final int MINYEAR = 2014;
-	final int CURRENTYEAR = Calendar.getInstance().get(Calendar.YEAR);
+    static final String LOG_NAME = "URLToMobileArticle";
+    static final int MINYEAR = 2014;
+    final int CURRENTYEAR = Calendar.getInstance().get(Calendar.YEAR);
 
     WebView wb;
-	String link;
-	boolean isOther;
+    String link;
+    boolean isOther;
 
-	public URLToMobileArticle(WebView webview) {
-		this.wb = webview;
-		this.isOther = false;
-	}
-	public URLToMobileArticle(WebView webView, boolean other) {
-		this.wb = webView;
-		this.isOther = other;
-	}
+    public URLToMobileArticle(WebView webview) {
+        this.wb = webview;
+        this.isOther = false;
+    }
+    public URLToMobileArticle(WebView webView, boolean other) {
+        this.wb = webView;
+        this.isOther = other;
+    }
 
     @Override
     protected String doInBackground(String... params) {

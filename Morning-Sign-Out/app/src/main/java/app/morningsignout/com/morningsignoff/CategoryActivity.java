@@ -2,6 +2,8 @@ package app.morningsignout.com.morningsignoff;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.SearchManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -12,8 +14,10 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,6 +35,7 @@ public class CategoryActivity extends ActionBarActivity {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
+    private SearchView searchView;
 
     private String mDrawerTitle;        // Title of activity when drawer swipe menu is visible
     private String mTitle;              // Current Title
@@ -154,10 +159,31 @@ public class CategoryActivity extends ActionBarActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
 //        getMenuInflater().inflate(R.menu.menu_category, menu);
         getMenuInflater().inflate(R.menu.menu_category, menu);
+
+        /* Search results in new SearchResultsActivity, clicked article passed back to articleActivity
+           Associate searchable configuration with the SearchView */
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+
+        ComponentName componentName = new ComponentName(this, SearchResultsActivity.class);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
 //        return super.onCreateOptionsMenu(menu);
         return true;
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // Check if the key event was the Back button
+        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+            if (!searchView.isIconified()) {    // Check if searchView is expanded
+                getSupportActionBar().collapseActionView();
+                return true;
+            }
+        }
+
+        // If it wasn't the Back key or none of the conditions are met, use default system behavior
+        return super.onKeyDown(keyCode, event);
+    }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -177,11 +203,6 @@ public class CategoryActivity extends ActionBarActivity {
         }
 
         int id = item.getItemId();
-
-        // noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
         if (id == R.id.title) {
             return true;

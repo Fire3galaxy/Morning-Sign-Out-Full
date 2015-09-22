@@ -8,9 +8,8 @@
     <application
         android:hardwareAccelerated="true"
         android:allowBackup="true"
-        android:icon="@drawable/mso_small"
+        android:icon="@drawable/mso_launch"
         android:label="@string/app_name"
-        android:logo="@drawable/mso_small"
         android:theme="@style/AppTheme" >
 
         <meta-data
@@ -43,16 +42,16 @@
             android:name=".ArticleActivity"
             android:label="@string/article"
             android:parentActivityName=".CategoryActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:uiOptions="splitActionBarWhenNarrow">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="app.morningsignout.com.morningsignoff.CategoryActivity" />
-            <meta-data android:name="android.support.UI_OPTIONS"
-                android:value="splitActionBarWhenNarrow" />
         </activity>
         <activity
             android:name=".SearchResultsActivity"
             android:launchMode="singleTop"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_search">
 
             <intent-filter>
