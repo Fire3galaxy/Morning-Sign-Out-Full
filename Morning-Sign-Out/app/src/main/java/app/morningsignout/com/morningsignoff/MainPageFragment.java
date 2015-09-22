@@ -62,10 +62,10 @@ public class MainPageFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        ArrayList<String> categories = new ArrayList<>(Arrays.asList(categories_titles));
+        ArrayList<String> categories = new ArrayList<String>(Arrays.asList(categories_titles));
 
         // Adapter that will send array's data to list view
-        final ArrayAdapter<String> stringAdapter = new ArrayAdapter<>(getActivity(),
+        final ArrayAdapter<String> stringAdapter = new ArrayAdapter<String>(getActivity(),
                 R.layout.list_items_mainpage,
                 R.id.list_item_button,
                 categories);
