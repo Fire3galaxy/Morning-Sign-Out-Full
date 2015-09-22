@@ -2,8 +2,11 @@ package app.morningsignout.com.morningsignoff;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -267,5 +270,19 @@ public class CategoryActivity extends ActionBarActivity {
         mDrawerList.setItemChecked(position, true);
         setTitle(categories_titles[position]);
         mDrawerLayout.closeDrawer(mDrawerList);
+    }
+
+    // courtesy of http://developer.android.com/training/monitoring-device-state/connectivity-monitoring.html
+    public boolean checkForInternet() {
+        ConnectivityManager cm =
+                (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+    }
+
+    public String getCurrentCategoryUrl() {
+        return categories_urls[position];
     }
 }

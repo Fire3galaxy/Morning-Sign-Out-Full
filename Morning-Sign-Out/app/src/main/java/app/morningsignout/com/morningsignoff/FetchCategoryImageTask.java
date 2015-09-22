@@ -1,6 +1,7 @@
 package app.morningsignout.com.morningsignoff;
 
 import android.graphics.Bitmap;
+import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -18,10 +19,12 @@ import java.net.URL;
 public class FetchCategoryImageTask extends AsyncTask<Void, Void, Bitmap> {
     SingleRow sr;
     ImageView image;
+    Resources resources;
 
-    public FetchCategoryImageTask(SingleRow singleRow, AdapterObject holder) {
+    public FetchCategoryImageTask(SingleRow singleRow, ImageView image, Resources r) {
         this.sr = singleRow;
-        this.image = holder.image;
+        this.image = image;
+        resources = r;
     }
 
     @Override
@@ -31,7 +34,7 @@ public class FetchCategoryImageTask extends AsyncTask<Void, Void, Bitmap> {
 
     @Override
     protected Bitmap doInBackground(Void... params) {
-        return (sr.imageURL != null) ? downloadBitmap(sr.imageURL) : null;
+        return downloadBitmap(sr.imageURL);
     }
 
     @Override
@@ -49,11 +52,10 @@ public class FetchCategoryImageTask extends AsyncTask<Void, Void, Bitmap> {
         sr.image = b;
     }
 
-    // The dimension of the rescaled bitmap
-    private static final int bitmapDimension = 100;
-
     // input an image URL, get its bitmap
     private Bitmap downloadBitmap(String url) {
+        if (url == null) return BitmapFactory.decodeResource(resources, R.drawable.no_image);
+
         HttpURLConnection urlConnection = null;
         try {
             URL uri = new URL(url);
@@ -80,7 +82,7 @@ public class FetchCategoryImageTask extends AsyncTask<Void, Void, Bitmap> {
                 urlConnection.disconnect();
             }
         }
-        return null;
+        return BitmapFactory.decodeResource(resources, R.drawable.no_image);
     }
 
 }

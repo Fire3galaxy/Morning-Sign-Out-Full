@@ -161,7 +161,7 @@ class CategoryAdapter extends BaseAdapter {
             holder.image = image;
             holder.pb = pb;
 
-            new FetchCategoryImageTask(rowTemp, holder).execute();
+            new FetchCategoryImageTask(rowTemp, holder.image, context.getResources()).execute();
         }
         else {                          // set saved image
             // Cropping image to preserve aspect ratio

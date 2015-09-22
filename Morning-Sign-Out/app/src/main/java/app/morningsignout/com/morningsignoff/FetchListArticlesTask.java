@@ -90,17 +90,9 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
             private boolean isScrolling = false;
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 if (visibleItemCount > 0) {
-                    boolean atStart = true;
                     boolean atEnd = true;
 
-                    View firstView = view.getChildAt(0);
-                    if (firstVisibleItem > 0) {
-                        // not at start
-                        atStart = false;
-                    }
-
                     int lastVisibleItem = firstVisibleItem + visibleItemCount;
-                    View lastView = view.getChildAt(visibleItemCount - 1);
                     if (lastVisibleItem < totalItemCount) {
                         // not at end
                         atEnd = false;

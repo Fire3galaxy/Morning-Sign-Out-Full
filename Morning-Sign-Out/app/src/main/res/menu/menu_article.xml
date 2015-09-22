@@ -7,7 +7,13 @@
         android:title="@string/action_search"
         android:icon="@android:drawable/ic_menu_search"
         app:showAsAction="collapseActionView|ifRoom"
+        android:orderInCategory="1"
         app:actionViewClass="android.support.v7.widget.SearchView"/>
+    <item android:id="@+id/action_share"
+        android:title="@string/action_share"
+        android:icon="@android:drawable/ic_menu_share"
+        android:orderInCategory="2"
+        app:showAsAction="ifRoom"/>
 
     <!--<item-->
         <!--android:id="@+id/phone"-->
