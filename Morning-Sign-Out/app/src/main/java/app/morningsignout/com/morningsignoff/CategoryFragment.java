@@ -128,46 +128,46 @@ class CategoryAdapter extends BaseAdapter {
         // crate a new rowItem object here
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View row;
+        AdapterObject viewHolder;
 
-        if (view == null) row = inflater.inflate(R.layout.single_row, viewGroup, false);
-        else row = view;
+        if (view == null) {
+            row = inflater.inflate(R.layout.single_row, viewGroup, false);
+            viewHolder = new AdapterObject();
 
-        // Get the description, image and title of the row item
-        TextView title = (TextView) row.findViewById(R.id.textView);
-        TextView description = (TextView) row.findViewById(R.id.textView2);
-        ImageView image = (ImageView) row.findViewById(R.id.imageView);
-        ProgressBar pb = (ProgressBar) row.findViewById(R.id.progressBarSingleRow);
+            // Get the description, image and title of the row item
+            viewHolder.title = (TextView) row.findViewById(R.id.textView);
+            viewHolder.description = (TextView) row.findViewById(R.id.textView2);
+            viewHolder.image = (ImageView) row.findViewById(R.id.imageView);
+            viewHolder.pb = (ProgressBar) row.findViewById(R.id.progressBarSingleRow);
+            row.setTag(viewHolder);
+        }
+        else {
+            row = view;
+            viewHolder = (AdapterObject) row.getTag();
+        }
 
         /* On getting view, set this to invisible until loaded. (issue before: old image seen
            before new image on fast scroll) Mostly fixed by this, but on fast scroll down, still
            shows a little */
-        image.setImageDrawable(null);
+        viewHolder.image.setImageDrawable(null);
 
         // Set the values of the rowItem
         SingleRow rowTemp = articles.get(i);
-        title.setText(rowTemp.title);
-        description.setText(rowTemp.description);
+        viewHolder.title.setText(rowTemp.title);
+        viewHolder.description.setText(rowTemp.description);
 
         String s = "null";
         if (rowTemp.image != null) s = "not null";
         Log.e("ImageLog", "Item " + Integer.toString(i) + ", is " + s);
 
         // Load image into row element
-        if (rowTemp.image == null) {    // download
-            // Prepare prepped row objects in single holder object for fetchCategoryImageTask
-            AdapterObject holder = new AdapterObject();
-            holder.title = title;
-            holder.description = description;
-            holder.image = image;
-            holder.pb = pb;
-
-            new FetchCategoryImageTask(rowTemp, holder.image, context.getResources()).execute();
-        }
+        if (rowTemp.image == null)      // download
+            new FetchCategoryImageTask(rowTemp, viewHolder.image, context.getResources()).execute();
         else {                          // set saved image
             // Cropping image to preserve aspect ratio
-            image.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            image.setCropToPadding(true);
-            image.setImageBitmap(rowTemp.image);
+            viewHolder.image.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            viewHolder.image.setCropToPadding(true);
+            viewHolder.image.setImageBitmap(rowTemp.image);
         }
 
         return row;
