@@ -133,14 +133,11 @@ public class CategoryActivity extends ActionBarActivity {
 
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null);
+        ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title, null);
         ib.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent categoryPageIntent = new Intent(getApplicationContext(), CategoryActivity.class);
-                categoryPageIntent.putExtra(Intent.EXTRA_TITLE, 0);
-                finish();
-                startActivity(categoryPageIntent);
+                selectItem(0);
             }
         });
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);

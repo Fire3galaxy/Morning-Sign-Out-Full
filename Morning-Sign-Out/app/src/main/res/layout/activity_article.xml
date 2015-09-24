@@ -35,7 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:id="@+id/button_share"
-            android:src="@android:drawable/ic_menu_share"
+            android:src="@drawable/ic_action_share"
             android:background="@drawable/button_scroll"
             android:contentDescription="@string/action_share"
             android:layout_marginStart="99dp"
