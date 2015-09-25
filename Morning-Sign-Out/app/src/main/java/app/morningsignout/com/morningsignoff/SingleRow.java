@@ -17,7 +17,7 @@ class SingleRow{
         this.imageURL = null;
     }
 
-    // For fetch list articles, imageURL is set to download image later (fetch cat. image task)
+    // For fetch list articles, imageURL is set to download imageViewReference later (fetch cat. imageViewReference task)
     SingleRow(String title, String description, String imageURL, String link) {
         this.title = title;
         this.description = description;

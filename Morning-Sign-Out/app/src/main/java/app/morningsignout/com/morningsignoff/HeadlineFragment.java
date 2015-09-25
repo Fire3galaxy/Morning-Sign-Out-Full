@@ -15,7 +15,7 @@ import android.widget.TextView;
  * Created by Daniel on 3/2/2015.
  */
 public class HeadlineFragment extends Fragment {
-    final static String IMAGE_NUMBER = "image number";
+    final static String IMAGE_NUMBER = "imageViewReference number";
     private int page_number;
     private boolean created;
     private Article article;
@@ -60,7 +60,7 @@ public class HeadlineFragment extends Fragment {
             // set up imageButton
             ImageButton ib = (ImageButton) rootView.findViewById(R.id.imageButton_headline);
 
-            // Decide image to show based on index in headline images
+            // Decide imageViewReference to show based on index in headline images
             new DownloadImageTask(this, getActivity(), rootView, ib).execute(page_number);
 
             created = true;
@@ -79,7 +79,7 @@ public class HeadlineFragment extends Fragment {
                 tv.setText(getArticle().getTitle());
                 tv.setVisibility(TextView.VISIBLE);
 
-                // Set imagebutton to saved image, with cropping properties
+                // Set imagebutton to saved imageViewReference, with cropping properties
                 ib.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 ib.setCropToPadding(true);
                 ib.setImageBitmap(getArticle().getBitmap());

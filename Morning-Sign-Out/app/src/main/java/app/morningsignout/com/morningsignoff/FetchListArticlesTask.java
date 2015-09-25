@@ -159,7 +159,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                         }
 
                         // convert string to bitmap then feed to each article
-//                        Bitmap image = downloadBitmap(imageURL);
+//                        Bitmap imageViewReference = downloadBitmap(imageURL);
                     }
                     // Description of article
                     else if (inputLine.contains("<p>")) {

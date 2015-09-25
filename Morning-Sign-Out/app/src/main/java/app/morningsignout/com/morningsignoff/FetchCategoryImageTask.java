@@ -1,7 +1,6 @@
 package app.morningsignout.com.morningsignoff;
 
 import android.graphics.Bitmap;
-import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -10,6 +9,7 @@ import android.widget.ImageView;
 import org.apache.http.HttpStatus;
 
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -19,12 +19,12 @@ import java.net.URL;
 public class FetchCategoryImageTask extends AsyncTask<Void, Void, Bitmap> {
     CategoryFragment categoryFragment;
     SingleRow sr;
-    ImageView image;
+    WeakReference<ImageView> imageViewReference;
 
-    public FetchCategoryImageTask(CategoryFragment categoryFragment, SingleRow singleRow, ImageView image) {
+    public FetchCategoryImageTask(CategoryFragment categoryFragment, SingleRow singleRow, ImageView imageViewReference) {
         this.categoryFragment = categoryFragment;
         this.sr = singleRow;
-        this.image = image;
+        this.imageViewReference = new WeakReference<ImageView>(imageViewReference);
     }
 
     @Override
@@ -34,22 +34,28 @@ public class FetchCategoryImageTask extends AsyncTask<Void, Void, Bitmap> {
 
     @Override
     protected Bitmap doInBackground(Void... params) {
-        Bitmap b = downloadBitmap(sr.imageURL);
-        categoryFragment.addBitmapToMemoryCache(sr.title, b);
-
-        return b;
+        return downloadBitmap(sr.imageURL);
     }
 
     @Override
     protected void onPostExecute(final Bitmap b) {
-        // imageView image
-        // Preserve aspect ratio of image
-        image.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        image.setCropToPadding(true);
-        image.setImageBitmap(b);
+        if (imageViewReference != null && b != null) {
+            final ImageView imageView = imageViewReference.get();
+            final FetchCategoryImageTask task = CategoryAdapter.getFetchCategoryImageTask(imageView);
+
+            if (this == task) {
+                // cache image
+                categoryFragment.addBitmapToMemoryCache(sr.title, b);
+
+                // Preserve aspect ratio of image
+                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                imageView.setCropToPadding(true);
+                imageView.setImageBitmap(b);
+            }
+        }
     }
 
-    // input an image URL, get its bitmap
+    // input an imageViewReference URL, get its bitmap
     private Bitmap downloadBitmap(String url) {
         if (url == null) return null;
 
@@ -64,15 +70,15 @@ public class FetchCategoryImageTask extends AsyncTask<Void, Void, Bitmap> {
 
             InputStream inputStream = urlConnection.getInputStream();
             if (inputStream != null) {
-                // Lowers resolution of images by subsampling image, saves memory & time
+                // Lowers resolution of images by subsampling imageViewReference, saves memory & time
                 BitmapFactory.Options a = new BitmapFactory.Options();
                 a.inSampleSize = 2;
 
                 // Create bitmap from stream
                 return BitmapFactory.decodeStream(inputStream, null, a);
-            } else Log.e("FetchCategoryImageTask", "image url: " + url);
+            } else Log.e("FetchCategoryImageTask", "imageViewReference url: " + url);
         } catch (Exception e) {
-            Log.e("FetchCategoryImageTask", "Error downloading image from " + url);
+            Log.e("FetchCategoryImageTask", "Error downloading imageViewReference from " + url);
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -81,4 +87,7 @@ public class FetchCategoryImageTask extends AsyncTask<Void, Void, Bitmap> {
         return null;
     }
 
+    public String getUrl() {
+        return sr.imageURL;
+    }
 }

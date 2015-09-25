@@ -1,13 +1,11 @@
 package app.morningsignout.com.morningsignoff;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.LruCache;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +16,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -200,7 +197,7 @@ class CategoryAdapter extends BaseAdapter {
             row = inflater.inflate(R.layout.single_row, viewGroup, false);
             viewHolder = new AdapterObject();
 
-            // Get the description, image and title of the row item
+            // Get the description, imageViewReference and title of the row item
             viewHolder.title = (TextView) row.findViewById(R.id.textView);
             viewHolder.description = (TextView) row.findViewById(R.id.textView2);
             viewHolder.image = (ImageView) row.findViewById(R.id.imageView);
@@ -219,14 +216,18 @@ class CategoryAdapter extends BaseAdapter {
 
         final Bitmap b = categoryFragment.getBitmapFromMemCache(rowTemp.title);
 
-        // Load image into row element
+        // Load imageViewReference into row element
         if (b == null) {    // download
-            viewHolder.image.setImageResource(android.R.color.darker_gray); // Placeholder
-            new FetchCategoryImageTask(categoryFragment, rowTemp, viewHolder.image).execute();
+            if (cancelPotentialWork(rowTemp.imageURL, viewHolder.image)) {
+                FetchCategoryImageTask task = new FetchCategoryImageTask(categoryFragment,
+                        rowTemp, viewHolder.image);
+                CategoryImageTaskDrawable taskWrapper = new CategoryImageTaskDrawable(task);
 
-            Log.d("CategoryAdapter", Integer.toString(categoryFragment.memoryCache.size()));
-        } else {            // set saved image
-            // Cropping image to preserve aspect ratio
+                viewHolder.image.setImageDrawable(taskWrapper);
+                task.execute();
+            }
+        } else {            // set saved imageViewReference
+            // Cropping imageViewReference to preserve aspect ratio
             viewHolder.image.setScaleType(ImageView.ScaleType.CENTER_CROP);
             viewHolder.image.setCropToPadding(true);
             viewHolder.image.setImageBitmap(b);
@@ -249,6 +250,30 @@ class CategoryAdapter extends BaseAdapter {
 
             notifyDataSetChanged();
         }
+    }
+
+    private static boolean cancelPotentialWork(String url, ImageView imageView) {
+        FetchCategoryImageTask task = getFetchCategoryImageTask(imageView);
+
+        if (task != null) {
+            String imageViewUrl = task.getUrl();
+
+            if (imageViewUrl == null || !imageViewUrl.equals(url))
+                task.cancel(true);
+            else
+                return false;
+        }
+        return true;
+    }
+
+    public static FetchCategoryImageTask getFetchCategoryImageTask(ImageView imageView) {
+        if (imageView != null) {
+            if (imageView.getDrawable() instanceof CategoryImageTaskDrawable) {
+                CategoryImageTaskDrawable taskDrawable = (CategoryImageTaskDrawable) imageView.getDrawable();
+                return taskDrawable.getFetchCategoryImageTask();
+            }
+        }
+        return null;
     }
 }
 

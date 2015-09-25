@@ -66,11 +66,11 @@ public class DownloadImageTask extends AsyncTask<Integer, Void, Article> {
         try {
             byte[] bytes;
 
-            // Lowers resolution of images by subsampling image, saves memory & time
+            // Lowers resolution of images by subsampling imageViewReference, saves memory & time
             BitmapFactory.Options a = new BitmapFactory.Options();
             a.inSampleSize = 1;
 
-            // Download image from website
+            // Download imageViewReference from website
             InputStream in = new URL(article.getImageURL()).openStream();
 
             // Save bitmap here
@@ -85,7 +85,7 @@ public class DownloadImageTask extends AsyncTask<Integer, Void, Article> {
     /** The system calls this to perform work in the UI thread and delivers
      * the result from doInBackground() */
     protected void onPostExecute(final Article result) {
-        // Preserve aspect ratio of image
+        // Preserve aspect ratio of imageViewReference
         i.setScaleType(ImageView.ScaleType.CENTER_CROP);
         i.setCropToPadding(true);
 

@@ -278,7 +278,7 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
                 heightStart, heightEnd;
 
         imgStart = newHtml.indexOf("<img");
-        imgStart = newHtml.indexOf("<img", imgStart + 1); // ignore featured image
+        imgStart = newHtml.indexOf("<img", imgStart + 1); // ignore featured imageViewReference
 
         while (imgStart != -1) {
             // Remove width attr (if present)
@@ -329,7 +329,7 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
         doc.select(".author-bio").attr("style", "margin-top: 5px");
         doc.select(".content__post").attr("style", "margin: 0px 5px 15px");
         doc.select(".author-posts > h1").attr("style", "margin: 15px 0px");
-        Elements imgElems = doc.select(".attachment-post-thumbnail, .wp-post-image");
+        Elements imgElems = doc.select(".attachment-post-thumbnail, .wp-post-imageViewReference");
         for (Element img : imgElems) {
             img.wrap(String.format("<a href=%s></a>", img.parent().select("a").attr("href")));
         }
