@@ -2,27 +2,32 @@ package app.morningsignout.com.morningsignoff;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.util.LruCache;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CategoryFragment extends Fragment {
-    ListView list;
-    ProgressBar progressBar, progressBar2;
-    String category = "";
     final static String EXTRA_TITLE = "EXTRA_TITLE";
+
+    String category = "";
+    LruCache<String, Bitmap> memoryCache;
 
     public CategoryFragment() {
     }
@@ -30,7 +35,24 @@ public class CategoryFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         category = getArguments() != null ? getArguments().getString(EXTRA_TITLE) + "/" : "";
+
+        /* Thanks to http://developer.android.com/training/displaying-bitmaps/cache-bitmap.html
+         * for caching code */
+        // max memory of hdpi ~32 MB
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+        // memory for images ~4.5 MB = 7-8 images
+        final int cacheSize = maxMemory / 7;
+
+        memoryCache = new LruCache<String, Bitmap>(cacheSize) {
+            @Override
+            protected int sizeOf(String key, Bitmap bitmap) {
+                // The cache size will be measured in kilobytes rather than
+                // number of items.
+                return bitmap.getByteCount() / 1024;
+            }
+        };
     }
 
     @Override
@@ -38,45 +60,75 @@ public class CategoryFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_category_main, container, false);
 
-        list = (ListView) rootView.findViewById(R.id.listView);
-        progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
+        final ListView listView = (ListView) rootView.findViewById(R.id.listView);
+        final ProgressBar progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
+
+        listView.setAdapter(new CategoryAdapter(this.getActivity()));
 
         // Use Asynctask to fetch article from the given category
-        new FetchListArticlesTask(getActivity(), list, progressBar, 1).execute(category);
+        new FetchListArticlesTask(getActivity(), listView, progressBar, 1).execute(category);
 
         // Setup the click listener for the listView
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 CategoryAdapter categoryAdapter = (CategoryAdapter) parent.getAdapter();
-
-                // test show its clicked
-                Log.e("position: " + position, "cccccccccccccccccc");
-                Log.e("Article size" + categoryAdapter.getItem(position), "cccccccccccccccccc");
-                SingleRow rowTemp= (SingleRow) categoryAdapter.getItem(position);
+                SingleRow rowTemp = (SingleRow) categoryAdapter.getItem(position);
                 String articleTitle = rowTemp.title;
-
-//                Toast toast = Toast.makeText(c.getApplicationContext(),
-//                        "Loading Article: " + articleTitle, Toast.LENGTH_SHORT);
-//                toast.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
-//                toast.show();
 
                 // Create new activity for the article here
                 // feed the new activity with the URL of the page
                 String articleLink = rowTemp.link;
-                Intent articleActivity = new Intent(list.getContext(), ArticleActivity.class);
+                Intent articleActivity = new Intent(listView.getContext(), ArticleActivity.class);
+
                 // EXTRA_HTML_TEXT holds the html link for the article
                 articleActivity.putExtra(Intent.EXTRA_HTML_TEXT, articleLink);
+
                 // EXTRA_SHORTCUT_NAME holds the name of the article, e.g. "what life sucks in hell"
                 articleActivity.putExtra(Intent.EXTRA_SHORTCUT_NAME, articleTitle);
+
                 // EXTRA_TITLE holds the category name, e.g. "wellness/"
                 articleActivity.putExtra(Intent.EXTRA_TITLE, category);
 
-                list.getContext().startActivity(articleActivity);
+                listView.getContext().startActivity(articleActivity);
+            }
+        });
+
+        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            int lastPageNum = 0;
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                int lastVisibleItem = firstVisibleItem + visibleItemCount;
+
+                // At last item
+                if (lastVisibleItem >= totalItemCount) {
+                    CategoryAdapter adapter = (CategoryAdapter) listView.getAdapter();
+
+                    // Only make one request per page request
+                    if (totalItemCount != 0 && lastPageNum != adapter.getPageNum()) {
+                        lastPageNum = adapter.getPageNum();
+                        new FetchListArticlesTask(listView.getContext(),
+                                listView,
+                                progressBar,
+                                adapter.getPageNum() + 1).execute(category);
+                    }
+                }
+            }
+
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
             }
         });
 
         return rootView;
+    }
+
+    public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+        if (getBitmapFromMemCache(key) == null) {
+            memoryCache.put(key, bitmap);
+        }
+    }
+
+    public Bitmap getBitmapFromMemCache(String key) {
+        return memoryCache.get(key);
     }
 }
 
@@ -86,23 +138,30 @@ public class CategoryFragment extends Fragment {
 class CategoryAdapter extends BaseAdapter {
     ArrayList<SingleRow> articles;
     Context context;
-    private int pageNum;
+    int pageNum;
+    Boolean canLoadMore;
 
-    CategoryAdapter(Context c, List<Article> articles){
+    CategoryAdapter(Context c) {
         this.articles = new ArrayList<SingleRow>();
-        // the context is needed for creating LayoutInflater
         context = c;
-//        Resources res = c.getResources();
         pageNum = 0;
+        canLoadMore = true;
+    }
 
-        loadMoreItems(articles, 1);
-        Log.d("CategoryAdapter", "First time calling loadMoreItems");
+    public synchronized int getPageNum() {
+        return pageNum;
+    }
 
-        // FIXME: Actually, just post a "no articles" thing or a "is your internet on?" or something
-        if (articles.isEmpty()) {
-            Log.e("CategoryAdapter", "Error: empty articles in initialization!");
-            System.exit(-1);
-        }
+    public void enableLoading() {
+        canLoadMore = true;
+    }
+
+    public void disableLoading() {
+        canLoadMore = false;
+    }
+
+    public Boolean canLoadMore() {
+        return canLoadMore;
     }
 
     // Get the number of row items
@@ -175,33 +234,18 @@ class CategoryAdapter extends BaseAdapter {
 
     // This function is called along with .notifyDataSetChange() in Asynctask's onScrollListener function
     // when the viewers scroll to the bottom of the articles
-    public void loadMoreItems(List<Article> moreArticles, int pageNum){
-        // If there are more than 24 articles, empty first 12 first then add 12 more articles in
-//        int numOfArticles = articles.size();
-//        if(numOfArticles >= maxStoredArticles){
-//            for(int i = 0; i < moreArticles.size(); i++){
-//                articles.remove(i);
-//            }
-//        }
-
+    public synchronized void loadMoreItems(List<Article> moreArticles, int pageNum){
         // if prevent the late page from loading twice
         if(moreArticles != null && this.pageNum != pageNum){
             this.pageNum = pageNum;
 
-            // Testing CategoryAdapter
-            Log.e("CategoryAdapter", "loading more" + this.pageNum);
-            Log.e("CategoryAdapter", "Moresize" + moreArticles.size());
-            Log.e("CategoryAdapter", "row" + articles.size());
-
             for (int i = 0; i < moreArticles.size(); ++i) {
                 articles.add(SingleRow.newInstance(moreArticles.get(i)));
-                notifyDataSetChanged();
+//                notifyDataSetChanged();
             }
-        }
-    }
 
-    public ArrayList<SingleRow> getArticles() {
-        return articles;
+            notifyDataSetChanged();
+        }
     }
 }
 
