@@ -27,7 +27,7 @@ public class CategoryFragment extends Fragment {
     final static String EXTRA_TITLE = "EXTRA_TITLE";
 
     String category = "";
-    LruCache<String, Bitmap> memoryCache;
+    public LruCache<String, Bitmap> memoryCache;
 
     public CategoryFragment() {
     }
@@ -44,6 +44,8 @@ public class CategoryFragment extends Fragment {
         final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
         // memory for images ~4.5 MB = 7-8 images
         final int cacheSize = maxMemory / 7;
+
+        Log.d("CategoryFragment", Integer.toString(cacheSize));
 
         memoryCache = new LruCache<String, Bitmap>(cacheSize) {
             @Override
@@ -63,7 +65,7 @@ public class CategoryFragment extends Fragment {
         final ListView listView = (ListView) rootView.findViewById(R.id.listView);
         final ProgressBar progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
 
-        listView.setAdapter(new CategoryAdapter(this.getActivity()));
+        listView.setAdapter(new CategoryAdapter(this, inflater));
 
         // Use Asynctask to fetch article from the given category
         new FetchListArticlesTask(getActivity(), listView, progressBar, 1).execute(category);
@@ -96,6 +98,8 @@ public class CategoryFragment extends Fragment {
 
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             int lastPageNum = 0;
+
+            @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 int lastVisibleItem = firstVisibleItem + visibleItemCount;
 
@@ -114,6 +118,7 @@ public class CategoryFragment extends Fragment {
                 }
             }
 
+            @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
             }
         });
@@ -137,15 +142,18 @@ public class CategoryFragment extends Fragment {
 // It is created in the FetchListArticlesTask which is called in CategoryActivity
 class CategoryAdapter extends BaseAdapter {
     ArrayList<SingleRow> articles;
-    Context context;
-    int pageNum;
-    Boolean canLoadMore;
 
-    CategoryAdapter(Context c) {
+    CategoryFragment categoryFragment;
+    LayoutInflater inflater;
+    Boolean canLoadMore;
+    int pageNum;
+
+    CategoryAdapter(CategoryFragment categoryFragment, LayoutInflater inflater) {
+        this.categoryFragment = categoryFragment;
         this.articles = new ArrayList<SingleRow>();
-        context = c;
-        pageNum = 0;
+        this.inflater = inflater;
         canLoadMore = true;
+        pageNum = 0;
     }
 
     public synchronized int getPageNum() {
@@ -185,7 +193,6 @@ class CategoryAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, final ViewGroup viewGroup){
         // crate a new rowItem object here
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View row;
         AdapterObject viewHolder;
 
@@ -205,28 +212,24 @@ class CategoryAdapter extends BaseAdapter {
             viewHolder = (AdapterObject) row.getTag();
         }
 
-        /* On getting view, set this to invisible until loaded. (issue before: old image seen
-           before new image on fast scroll) Mostly fixed by this, but on fast scroll down, still
-           shows a little */
-        viewHolder.image.setImageDrawable(null);
-
         // Set the values of the rowItem
         SingleRow rowTemp = articles.get(i);
         viewHolder.title.setText(rowTemp.title);
         viewHolder.description.setText(rowTemp.description);
 
-        String s = "null";
-        if (rowTemp.image != null) s = "not null";
-        Log.e("ImageLog", "Item " + Integer.toString(i) + ", is " + s);
+        final Bitmap b = categoryFragment.getBitmapFromMemCache(rowTemp.title);
 
         // Load image into row element
-        if (rowTemp.image == null)      // download
-            new FetchCategoryImageTask(rowTemp, viewHolder.image, context.getResources()).execute();
-        else {                          // set saved image
+        if (b == null) {    // download
+            viewHolder.image.setImageResource(android.R.color.darker_gray); // Placeholder
+            new FetchCategoryImageTask(categoryFragment, rowTemp, viewHolder.image).execute();
+
+            Log.d("CategoryAdapter", Integer.toString(categoryFragment.memoryCache.size()));
+        } else {            // set saved image
             // Cropping image to preserve aspect ratio
             viewHolder.image.setScaleType(ImageView.ScaleType.CENTER_CROP);
             viewHolder.image.setCropToPadding(true);
-            viewHolder.image.setImageBitmap(rowTemp.image);
+            viewHolder.image.setImageBitmap(b);
         }
 
         return row;

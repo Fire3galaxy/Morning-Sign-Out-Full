@@ -17,24 +17,27 @@ import java.net.URL;
  * Created by Daniel on 6/24/2015.
  */
 public class FetchCategoryImageTask extends AsyncTask<Void, Void, Bitmap> {
+    CategoryFragment categoryFragment;
     SingleRow sr;
     ImageView image;
-    Resources resources;
 
-    public FetchCategoryImageTask(SingleRow singleRow, ImageView image, Resources r) {
+    public FetchCategoryImageTask(CategoryFragment categoryFragment, SingleRow singleRow, ImageView image) {
+        this.categoryFragment = categoryFragment;
         this.sr = singleRow;
         this.image = image;
-        resources = r;
     }
 
     @Override
     protected void onPreExecute() {
-        image.setVisibility(ImageView.INVISIBLE);
+
     }
 
     @Override
     protected Bitmap doInBackground(Void... params) {
-        return downloadBitmap(sr.imageURL);
+        Bitmap b = downloadBitmap(sr.imageURL);
+        categoryFragment.addBitmapToMemoryCache(sr.title, b);
+
+        return b;
     }
 
     @Override
@@ -44,17 +47,11 @@ public class FetchCategoryImageTask extends AsyncTask<Void, Void, Bitmap> {
         image.setScaleType(ImageView.ScaleType.CENTER_CROP);
         image.setCropToPadding(true);
         image.setImageBitmap(b);
-
-        // Make image visible
-        image.setVisibility(ImageView.VISIBLE);
-
-        // Save image to SingleRow object for categoryAdapter's getView()
-        sr.image = b;
     }
 
     // input an image URL, get its bitmap
     private Bitmap downloadBitmap(String url) {
-        if (url == null) return BitmapFactory.decodeResource(resources, R.drawable.no_image);
+        if (url == null) return null;
 
         HttpURLConnection urlConnection = null;
         try {
@@ -73,8 +70,7 @@ public class FetchCategoryImageTask extends AsyncTask<Void, Void, Bitmap> {
 
                 // Create bitmap from stream
                 return BitmapFactory.decodeStream(inputStream, null, a);
-            }
-            else Log.e("FetchCategoryImageTask", "image url: " + url);
+            } else Log.e("FetchCategoryImageTask", "image url: " + url);
         } catch (Exception e) {
             Log.e("FetchCategoryImageTask", "Error downloading image from " + url);
         } finally {
@@ -82,7 +78,7 @@ public class FetchCategoryImageTask extends AsyncTask<Void, Void, Bitmap> {
                 urlConnection.disconnect();
             }
         }
-        return BitmapFactory.decodeResource(resources, R.drawable.no_image);
+        return null;
     }
 
 }

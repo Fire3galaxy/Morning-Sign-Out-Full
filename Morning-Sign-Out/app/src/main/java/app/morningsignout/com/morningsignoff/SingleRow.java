@@ -8,12 +8,10 @@ class SingleRow{
     String description;
     String link;
     String imageURL;
-    Bitmap image;
 
-    SingleRow(String title, String description, Bitmap image, String link) {
+    SingleRow(String title, String description, String link) {
         this.title = title;
         this.description = description;
-        this.image = image;
         this.link = link;
 
         this.imageURL = null;
@@ -25,8 +23,6 @@ class SingleRow{
         this.description = description;
         this.imageURL = imageURL;
         this.link = link;
-
-        this.image = null;
     }
 
     static SingleRow newInstance(Article article) {
