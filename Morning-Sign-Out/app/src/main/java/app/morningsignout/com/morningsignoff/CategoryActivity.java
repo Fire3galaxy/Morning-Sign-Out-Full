@@ -100,6 +100,7 @@ public class CategoryActivity extends ActionBarActivity {
         navDrawerItems.add(new NavDrawerItem(categories_titles[5], navMenuIcons.getResourceId(5, -1)));
         navDrawerItems.add(new NavDrawerItem(categories_titles[6], navMenuIcons.getResourceId(6, -1)));
         navDrawerItems.add(new NavDrawerItem(categories_titles[7], navMenuIcons.getResourceId(7, -1)));
+        navDrawerItems.add(new NavDrawerItem(categories_titles[8], navMenuIcons.getResourceId(8, -1)));
 
         navMenuIcons.recycle();
         adapter = new NavDrawerListAdapter(getApplicationContext(),

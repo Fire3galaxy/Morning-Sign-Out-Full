@@ -98,11 +98,11 @@ class CategoryAdapter extends BaseAdapter {
         loadMoreItems(articles, 1);
         Log.d("CategoryAdapter", "First time calling loadMoreItems");
 
-        // FIXME: Actually, just post a "no articles" thing or a "is your internet on?" or something
-        if (articles.isEmpty()) {
-            Log.e("CategoryAdapter", "Error: empty articles in initialization!");
-            System.exit(-1);
-        }
+//        // FIXME: Actually, just post a "no articles" thing or a "is your internet on?" or something
+//        if (articles.isEmpty()) {
+//            Log.e("CategoryAdapter", "Error: empty articles in initialization!");
+//            System.exit(-1);
+//        }
     }
 
     // Get the number of row items
