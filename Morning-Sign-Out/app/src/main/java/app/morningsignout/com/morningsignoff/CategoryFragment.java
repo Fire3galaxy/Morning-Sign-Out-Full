@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.util.LruCache;
 import android.view.LayoutInflater;
@@ -22,6 +23,7 @@ import java.util.List;
 
 public class CategoryFragment extends Fragment {
     final static String EXTRA_TITLE = "EXTRA_TITLE";
+    final static String TAG = "CategoryFragment";
 
     String category = "";
     public LruCache<String, Bitmap> memoryCache;
@@ -32,6 +34,7 @@ public class CategoryFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
 
         category = getArguments() != null ? getArguments().getString(EXTRA_TITLE) + "/" : "";
 
@@ -132,6 +135,15 @@ public class CategoryFragment extends Fragment {
     public Bitmap getBitmapFromMemCache(String key) {
         return memoryCache.get(key);
     }
+
+    public static CategoryFragment findOrCreateRetainFragment(FragmentManager fm) {
+        CategoryFragment fragment = (CategoryFragment) fm.findFragmentByTag(TAG);
+        if (fragment == null) {
+            return new CategoryFragment();
+        }
+        return fragment;
+    }
+
 }
 
 // CategoryAdapter takes in a list of Articles and displays the titles, descriptions, images

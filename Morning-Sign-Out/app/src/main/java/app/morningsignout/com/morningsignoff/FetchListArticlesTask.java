@@ -185,8 +185,6 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
             // If buffer was empty, no items in list, so website has no articles for some reason.
             return articlesList.isEmpty() ? null : articlesList;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

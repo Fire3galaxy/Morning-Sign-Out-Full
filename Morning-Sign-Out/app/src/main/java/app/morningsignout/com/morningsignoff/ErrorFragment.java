@@ -26,7 +26,7 @@ public class ErrorFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        if (getArguments() != null) {
+        if (getArguments() != null && getArguments().containsKey(ERROR_CODE)) {
             switch (getArguments().getString(ERROR_CODE)) {
                 case NO_INTERNET:
                     View rootView = inflater.inflate(R.layout.fragment_error_no_internet, container, false);
