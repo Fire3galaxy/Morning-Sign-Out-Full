@@ -48,7 +48,7 @@ public class MainActivity extends ActionBarActivity {
     /**
      * A simple pager adapter that represents 5 HeadlineFragment objects, in
      * sequence. Copied from http://developer.android.com/training/animation/screen-slide.html
-     * Each image button will be a page instantiated by the pager adapter
+     * Each imageViewReference button will be a page instantiated by the pager adapter
      */
     private class HeadlinePagerAdapter extends FragmentPagerAdapter {
         public HeadlinePagerAdapter(FragmentManager fm) {

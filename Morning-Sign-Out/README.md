@@ -8,7 +8,7 @@ The current structure of the application consists of 3 pages.
 
 1.  The front page will contain categories of articles and the latest publications 
 2.  The categories page will contain article titles, images, and descriptions 
-3.  Article pages will simply consist of title, image, article, and author.
+3.  Article pages will simply consist of title, imageViewReference, article, and author.
 
 Settings, subscription, etc. will be considered at a later time.
 

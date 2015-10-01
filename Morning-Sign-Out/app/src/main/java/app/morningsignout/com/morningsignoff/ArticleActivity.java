@@ -316,7 +316,7 @@ class ArticleWebViewClient extends WebViewClient {
         Uri requestUrl = Uri.parse(url);
 
         /* Not from morningsignout, e.g. googleapis, gstatic, or gravatar
-         * or an image/theme/plugin from wordpress
+         * or an imageViewReference/theme/plugin from wordpress
          * or a .* file, e.g. favicon.ico
          */
         if (!requestUrl.getHost().endsWith("morningsignout.com")
@@ -376,7 +376,7 @@ class ArticleWebViewClient extends WebViewClient {
     boolean isArticle(String url) {
         Uri requestUrl = Uri.parse(url);
 
-        // image/etc.
+        // imageViewReference/etc.
         if (!requestUrl.getHost().endsWith("morningsignout.com")
                 || requestUrl.getPathSegments().get(0).equals("wp-content")
                 || requestUrl.getPathSegments().get(0).matches(".*\\.[a-zA-Z]+"))

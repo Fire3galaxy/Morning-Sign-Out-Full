@@ -33,7 +33,6 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
     // Assigned value keeps logString in sync with class name if class name changed (Udacity)
     private final String logString = FetchListArticlesTask.class.getSimpleName();
 
-    // Used for creating CategoryAdapter and onItemClick listener
     private ListView listView;
     private ProgressBar progressBar;
     private Context c;
@@ -41,6 +40,8 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
     private List<Article> articlesList;
     private int pageNum;
+
+    private int adapterPageNum;
 
     public FetchListArticlesTask(Context c, ListView listView, ProgressBar progressBar,
                                  int pageNum) {
@@ -52,85 +53,51 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
     @Override
     protected void onPreExecute() {
+        // Make access to the asyncTask synchronized to prevent excess loading
+        final CategoryAdapter adapter = (CategoryAdapter) listView.getAdapter();
+        adapter.disableLoading();
+        adapterPageNum = adapter.getPageNum();
     }
 
     // takes in the category name as a sufix to the URL, ex. healthcare/  and call getArticles()
     @Override
     protected List<Article> doInBackground(String... params) {
-        try {
-            // pass the category name as a string
-            category = params[0];
-            return getArticles(params[0], pageNum);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (adapterPageNum == pageNum - 1) {
+            try {
+                // pass the category name as a string
+                category = params[0];
+                return getArticles(params[0], pageNum);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+        // else, invalid request
 
         return null;
     }
 
     // Articles retrived online are being sent here, and we pass the info to the CategoryAdapter
     protected void onPostExecute(final List<Article> articles) {
+        final CategoryAdapter adapter = (CategoryAdapter) listView.getAdapter();
+
         // Avoids redundancy if bar is gone
         if (progressBar.getVisibility() != ProgressBar.GONE)
             progressBar.setVisibility(ProgressBar.GONE);
 
-        // Setup the adapter using the CategoryAdapter class
-        // If the adapter is not set, then create the adapter and add the articles
-        // If the adapter is set, then add more articles to the list then notify the data change
-        if(listView.getAdapter() == null) {
-            CategoryAdapter categoryAdapter = new CategoryAdapter(c, articles);
-            listView.setAdapter(categoryAdapter);
-        } else {
-            CategoryAdapter categoryAdapter = (CategoryAdapter) listView.getAdapter();
-            categoryAdapter.loadMoreItems(articles, pageNum);
+        // If result is not null, then add more articles to the list and notify the data change
+        if (articles != null) {
+            Log.d("FetchListArticlesTask", Integer.toString(pageNum));
+
+            adapter.loadMoreItems(articles, pageNum);
+
             Log.d("FetchListArticlesTask", "Calling loadMoreItems " + Integer.toString(pageNum));
         }
 
-        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
-            private boolean isScrolling = false;
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                if (visibleItemCount > 0) {
-                    boolean atEnd = true;
-
-                    int lastVisibleItem = firstVisibleItem + visibleItemCount;
-                    if (lastVisibleItem < totalItemCount) {
-                        // not at end
-                        atEnd = false;
-                    }
-
-                    // now use atStart and atEnd to do whatever you need to do
-                    if(atEnd && isScrolling) {
-                        // The articltList only returns null if the last page has 12 items
-                        // otherwise it returns random articles
-                        if(articlesList == null || articlesList.size() < 12){
-                            Toast toast = Toast.makeText(c.getApplicationContext(),
-                                    "No other articles", Toast.LENGTH_SHORT);
-                            toast.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0);
-                            toast.show();
-                        }else {
-                            Toast toast = Toast.makeText(c.getApplicationContext(),
-                                    "Loading........", Toast.LENGTH_SHORT);
-                            toast.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0);
-                            toast.show();
-
-                            /* FIXME: Replace toast with loading bar, placed as "item" in listview
-                             * with its own space. Disappears on items appearance (on post execute)
-                             */
-                            //loadingMoreArticles.setVisibility(ProgressBar.VISIBLE);
-
-                            new FetchListArticlesTask(c, listView, progressBar, ++pageNum).execute(category);
-                            Log.d("FetchListArticlesTask", "Loading more articles: page " + Integer.toString(pageNum));
-                        }
-                        isScrolling = false;
-                    }
-
-                }
-            }
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-                isScrolling = true;
-            }
-        });
-
+        // if there are no more articles available, indicated by a successful request but null
+        // return/less than 12 results, do not enable loading for the adapter.
+        if (!(adapterPageNum == pageNum - 1 && (articlesList == null || articlesList.size() < 12))) {
+            adapter.enableLoading();
+        }
     }
 
     // Go to MorningSignOut.com and get a list of articles
@@ -192,7 +159,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                         }
 
                         // convert string to bitmap then feed to each article
-//                        Bitmap image = downloadBitmap(imageURL);
+//                        Bitmap imageViewReference = downloadBitmap(imageURL);
                     }
                     // Description of article
                     else if (inputLine.contains("<p>")) {
@@ -218,8 +185,6 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
             // If buffer was empty, no items in list, so website has no articles for some reason.
             return articlesList.isEmpty() ? null : articlesList;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

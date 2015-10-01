@@ -116,13 +116,13 @@ public class CategoryActivity extends ActionBarActivity {
 //        Log.d("CategoryActivity", "mTitle = " + mTitle.toLowerCase());
 
         // For CategoryFragment
-        CategoryFragment fragment = new CategoryFragment();
+        CategoryFragment fragment = CategoryFragment.findOrCreateRetainFragment(getSupportFragmentManager());
         Bundle args = new Bundle();
         args.putString(CategoryFragment.EXTRA_TITLE, categories_urls[position]);
         fragment.setArguments(args);
 
         // Set fragment's listview
-        if (getIntent() != null && savedInstanceState == null) {
+        if (getIntent() != null && savedInstanceState == null && checkForInternet()) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container_category, fragment)
                     .commit();
@@ -149,7 +149,10 @@ public class CategoryActivity extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
-        return;
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     @Override
