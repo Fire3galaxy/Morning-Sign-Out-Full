@@ -26,6 +26,7 @@
 
     <string name="search_hint">Search MorningSignOut</string>
 
+    <string name="category_refresh">If articles do not load, drag down to refresh</string>
     <string name="error">Something went wrong. Please report this bug to the developers in the play
         store comment section.</string>
     <string name="error_no_internet_1">We cannot connect to</string>

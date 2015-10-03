@@ -122,15 +122,16 @@ public class CategoryActivity extends ActionBarActivity {
         fragment.setArguments(args);
 
         // Set fragment's listview
-        if (getIntent() != null && savedInstanceState == null && checkForInternet()) {
+        if (getIntent() != null && savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container_category, fragment)
                     .commit();
-        } else {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container_category, new ErrorFragment())
-                    .commit();
         }
+//        else {
+//            getSupportFragmentManager().beginTransaction()
+//                    .add(R.id.container_category, new ErrorFragment())
+//                    .commit();
+//        }
 
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 

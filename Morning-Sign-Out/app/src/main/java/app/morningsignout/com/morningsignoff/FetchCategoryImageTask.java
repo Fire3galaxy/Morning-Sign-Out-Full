@@ -8,6 +8,7 @@ import android.widget.ImageView;
 
 import org.apache.http.HttpStatus;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
@@ -76,9 +77,10 @@ public class FetchCategoryImageTask extends AsyncTask<Void, Void, Bitmap> {
 
                 // Create bitmap from stream
                 return BitmapFactory.decodeStream(inputStream, null, a);
-            } else Log.e("FetchCategoryImageTask", "imageViewReference url: " + url);
-        } catch (Exception e) {
-            Log.e("FetchCategoryImageTask", "Error downloading imageViewReference from " + url);
+            } else
+                Log.e("FetchCategoryImageTask", "imageViewReference url: " + url);
+        } catch (IOException e) {
+            Log.e("FetchCategoryImageTask", "Error: " + url);
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();

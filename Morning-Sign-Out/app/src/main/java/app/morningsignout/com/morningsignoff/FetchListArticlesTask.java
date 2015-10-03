@@ -1,26 +1,18 @@
 package app.morningsignout.com.morningsignoff;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.AbsListView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
-
-import org.apache.http.HttpStatus;
+import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,30 +25,48 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
     // Assigned value keeps logString in sync with class name if class name changed (Udacity)
     private final String logString = FetchListArticlesTask.class.getSimpleName();
 
-    private ListView listView;
-    private ProgressBar progressBar;
-    private Context c;
-    private String category;
-
-    private List<Article> articlesList;
+    private WeakReference<CategoryFragment> fragmentRef;
+    private WeakReference<ListView> listViewWeakRef;
+    private CategoryFragment.CategoryViews loadingViews;
     private int pageNum;
 
     private int adapterPageNum;
 
-    public FetchListArticlesTask(Context c, ListView listView, ProgressBar progressBar,
+    public FetchListArticlesTask(CategoryFragment fragment,
+                                 ListView listView,
+                                 CategoryFragment.CategoryViews loadingViews,
                                  int pageNum) {
-        this.c = c;
-        this.listView = listView;
-        this.progressBar = progressBar;
+        this.fragmentRef = new WeakReference<CategoryFragment>(fragment);
+        this.listViewWeakRef = new WeakReference<ListView>(listView);
+        this.loadingViews = loadingViews;
+        this.pageNum = pageNum;
+    }
+
+    public FetchListArticlesTask(CategoryFragment fragment,
+                                 ListView listView,
+                                 int pageNum) {
+        this.fragmentRef = new WeakReference<CategoryFragment>(fragment);
+        this.listViewWeakRef = new WeakReference<ListView>(listView);
+        this.loadingViews = null;
         this.pageNum = pageNum;
     }
 
     @Override
     protected void onPreExecute() {
-        // Make access to the asyncTask synchronized to prevent excess loading
-        final CategoryAdapter adapter = (CategoryAdapter) listView.getAdapter();
-        adapter.disableLoading();
-        adapterPageNum = adapter.getPageNum();
+        // Loading views
+        if (loadingViews != null) {
+            if (loadingViews.refresh && loadingViews.swipeRefresh.get() != null)
+                loadingViews.swipeRefresh.get().setRefreshing(true);
+            else if (loadingViews.progressBar.get() != null)
+                loadingViews.progressBar.get().setVisibility(View.VISIBLE);
+        }
+
+        // initialize variables
+        if (listViewWeakRef.get() != null) {
+            // Make access to the asyncTask synchronized to prevent excess loading
+            final CategoryAdapter adapter = (CategoryAdapter) listViewWeakRef.get().getAdapter();
+            adapterPageNum = adapter.getPageNum();
+        }
     }
 
     // takes in the category name as a sufix to the URL, ex. healthcare/  and call getArticles()
@@ -64,8 +74,6 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
     protected List<Article> doInBackground(String... params) {
         if (adapterPageNum == pageNum - 1) {
             try {
-                // pass the category name as a string
-                category = params[0];
                 return getArticles(params[0], pageNum);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -78,25 +86,40 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
     // Articles retrived online are being sent here, and we pass the info to the CategoryAdapter
     protected void onPostExecute(final List<Article> articles) {
-        final CategoryAdapter adapter = (CategoryAdapter) listView.getAdapter();
+        CategoryAdapter adapter = null;
 
-        // Avoids redundancy if bar is gone
-        if (progressBar.getVisibility() != ProgressBar.GONE)
-            progressBar.setVisibility(ProgressBar.GONE);
+        if (listViewWeakRef.get() != null)
+            adapter = (CategoryAdapter) listViewWeakRef.get().getAdapter();
 
-        // If result is not null, then add more articles to the list and notify the data change
-        if (articles != null) {
-            Log.d("FetchListArticlesTask", Integer.toString(pageNum));
+        boolean loadingAnim = false;
+        if (loadingViews != null) {
+            if (loadingViews.refresh)
+                loadingAnim = loadingViews.swipeRefresh.get() != null &&
+                        loadingViews.swipeRefresh.get().isRefreshing();
+            else
+                loadingAnim = loadingViews.progressBar.get() != null &&
+                        loadingViews.progressBar.get().getVisibility() != ProgressBar.GONE;
+        }
 
+        // Loading should only show on first loading list
+        // hide progressbar, refresh message, and refresh icon (if loading is done/successful)
+        if (loadingViews != null && loadingAnim) {
+            if (loadingViews.refresh) loadingViews.swipeRefresh.get().setRefreshing(false);
+            else loadingViews.progressBar.get().setVisibility(ProgressBar.GONE);
+
+            if (articles != null) {
+                TextView txtv = loadingViews.refreshTextView.get();
+
+                if (txtv != null) txtv.setVisibility(View.GONE);
+            }
+        }
+
+        // If result and adapter are not null and fragment still exists, load items
+        if (articles != null && adapter != null && fragmentRef.get() != null) {
+            fragmentRef.get().isLoadingArticles.set(false);
             adapter.loadMoreItems(articles, pageNum);
 
             Log.d("FetchListArticlesTask", "Calling loadMoreItems " + Integer.toString(pageNum));
-        }
-
-        // if there are no more articles available, indicated by a successful request but null
-        // return/less than 12 results, do not enable loading for the adapter.
-        if (!(adapterPageNum == pageNum - 1 && (articlesList == null || articlesList.size() < 12))) {
-            adapter.enableLoading();
         }
     }
 
@@ -107,8 +130,8 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         // For getting article titles, descriptions, and images. See class Article
         Parser p = new Parser();
         String urlPath = "";
-        if (arg.equals("latest/")) urlPath = "http://morningsignout.com/" + arg + "page/" + pageNum;
-        else urlPath = "http://morningsignout.com/category/" + arg + "page/" + pageNum;
+        if (arg.equals("latest")) urlPath = "http://morningsignout.com/" + arg + "/page/" + pageNum;
+        else urlPath = "http://morningsignout.com/category/" + arg + "/page/" + pageNum;
         Log.d("FetchListArticlesTask", "loading " + urlPath);
 
         BufferedReader in = null;
@@ -130,7 +153,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
             boolean inContent = false; // If in <h1> tags, need to wait 2 tags before
             int closeDiv = 0, ind = 0; // counts </div> tags, ind is index of articlesList
 
-            articlesList = new ArrayList<Article>();
+            List<Article> articlesList = new ArrayList<Article>();
 
             while ((inputLine = in.readLine()) != null) {
                 if (inputLine.contains("<div class=\"content__post__info\">")) {

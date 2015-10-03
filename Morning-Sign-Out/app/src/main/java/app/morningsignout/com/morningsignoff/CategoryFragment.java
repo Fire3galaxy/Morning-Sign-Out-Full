@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.util.LruCache;
 import android.view.LayoutInflater;
@@ -18,14 +19,26 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CategoryFragment extends Fragment {
+    static public class CategoryViews {
+        public WeakReference<SwipeRefreshLayout> swipeRefresh;
+        public WeakReference<ProgressBar> progressBar;
+        public WeakReference<TextView> refreshTextView;
+
+        public boolean refresh;
+    }
+
     final static String EXTRA_TITLE = "EXTRA_TITLE";
+    final static String EXTRA_REFRESH = "EXTRA_REFRESH";
     final static String TAG = "CategoryFragment";
 
     String category = "";
+    AtomicBoolean isLoadingArticles;
     public LruCache<String, Bitmap> memoryCache;
 
     public CategoryFragment() {
@@ -36,7 +49,8 @@ public class CategoryFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
-        category = getArguments() != null ? getArguments().getString(EXTRA_TITLE) + "/" : "";
+        category = getArguments() != null ? getArguments().getString(EXTRA_TITLE) : "";
+        isLoadingArticles = new AtomicBoolean(false);
 
         /* Thanks to http://developer.android.com/training/displaying-bitmaps/cache-bitmap.html
          * for caching code */
@@ -61,14 +75,21 @@ public class CategoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_category_main, container, false);
-
+        final SwipeRefreshLayout refreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefresh_category);
         final ListView listView = (ListView) rootView.findViewById(R.id.listView);
-        final ProgressBar progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
+
+        final CategoryViews loadingViews = new CategoryViews();
+        loadingViews.swipeRefresh = new WeakReference<SwipeRefreshLayout>(refreshLayout);
+        loadingViews.progressBar = new WeakReference<ProgressBar>((ProgressBar) rootView.findViewById(R.id.progressBar));
+        loadingViews.refreshTextView = new WeakReference<TextView>((TextView) rootView.findViewById(R.id.textView_categoryRefresh));
+        if (getArguments().containsKey(EXTRA_REFRESH)) loadingViews.refresh = true;
+        else loadingViews.refresh = false;
 
         listView.setAdapter(new CategoryAdapter(this, inflater));
 
         // Use Asynctask to fetch article from the given category
-        new FetchListArticlesTask(getActivity(), listView, progressBar, 1).execute(category);
+        isLoadingArticles.set(true);
+        new FetchListArticlesTask(this, listView, loadingViews, 1).execute(category);
 
         // Setup the click listener for the listView
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -107,19 +128,37 @@ public class CategoryFragment extends Fragment {
                 if (lastVisibleItem >= totalItemCount) {
                     CategoryAdapter adapter = (CategoryAdapter) listView.getAdapter();
 
+                    int pageNum = adapter.getPageNum();
                     // Only make one request per page request
-                    if (totalItemCount != 0 && lastPageNum != adapter.getPageNum()) {
-                        lastPageNum = adapter.getPageNum();
-                        new FetchListArticlesTask(listView.getContext(),
-                                listView,
-                                progressBar,
-                                adapter.getPageNum() + 1).execute(category);
+                    if (totalItemCount != 0 && lastPageNum != pageNum && isLoadingArticles.weakCompareAndSet(false, true)) {
+                        lastPageNum = pageNum;
+                        new FetchListArticlesTask(CategoryFragment.this, listView, pageNum + 1).execute(category);
                     }
                 }
             }
 
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
+            }
+        });
+
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (!listView.getAdapter().isEmpty() || !isLoadingArticles.get()) {
+                    // Reload categoryFragment
+                    CategoryFragment fragment =
+                            CategoryFragment.findOrCreateRetainFragment(getActivity().getSupportFragmentManager());
+                    Bundle args = new Bundle();
+                    args.putString(CategoryFragment.EXTRA_TITLE, category);
+                    args.putBoolean(CategoryFragment.EXTRA_REFRESH, true);
+                    fragment.setArguments(args);
+
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container_category, fragment)
+                            .commit();
+                }
+                refreshLayout.setRefreshing(false);
             }
         });
 
@@ -136,6 +175,10 @@ public class CategoryFragment extends Fragment {
         return memoryCache.get(key);
     }
 
+    public void setisLoadingFalse() {
+        isLoadingArticles.set(false);
+    }
+
     public static CategoryFragment findOrCreateRetainFragment(FragmentManager fm) {
         CategoryFragment fragment = (CategoryFragment) fm.findFragmentByTag(TAG);
         if (fragment == null) {
@@ -143,7 +186,6 @@ public class CategoryFragment extends Fragment {
         }
         return fragment;
     }
-
 }
 
 // CategoryAdapter takes in a list of Articles and displays the titles, descriptions, images
@@ -167,18 +209,6 @@ class CategoryAdapter extends BaseAdapter {
 
     public synchronized int getPageNum() {
         return pageNum;
-    }
-
-    public synchronized void enableLoading() {
-        canLoadMore = true;
-    }
-
-    public synchronized void disableLoading() {
-        canLoadMore = false;
-    }
-
-    public Boolean canLoadMore() {
-        return canLoadMore;
     }
 
     // Get the number of row items
