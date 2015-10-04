@@ -28,7 +28,9 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CategoryFragment extends Fragment {
@@ -244,6 +246,7 @@ public class CategoryFragment extends Fragment {
 // It is created in the FetchListArticlesTask which is called in CategoryActivity
 class CategoryAdapter extends BaseAdapter {
     ArrayList<SingleRow> articles;
+    Set<String> uniqueArticleNames;
 
     CategoryFragment categoryFragment;
     LayoutInflater inflater;
@@ -253,6 +256,7 @@ class CategoryAdapter extends BaseAdapter {
     CategoryAdapter(CategoryFragment categoryFragment, LayoutInflater inflater) {
         this.categoryFragment = categoryFragment;
         this.articles = new ArrayList<SingleRow>();
+        this.uniqueArticleNames = new HashSet<String>();
         this.inflater = inflater;
         canLoadMore = true;
         pageNum = 0;
@@ -337,8 +341,13 @@ class CategoryAdapter extends BaseAdapter {
             this.pageNum = pageNum;
 
             for (int i = 0; i < moreArticles.size(); ++i) {
-                articles.add(SingleRow.newInstance(moreArticles.get(i)));
+                String article = moreArticles.get(i).getTitle();
+
+                if (!uniqueArticleNames.contains(article))
+                    articles.add(SingleRow.newInstance(moreArticles.get(i)));
+                uniqueArticleNames.add(article);
 //                notifyDataSetChanged();
+                Log.d("Nothing","at all");
             }
 
             notifyDataSetChanged();
