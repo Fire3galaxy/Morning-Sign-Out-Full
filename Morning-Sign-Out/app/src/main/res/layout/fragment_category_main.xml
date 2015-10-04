@@ -24,7 +24,8 @@
             android:dividerHeight="10dp"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
-            android:listSelector="@android:color/transparent" />
+            android:listSelector="@android:color/transparent"
+            android:footerDividersEnabled="true"/>
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <ProgressBar
@@ -35,7 +36,7 @@
         android:layout_alignParentEnd="false"
         android:layout_centerInParent="true"
         android:indeterminate="true"
-        android:visibility="invisible" />
+        android:visibility="invisible"/>
 
     <TextView
         android:layout_width="wrap_content"

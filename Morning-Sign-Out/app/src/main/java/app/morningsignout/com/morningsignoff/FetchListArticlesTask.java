@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.WrapperListAdapter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,20 +29,24 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
     private WeakReference<CategoryFragment> fragmentRef;
     private WeakReference<ListView> listViewWeakRef;
     private CategoryFragment.CategoryViews loadingViews;
+    private ProgressBar footerProgressBar;
     private int pageNum;
 
     private int adapterPageNum;
 
+    // Called by onCreateView on first call
     public FetchListArticlesTask(CategoryFragment fragment,
                                  ListView listView,
                                  CategoryFragment.CategoryViews loadingViews,
                                  int pageNum) {
-        this.fragmentRef = new WeakReference<CategoryFragment>(fragment);
-        this.listViewWeakRef = new WeakReference<ListView>(listView);
-        this.loadingViews = loadingViews;
-        this.pageNum = pageNum;
+        this.fragmentRef = new WeakReference<CategoryFragment>(fragment);   // ensure fragment still exists
+        this.listViewWeakRef = new WeakReference<ListView>(listView);       // ensure listview still exists
+        this.loadingViews = loadingViews;       // refresh layout, task, loading message (first time views)
+        this.pageNum = pageNum;         // page of mso page called for task
+        this.footerProgressBar = null; // not used on first call to task
     }
 
+    // Called by onScrollListener after first call
     public FetchListArticlesTask(CategoryFragment fragment,
                                  ListView listView,
                                  int pageNum) {
@@ -49,11 +54,14 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         this.listViewWeakRef = new WeakReference<ListView>(listView);
         this.loadingViews = null;
         this.pageNum = pageNum;
+        this.footerProgressBar = new ProgressBar(this.fragmentRef.get().getActivity());
+
+        Log.d("FetchListArticlesTask", "using footerPrgressBar");
     }
 
     @Override
     protected void onPreExecute() {
-        // Loading views
+        // Loading animations (first time only, use refresh or center progressbar)
         if (loadingViews != null) {
             if (loadingViews.refresh && loadingViews.swipeRefresh.get() != null)
                 loadingViews.swipeRefresh.get().setRefreshing(true);
@@ -63,15 +71,21 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
         // initialize variables
         if (listViewWeakRef.get() != null) {
-            // Make access to the asyncTask synchronized to prevent excess loading
-            final CategoryAdapter adapter = (CategoryAdapter) listViewWeakRef.get().getAdapter();
+            WrapperListAdapter wrappedAdapter = (WrapperListAdapter) listViewWeakRef.get().getAdapter();
+
+            CategoryAdapter adapter = (CategoryAdapter) wrappedAdapter.getWrappedAdapter();
             adapterPageNum = adapter.getPageNum();
+
+            // Loading animation (after first time)
+//            if (loadingViews == null)
+//                listViewWeakRef.get().addFooterView(footerProgressBar);
         }
     }
 
     // takes in the category name as a sufix to the URL, ex. healthcare/  and call getArticles()
     @Override
     protected List<Article> doInBackground(String... params) {
+        // is valid request (next page only, not repeat or excess page)
         if (adapterPageNum == pageNum - 1) {
             try {
                 return getArticles(params[0], pageNum);
@@ -79,7 +93,6 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                 e.printStackTrace();
             }
         }
-        // else, invalid request
 
         return null;
     }
@@ -88,22 +101,24 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
     protected void onPostExecute(final List<Article> articles) {
         CategoryAdapter adapter = null;
 
-        if (listViewWeakRef.get() != null)
-            adapter = (CategoryAdapter) listViewWeakRef.get().getAdapter();
+        if (listViewWeakRef.get() != null) {
+            WrapperListAdapter wrappedAdapter = (WrapperListAdapter) listViewWeakRef.get().getAdapter();
+            adapter = (CategoryAdapter) wrappedAdapter.getWrappedAdapter();
+        }
 
-        boolean loadingAnim = false;
+        boolean loadingFirstAnim = false;
         if (loadingViews != null) {
             if (loadingViews.refresh)
-                loadingAnim = loadingViews.swipeRefresh.get() != null &&
+                loadingFirstAnim = loadingViews.swipeRefresh.get() != null &&
                         loadingViews.swipeRefresh.get().isRefreshing();
             else
-                loadingAnim = loadingViews.progressBar.get() != null &&
+                loadingFirstAnim = loadingViews.progressBar.get() != null &&
                         loadingViews.progressBar.get().getVisibility() != ProgressBar.GONE;
         }
 
         // Loading should only show on first loading list
         // hide progressbar, refresh message, and refresh icon (if loading is done/successful)
-        if (loadingViews != null && loadingAnim) {
+        if (loadingViews != null && loadingFirstAnim) {
             if (loadingViews.refresh) loadingViews.swipeRefresh.get().setRefreshing(false);
             else loadingViews.progressBar.get().setVisibility(ProgressBar.GONE);
 
@@ -112,6 +127,10 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
                 if (txtv != null) txtv.setVisibility(View.GONE);
             }
+        } else {
+            Log.d("FetchListArticlesTask", "removing footerPrgressBar");
+//            if (listViewWeakRef.get() != null)
+//                listViewWeakRef.get().removeFooterView(footerProgressBar);
         }
 
         // If result and adapter are not null and fragment still exists, load items

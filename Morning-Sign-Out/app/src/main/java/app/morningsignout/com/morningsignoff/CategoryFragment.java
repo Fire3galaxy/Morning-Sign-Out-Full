@@ -6,8 +6,10 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.util.LruCache;
+import android.util.Xml;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +20,12 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.WrapperListAdapter;
 
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +36,17 @@ public class CategoryFragment extends Fragment {
         public WeakReference<SwipeRefreshLayout> swipeRefresh;
         public WeakReference<ProgressBar> progressBar;
         public WeakReference<TextView> refreshTextView;
+        public WeakReference<ProgressBar> footerProgress;
 
+        public boolean firstLoad;
         public boolean refresh;
+
+        public CategoryViews() {
+            swipeRefresh = null;
+            progressBar = null;
+            refreshTextView = null;
+            footerProgress = null;
+        }
     }
 
     final static String EXTRA_TITLE = "EXTRA_TITLE";
@@ -40,6 +56,7 @@ public class CategoryFragment extends Fragment {
     String category = "";
     AtomicBoolean isLoadingArticles;
     public LruCache<String, Bitmap> memoryCache;
+    ProgressBar footerProgressBar;
 
     public CategoryFragment() {
     }
@@ -78,13 +95,40 @@ public class CategoryFragment extends Fragment {
         final SwipeRefreshLayout refreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefresh_category);
         final ListView listView = (ListView) rootView.findViewById(R.id.listView);
 
+        // Views for first FetchListArticlesTask to affect
         final CategoryViews loadingViews = new CategoryViews();
         loadingViews.swipeRefresh = new WeakReference<SwipeRefreshLayout>(refreshLayout);
         loadingViews.progressBar = new WeakReference<ProgressBar>((ProgressBar) rootView.findViewById(R.id.progressBar));
         loadingViews.refreshTextView = new WeakReference<TextView>((TextView) rootView.findViewById(R.id.textView_categoryRefresh));
+        loadingViews.firstLoad = true;
+
         if (getArguments().containsKey(EXTRA_REFRESH)) loadingViews.refresh = true;
         else loadingViews.refresh = false;
 
+        // Footer progressbar view
+        // -get attributes for footerProgressBar
+        XmlPullParser pullParser = getResources().getXml(R.xml.footer_progressbar);
+
+        // -get first tag of xml
+        try {
+            int type = 0;
+            while (type != XmlPullParser.END_DOCUMENT && type != XmlPullParser.START_TAG) {
+                type = pullParser.next();
+            }
+        } catch (XmlPullParserException | IOException e) {
+            Log.e("CategoryFragment", e.getMessage());
+        }
+
+        // -get attriuteSet
+        AttributeSet attrs = Xml.asAttributeSet(pullParser);
+
+        // -create progressBar and add to listView
+        footerProgressBar = new ProgressBar(getActivity(), attrs);
+        listView.addFooterView(footerProgressBar);
+
+        //FIXME: Change fetchListArticlesTask to get the footer and change visibility
+
+        // Adapter
         listView.setAdapter(new CategoryAdapter(this, inflater));
 
         // Use Asynctask to fetch article from the given category
@@ -95,8 +139,10 @@ public class CategoryFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                CategoryAdapter categoryAdapter = (CategoryAdapter) parent.getAdapter();
-                SingleRow rowTemp = (SingleRow) categoryAdapter.getItem(position);
+                WrapperListAdapter wrappedAdapter = (WrapperListAdapter) parent.getAdapter();
+
+                CategoryAdapter adapter = (CategoryAdapter) wrappedAdapter.getWrappedAdapter();
+                SingleRow rowTemp = (SingleRow) adapter.getItem(position);
                 String articleTitle = rowTemp.title;
 
                 // Create new activity for the article here
@@ -126,7 +172,8 @@ public class CategoryFragment extends Fragment {
 
                 // At last item
                 if (lastVisibleItem >= totalItemCount) {
-                    CategoryAdapter adapter = (CategoryAdapter) listView.getAdapter();
+                    WrapperListAdapter wrappedAdapter = (WrapperListAdapter) listView.getAdapter();
+                    CategoryAdapter adapter = (CategoryAdapter) wrappedAdapter.getWrappedAdapter();
 
                     int pageNum = adapter.getPageNum();
                     // Only make one request per page request
