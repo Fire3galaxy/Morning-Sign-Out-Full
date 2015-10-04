@@ -178,8 +178,12 @@ public class CategoryFragment extends Fragment {
                     int pageNum = adapter.getPageNum();
                     // Only make one request per page request
                     if (totalItemCount != 0 && lastPageNum != pageNum && isLoadingArticles.weakCompareAndSet(false, true)) {
+                        CategoryViews views = new CategoryViews();
+                        views.firstLoad = false;
+                        views.footerProgress = new WeakReference<ProgressBar>(footerProgressBar);
+
                         lastPageNum = pageNum;
-                        new FetchListArticlesTask(CategoryFragment.this, listView, pageNum + 1).execute(category);
+                        new FetchListArticlesTask(CategoryFragment.this, listView, views, pageNum + 1).execute(category);
                     }
                 }
             }

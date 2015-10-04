@@ -46,27 +46,19 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         this.footerProgressBar = null; // not used on first call to task
     }
 
-    // Called by onScrollListener after first call
-    public FetchListArticlesTask(CategoryFragment fragment,
-                                 ListView listView,
-                                 int pageNum) {
-        this.fragmentRef = new WeakReference<CategoryFragment>(fragment);
-        this.listViewWeakRef = new WeakReference<ListView>(listView);
-        this.loadingViews = null;
-        this.pageNum = pageNum;
-        this.footerProgressBar = new ProgressBar(this.fragmentRef.get().getActivity());
-
-        Log.d("FetchListArticlesTask", "using footerPrgressBar");
-    }
-
     @Override
     protected void onPreExecute() {
         // Loading animations (first time only, use refresh or center progressbar)
         if (loadingViews != null) {
-            if (loadingViews.refresh && loadingViews.swipeRefresh.get() != null)
-                loadingViews.swipeRefresh.get().setRefreshing(true);
-            else if (loadingViews.progressBar.get() != null)
-                loadingViews.progressBar.get().setVisibility(View.VISIBLE);
+            if (loadingViews.firstLoad) {
+                if (loadingViews.refresh && loadingViews.swipeRefresh.get() != null)
+                    loadingViews.swipeRefresh.get().setRefreshing(true);
+                else if (loadingViews.progressBar.get() != null)
+                    loadingViews.progressBar.get().setVisibility(View.VISIBLE);
+            } else {
+                if (loadingViews.footerProgress.get() != null)
+                    loadingViews.footerProgress.get().setVisibility(View.VISIBLE);
+            }
         }
 
         // initialize variables
@@ -75,10 +67,6 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
             CategoryAdapter adapter = (CategoryAdapter) wrappedAdapter.getWrappedAdapter();
             adapterPageNum = adapter.getPageNum();
-
-            // Loading animation (after first time)
-//            if (loadingViews == null)
-//                listViewWeakRef.get().addFooterView(footerProgressBar);
         }
     }
 
@@ -106,31 +94,31 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
             adapter = (CategoryAdapter) wrappedAdapter.getWrappedAdapter();
         }
 
-        boolean loadingFirstAnim = false;
-        if (loadingViews != null) {
-            if (loadingViews.refresh)
-                loadingFirstAnim = loadingViews.swipeRefresh.get() != null &&
-                        loadingViews.swipeRefresh.get().isRefreshing();
-            else
-                loadingFirstAnim = loadingViews.progressBar.get() != null &&
-                        loadingViews.progressBar.get().getVisibility() != ProgressBar.GONE;
-        }
-
         // Loading should only show on first loading list
         // hide progressbar, refresh message, and refresh icon (if loading is done/successful)
-        if (loadingViews != null && loadingFirstAnim) {
-            if (loadingViews.refresh) loadingViews.swipeRefresh.get().setRefreshing(false);
-            else loadingViews.progressBar.get().setVisibility(ProgressBar.GONE);
+        if (loadingViews != null) {
+            if (loadingViews.firstLoad) {
+                boolean shouldDisableRefresh = loadingViews.refresh &&
+                        loadingViews.swipeRefresh.get() != null &&
+                        loadingViews.swipeRefresh.get().isRefreshing();
+                boolean canHideProgressBar = loadingViews.progressBar.get() != null &&
+                        loadingViews.progressBar.get().getVisibility() != ProgressBar.GONE;
 
-            if (articles != null) {
-                TextView txtv = loadingViews.refreshTextView.get();
+                if (shouldDisableRefresh)
+                    loadingViews.swipeRefresh.get().setRefreshing(false);
+                else if (canHideProgressBar)
+                    loadingViews.progressBar.get().setVisibility(ProgressBar.GONE);
 
-                if (txtv != null) txtv.setVisibility(View.GONE);
+                // hide how-to-refresh textview
+                if (articles != null) {
+                    TextView txtv = loadingViews.refreshTextView.get();
+
+                    if (txtv != null) txtv.setVisibility(View.GONE);
+                }
+            } else {
+                if (loadingViews.footerProgress.get() != null)
+                    loadingViews.footerProgress.get().setVisibility(View.GONE);
             }
-        } else {
-            Log.d("FetchListArticlesTask", "removing footerPrgressBar");
-//            if (listViewWeakRef.get() != null)
-//                listViewWeakRef.get().removeFooterView(footerProgressBar);
         }
 
         // If result and adapter are not null and fragment still exists, load items
