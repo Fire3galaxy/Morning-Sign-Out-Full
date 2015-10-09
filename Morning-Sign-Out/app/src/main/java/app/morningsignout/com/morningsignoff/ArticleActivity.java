@@ -28,6 +28,7 @@ import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -64,60 +65,47 @@ public class ArticleActivity extends ActionBarActivity {
         // Set the title for this myActivity to the article title
         Intent intent = getIntent();
         if (intent != null) {
-            // Setting variable category (healthcare, wellness, etc.) and title of myActivity (article name)
+            // VARIABLES/TITLE - Setting variable category (healthcare, wellness, etc.) and title of myActivity (article name)
             category = getIntent().getStringExtra(Intent.EXTRA_TITLE);
             setTitle(getIntent().getStringExtra(Intent.EXTRA_SHORTCUT_NAME));
 
-            // ImageButton is Morning Sign Out logo, which sends user back to home screen (see XML)
-            // Setting imageButton to center of actionbar
+            // ACTION BAR
+            //      ImageButton is Morning Sign Out logo, which sends user back to home screen (see XML)
+            //      Setting imageButton to center of actionbar
             ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title, null);
             ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);
             this.getSupportActionBar().setCustomView(ib, params);
 
-            // Disabling title text of actionbar, enabling imagebutton
+            //      Disabling title text of actionbar, enabling imagebutton
             this.getSupportActionBar().setDisplayShowTitleEnabled(false);
             this.getSupportActionBar().setDisplayShowCustomEnabled(true);
 
-            // Getting article from URL and stripping away extra parts of website for better reading
+            // WEBVIEW - Getting article from URL and stripping away extra parts of website for better reading
             webView = (CustomWebView) findViewById(R.id.webView_article);
             webView.getSettings().setBuiltInZoomControls(true);
             webViewClient = new ArticleWebViewClient(this);
             webView.setWebViewClient(webViewClient);
 
-            // Setting relativeLayout
+            // ARTICLE BAR
+            //      Setting relativeLayout
             relativeLayout = (RelativeLayout) findViewById(R.id.container_articleBar);
 
-            // Setting up objectAnimators for articleBar's show/hide animation
+            //      Setting up objectAnimators for articleBar's show/hide animation
             showArticleBar = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.show_article_bar);
             showArticleBar.setTarget(relativeLayout);
             hideArticleBar = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.hide_article_bar);
             hideArticleBar.setTarget(relativeLayout);
 
+            //      How the animation of the articleBar is programmed
             LinearLayout container = (LinearLayout) findViewById(R.id.container_article);
-            LayoutTransition customTransition = new LayoutTransition();
-//            customTransition.enableTransitionType(LayoutTransition.CHANGING);
-//            customTransition.disableTransitionType(LayoutTransition.CHANGE_APPEARING);
-//            customTransition.disableTransitionType(LayoutTransition.CHANGE_DISAPPEARING);
-            customTransition.setAnimator(LayoutTransition.APPEARING, showArticleBar);
-            customTransition.setAnimator(LayoutTransition.DISAPPEARING, hideArticleBar);
-            customTransition.setStartDelay(LayoutTransition.APPEARING, 0);
-            customTransition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
-            customTransition.setStartDelay(LayoutTransition.DISAPPEARING, 0);
-            customTransition.setStartDelay(LayoutTransition.CHANGE_DISAPPEARING, 0);
-//            customTransition.setStartDelay(LayoutTransition.CHANGING, 0);
-            customTransition.setDuration(LayoutTransition.APPEARING, showArticleBar.getDuration());
-            customTransition.setDuration(LayoutTransition.CHANGE_APPEARING, showArticleBar.getDuration());
-            customTransition.setDuration(LayoutTransition.DISAPPEARING, hideArticleBar.getDuration());
-            customTransition.setDuration(LayoutTransition.CHANGE_DISAPPEARING, hideArticleBar.getDuration());
-//            customTransition.setDuration(LayoutTransition.APPEARING, showArticleBar.getDuration());
+            container.setLayoutTransition(getCustomLayoutTransition());
 
-            container.setLayoutTransition(customTransition);
-
-            // Setting up share intent for first web page
+            // SHARE BUTTON
+            //      Setting up share intent for first web page
             shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.putExtra(Intent.EXTRA_TEXT, getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT));
 
-            // Setting up share button
+            //      Setting up share button
             ImageButton shareButton = (ImageButton) findViewById(R.id.button_share);
             shareButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -127,7 +115,8 @@ public class ArticleActivity extends ActionBarActivity {
                 }
             });
 
-            // Setting up "tumblr" scroll button
+            // SCROLL BUTTON
+            //      Setting up "tumblr" scroll button
             ImageButton scrollButton = (ImageButton) findViewById(R.id.button_scroll);
             scrollButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -146,6 +135,16 @@ public class ArticleActivity extends ActionBarActivity {
                             scrollDown.start();
                         }
                     }
+                }
+            });
+
+            // COMMENT BUTTON
+            ImageButton commentButton = (ImageButton) findViewById(R.id.button_comment);
+            commentButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(ArticleActivity.this, DisqusActivity.class);
+                    startActivity(intent);
                 }
             });
         }
@@ -222,7 +221,7 @@ public class ArticleActivity extends ActionBarActivity {
 
         // 1. App has returned from search w/ result
         if (searchReturnUrl != null) {
-            searchReturnUrl = new String(getIntent().getStringExtra(Intent.EXTRA_RETURN_RESULT));   // copy string
+            searchReturnUrl = getIntent().getStringExtra(Intent.EXTRA_RETURN_RESULT);   // copy string
             getIntent().removeExtra(Intent.EXTRA_RETURN_RESULT);        // Return url only valid once, remove it after use
             new URLToMobileArticle(webView).execute(searchReturnUrl);
             Log.d("ArticleActivity", "Loading: " + intentUrl);
@@ -230,7 +229,8 @@ public class ArticleActivity extends ActionBarActivity {
         // 2. App was stopped/return to this myActivity from search w/o a result (do nothing)
         else if (webviewUrl != null && !webviewUrl.isEmpty());
             // 3. App has not loaded its first article yet
-        else if (intentUrl != null) new URLToMobileArticle(webView).execute(intentUrl);
+        else if (intentUrl != null)
+            new URLToMobileArticle(webView).execute(intentUrl);
 
         if (getSupportActionBar() != null)
             getSupportActionBar().collapseActionView(); // collapse search bar on return from search
@@ -258,6 +258,27 @@ public class ArticleActivity extends ActionBarActivity {
         if (relativeLayout.getVisibility() != RelativeLayout.GONE) {
             relativeLayout.setVisibility(RelativeLayout.GONE);
         }
+    }
+
+    LayoutTransition getCustomLayoutTransition() {
+        LayoutTransition customTransition = new LayoutTransition();
+//            customTransition.enableTransitionType(LayoutTransition.CHANGING);
+//            customTransition.disableTransitionType(LayoutTransition.CHANGE_APPEARING);
+//            customTransition.disableTransitionType(LayoutTransition.CHANGE_DISAPPEARING);
+        customTransition.setAnimator(LayoutTransition.APPEARING, showArticleBar);
+        customTransition.setAnimator(LayoutTransition.DISAPPEARING, hideArticleBar);
+        customTransition.setStartDelay(LayoutTransition.APPEARING, 0);
+        customTransition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
+        customTransition.setStartDelay(LayoutTransition.DISAPPEARING, 0);
+        customTransition.setStartDelay(LayoutTransition.CHANGE_DISAPPEARING, 0);
+//            customTransition.setStartDelay(LayoutTransition.CHANGING, 0);
+        customTransition.setDuration(LayoutTransition.APPEARING, showArticleBar.getDuration());
+        customTransition.setDuration(LayoutTransition.CHANGE_APPEARING, showArticleBar.getDuration());
+        customTransition.setDuration(LayoutTransition.DISAPPEARING, hideArticleBar.getDuration());
+        customTransition.setDuration(LayoutTransition.CHANGE_DISAPPEARING, hideArticleBar.getDuration());
+//            customTransition.setDuration(LayoutTransition.APPEARING, showArticleBar.getDuration());
+
+        return customTransition;
     }
 }
 

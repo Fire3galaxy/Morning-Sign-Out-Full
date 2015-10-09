@@ -20,7 +20,7 @@
     <string name="title_activity_article">ArticleActivity</string>
     <!-- In menu_main.xml, we can add items to the action bar! Set showAsAction to strings like never, ifRoom, etc to show!-->
     <string name="title_activity_search">SearchResultsActivity</string>
-    <string name="title_activity_test">TestActivity</string>
+    <string name="title_activity_disqus">DisqusActivity</string>
     <string name="title_contentDescription">app home button</string>
     <string name="title_slide_menu">Categories menu</string>
 
