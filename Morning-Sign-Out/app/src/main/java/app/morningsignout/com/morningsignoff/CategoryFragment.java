@@ -128,10 +128,17 @@ public class CategoryFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 WrapperListAdapter wrappedAdapter = (WrapperListAdapter) parent.getAdapter();
-
                 CategoryAdapter adapter = (CategoryAdapter) wrappedAdapter.getWrappedAdapter();
-                SingleRow rowTemp = (SingleRow) adapter.getItem(position);
+                int id_int = (int) id;
+
+                // Do nothing if id is invalid
+                if (id_int < 0 || id_int > adapter.getCount())
+                    return;
+
+                SingleRow rowTemp = (SingleRow) adapter.getItem(id_int);
                 String articleTitle = rowTemp.title;
+
+                Log.d("CategoryFragment", "Position: " + String.valueOf(position) + ", id: " + String.valueOf(id));
 
                 // Create new activity for the article here
                 // feed the new activity with the URL of the page
