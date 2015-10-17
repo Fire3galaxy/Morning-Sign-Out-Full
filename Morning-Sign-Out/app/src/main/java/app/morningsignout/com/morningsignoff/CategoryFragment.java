@@ -103,9 +103,7 @@ public class CategoryFragment extends Fragment {
         loadingViews.progressBar = new WeakReference<ProgressBar>((ProgressBar) rootView.findViewById(R.id.progressBar));
         loadingViews.refreshTextView = new WeakReference<TextView>((TextView) rootView.findViewById(R.id.textView_categoryRefresh));
         loadingViews.firstLoad = true;
-
-        if (getArguments().containsKey(EXTRA_REFRESH)) loadingViews.refresh = true;
-        else loadingViews.refresh = false;
+        loadingViews.refresh = getArguments().containsKey(EXTRA_REFRESH);
 
         // Footer progressbar view
         // -get attributes for footerProgressBar

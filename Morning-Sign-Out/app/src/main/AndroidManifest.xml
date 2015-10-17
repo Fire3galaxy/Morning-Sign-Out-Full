@@ -61,7 +61,8 @@
         <activity
             android:name=".DisqusActivity"
             android:label="@string/title_activity_disqus"
-            android:parentActivityName=".ArticleActivity">
+            android:parentActivityName=".ArticleActivity"
+            android:theme="@style/DisqusTheme">
         </activity>
     </application>
 

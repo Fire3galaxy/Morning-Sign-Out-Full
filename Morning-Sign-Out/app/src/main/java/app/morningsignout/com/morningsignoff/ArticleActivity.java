@@ -72,7 +72,7 @@ public class ArticleActivity extends ActionBarActivity {
             // ACTION BAR
             //      ImageButton is Morning Sign Out logo, which sends user back to home screen (see XML)
             //      Setting imageButton to center of actionbar
-            ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title, null);
+            ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null); // could replace null with new LinearLayout. properties not needed though.
             ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);
             this.getSupportActionBar().setCustomView(ib, params);
 
@@ -238,10 +238,9 @@ public class ArticleActivity extends ActionBarActivity {
 
     // view parameter needed for title.xml onClick()
     public void returnToParent(View view) {
-        Intent intent = NavUtils.getParentActivityIntent(this);
+        Intent intent = new Intent(this, CategoryActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        intent.putExtra(Intent.EXTRA_TITLE, category);
-        NavUtils.navigateUpTo(this, intent);
+        startActivity(intent);
     }
     synchronized public void resetLastSavedY() {
         lastSavedY = 0;

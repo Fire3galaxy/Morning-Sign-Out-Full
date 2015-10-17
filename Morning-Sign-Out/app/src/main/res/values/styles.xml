@@ -7,7 +7,10 @@
         <item name="android:actionBarSize">45dp</item>
     </style>
 
-    <style name="MsoActionBarTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="DisqusTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:homeAsUpIndicator">@drawable/ic_action_cancel</item>
+        <item name="colorPrimary">@color/mso_blue</item>
+        <item name="android:actionBarSize">45dp</item>
     </style>
 
     <!-- Attempted to use this to italicize/customize article actionbar title without custom textView. No italics. -->

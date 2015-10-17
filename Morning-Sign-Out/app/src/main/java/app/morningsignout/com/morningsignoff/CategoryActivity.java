@@ -135,7 +135,7 @@ public class CategoryActivity extends ActionBarActivity {
 
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title, null);
+        ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null);
         ib.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
