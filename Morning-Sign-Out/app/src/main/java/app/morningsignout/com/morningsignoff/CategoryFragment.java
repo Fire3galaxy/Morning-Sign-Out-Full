@@ -38,6 +38,7 @@ public class CategoryFragment extends Fragment {
         public WeakReference<SwipeRefreshLayout> swipeRefresh;
         public WeakReference<ProgressBar> progressBar;
         public WeakReference<TextView> refreshTextView;
+        public WeakReference<TextView> headerTextView;
         public WeakReference<ProgressBar> footerProgress;
 
         public boolean firstLoad;
@@ -47,6 +48,7 @@ public class CategoryFragment extends Fragment {
             swipeRefresh = null;
             progressBar = null;
             refreshTextView = null;
+            headerTextView = null;
             footerProgress = null;
         }
     }
@@ -96,39 +98,23 @@ public class CategoryFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_category_main, container, false);
         final SwipeRefreshLayout refreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefresh_category);
         final ListView listView = (ListView) rootView.findViewById(R.id.listView);
+        TextView headerTitle = getHeaderTextView();
 
         // Views for first FetchListArticlesTask to affect
         final CategoryViews loadingViews = new CategoryViews();
         loadingViews.swipeRefresh = new WeakReference<SwipeRefreshLayout>(refreshLayout);
         loadingViews.progressBar = new WeakReference<ProgressBar>((ProgressBar) rootView.findViewById(R.id.progressBar));
         loadingViews.refreshTextView = new WeakReference<TextView>((TextView) rootView.findViewById(R.id.textView_categoryRefresh));
+        loadingViews.headerTextView = new WeakReference<TextView>((TextView) headerTitle);
+        loadingViews.refresh = getArguments().containsKey(EXTRA_REFRESH);
         loadingViews.firstLoad = true;
 
-        if (getArguments().containsKey(EXTRA_REFRESH)) loadingViews.refresh = true;
-        else loadingViews.refresh = false;
+        // Header TextView
+        listView.addHeaderView(headerTitle);
 
         // Footer progressbar view
-        // -get attributes for footerProgressBar
-        XmlPullParser pullParser = getResources().getXml(R.xml.footer_progressbar);
-
-        // -get first tag of xml
-        try {
-            int type = 0;
-            while (type != XmlPullParser.END_DOCUMENT && type != XmlPullParser.START_TAG) {
-                type = pullParser.next();
-            }
-        } catch (XmlPullParserException | IOException e) {
-            Log.e("CategoryFragment", e.getMessage());
-        }
-
-        // -get attriuteSet
-        AttributeSet attrs = Xml.asAttributeSet(pullParser);
-
-        // -create progressBar and add to listView
-        footerProgressBar = new ProgressBar(getActivity(), attrs);
+        footerProgressBar = getFooterProgressBar();
         listView.addFooterView(footerProgressBar);
-
-        //FIXME: Change fetchListArticlesTask to get the footer and change visibility
 
         // Adapter
         listView.setAdapter(new CategoryAdapter(this, inflater));
@@ -238,6 +224,77 @@ public class CategoryFragment extends Fragment {
             return new CategoryFragment();
         }
         return fragment;
+    }
+
+    TextView getHeaderTextView() {
+        // -get attributes
+        XmlPullParser pullParser = getResources().getXml(R.xml.header_textview);
+
+        // -get first tag of xml
+        try {
+            int type = 0;
+            while (type != XmlPullParser.END_DOCUMENT && type != XmlPullParser.START_TAG) {
+                type = pullParser.next();
+            }
+        } catch (XmlPullParserException | IOException e) {
+            Log.e("CategoryFragment", e.getMessage());
+        }
+
+        // -get attriuteSet
+        AttributeSet attrs = Xml.asAttributeSet(pullParser);
+
+        // Set text to category
+        TextView textView = new TextView(getActivity(), attrs);
+        textView.setText(getReadableCategory(category));
+
+        return textView;
+    }
+
+    ProgressBar getFooterProgressBar() {
+        // -get attributes for footerProgressBar
+        XmlPullParser pullParser = getResources().getXml(R.xml.footer_progressbar);
+
+        // -get first tag of xml
+        try {
+            int type = 0;
+            while (type != XmlPullParser.END_DOCUMENT && type != XmlPullParser.START_TAG) {
+                type = pullParser.next();
+            }
+        } catch (XmlPullParserException | IOException e) {
+            Log.e("CategoryFragment", e.getMessage());
+        }
+
+        // -get attriuteSet
+        AttributeSet attrs = Xml.asAttributeSet(pullParser);
+
+        // -create progressBar and add to listView
+        return new ProgressBar(getActivity(), attrs);
+    }
+
+    String getReadableCategory(String category) {
+        // beautiful capitalizing code....aw.
+//        StringBuilder changedVal = new StringBuilder(val);
+//
+//        int length = val.length();
+//        for (int i = 0; i < length; i++) {
+//            if (Character.isAlphabetic(val.charAt(i)) &&
+//                    (i == 0 || Character.isWhitespace(val.charAt(i - 1))))
+//                changedVal.setCharAt(i, Character.toUpperCase(val.charAt(i)));
+//        }
+//
+//        return changedVal.toString();
+
+        // O(n) operation. Using static strings since we know all categories.
+        String readableCategories[] = getResources().getStringArray(R.array.categories),
+                urlCategories[] = getResources().getStringArray(R.array.categories_for_url);
+
+        int index = -1;
+        for (int i = 0; i < urlCategories.length; i++)
+            if (urlCategories[i].equals(category))
+                index = i;
+
+        // Should never return -1
+        return readableCategories[index];
     }
 }
 

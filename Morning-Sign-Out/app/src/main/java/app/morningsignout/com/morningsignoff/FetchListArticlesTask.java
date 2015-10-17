@@ -111,9 +111,11 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
                 // hide how-to-refresh textview
                 if (articles != null) {
-                    TextView txtv = loadingViews.refreshTextView.get();
+                    TextView refresh = loadingViews.refreshTextView.get();
+                    if (refresh != null) refresh.setVisibility(View.GONE);
 
-                    if (txtv != null) txtv.setVisibility(View.GONE);
+                    TextView header = loadingViews.headerTextView.get();
+                    if (header != null) header.setVisibility(View.VISIBLE);
                 }
             } else {
                 if (loadingViews.footerProgress.get() != null)
