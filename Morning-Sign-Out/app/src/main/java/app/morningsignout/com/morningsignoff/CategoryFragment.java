@@ -272,18 +272,6 @@ public class CategoryFragment extends Fragment {
     }
 
     String getReadableCategory(String category) {
-        // beautiful capitalizing code....aw.
-//        StringBuilder changedVal = new StringBuilder(val);
-//
-//        int length = val.length();
-//        for (int i = 0; i < length; i++) {
-//            if (Character.isAlphabetic(val.charAt(i)) &&
-//                    (i == 0 || Character.isWhitespace(val.charAt(i - 1))))
-//                changedVal.setCharAt(i, Character.toUpperCase(val.charAt(i)));
-//        }
-//
-//        return changedVal.toString();
-
         // O(n) operation. Using static strings since we know all categories.
         String readableCategories[] = getResources().getStringArray(R.array.categories),
                 urlCategories[] = getResources().getStringArray(R.array.categories_for_url);
