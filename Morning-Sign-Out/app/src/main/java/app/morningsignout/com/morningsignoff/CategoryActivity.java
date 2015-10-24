@@ -70,8 +70,6 @@ public class CategoryActivity extends ActionBarActivity {
             position = getIntent().getIntExtra(Intent.EXTRA_TITLE, -1);
 //        setupActivityTitle();
 
-
-
 //        // For DrawerLayout (no fragment)
 //        mDrawerList = (ListView) findViewById(R.id.listView_slide);
 //        ArrayAdapter<String> mAdapter = new ArrayAdapter<String>(this,
@@ -275,7 +273,7 @@ public class CategoryActivity extends ActionBarActivity {
     }
 
     void selectItem(int position) {
-        if (this.position != position) {
+        if (this.position != position && position < categories_urls.length) {
             this.position = position;
 
             CategoryFragment fragment = new CategoryFragment();
@@ -287,6 +285,10 @@ public class CategoryActivity extends ActionBarActivity {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.container_category, fragment)
                     .commit();
+        } else if (position == categories_urls.length){
+            // Enter code here! categories_urls.length -> About MSO
+        } else if (position == categories_urls.length + 1) {
+            // categories_urls.length + 1 -> Meet the Team
         }
 
         // Highlight the selected item, update the title, and close the drawer
