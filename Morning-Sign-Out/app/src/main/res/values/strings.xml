@@ -73,5 +73,25 @@
         <item>healthcare</item>
     </string-array>
 
+    <string-array name ="executive_names">
+        <item>Andrew Lee</item>
+        <item>Asal Homayouni</item>
+        <item>Gloria Ye</item>
+        <item>Katy Cohen</item>
+        <item>Kevin Jiang</item>
+        <item>Sofia Dhanani</item>
+        <item>Stephanie Chang</item>
+    </string-array>
+
+    <string-array name ="executive_positions">
+        <item>Executive Chairman and Founder</item>
+        <item>Chief Operating Officer</item>
+        <item>Director of Development and Growth Analytics</item>
+        <item>Creative Director</item>
+        <item>Chief Technical Director</item>
+        <item>Chief Executive Officer</item>
+        <item>Director of Operations and Administration</item>
+    </string-array>
+
     <string name="description_error_no_internet">Cannot connect to internet</string>
 </resources>
