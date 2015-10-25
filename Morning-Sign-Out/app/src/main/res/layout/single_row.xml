@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="275dp"
+    android:layout_height="wrap_content"
     android:background="@drawable/row_item_background"
     android:visibility="visible"
     android:elevation="3dp">
@@ -20,26 +20,27 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true">
 
         <ImageView
             android:src="@drawable/list_item_1"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="220dp"
             android:id="@+id/imageView"
             android:background="#00ffffff"
-            android:layout_weight="9"
             android:layout_margin="0dp"
-            android:elevation="3dp" />
+            android:elevation="3dp"
+            android:layout_alignParentTop = "true" />
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_weight="3">
+            android:layout_alignParentBottom = "true"
+            >
 
             <TextView
                 android:layout_width="match_parent"
@@ -63,9 +64,10 @@
                 android:id="@+id/textView2"
                 android:background="#00ffffff"
                 android:ellipsize="end"
-                android:lines="5"
+                android:maxLines="1"
                 android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp" />
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="5dp" />
         </LinearLayout>
     </LinearLayout>
 
