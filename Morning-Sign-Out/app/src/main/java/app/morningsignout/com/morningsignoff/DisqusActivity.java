@@ -29,8 +29,9 @@ public class DisqusActivity extends ActionBarActivity {
         // Commenting webview
         long id = 3635144879L; // long-type literals are SO BIG they need L on the end. who knew?
         String disqus_thread_id = String.valueOf(id);
-        String commentsUrl = "http://www.morningsignout.com/showcomments.php?disqus_id="
-                + disqus_thread_id;
+//        String commentsUrl = "http://www.morningsignout.com/showcomments.php?disqus_id="
+//                + disqus_thread_id;
+        String commentsUrl = "http://morningsignout.com/an-international-patchwork-of-healthcare/";
 
         WebView webView = (WebView) findViewById(R.id.webView_disqus);
 
