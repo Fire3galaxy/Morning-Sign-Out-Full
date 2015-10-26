@@ -12,7 +12,7 @@ public class CategoryImageTaskDrawable extends ColorDrawable {
     WeakReference<FetchCategoryImageTask> taskReference;
 
     public CategoryImageTaskDrawable(FetchCategoryImageTask task) {
-        super(Color.GRAY);
+        super(Color.WHITE);
         taskReference = new WeakReference<FetchCategoryImageTask>(task);
     }
 
