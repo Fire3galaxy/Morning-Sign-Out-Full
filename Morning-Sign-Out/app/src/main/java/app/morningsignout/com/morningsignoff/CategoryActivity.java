@@ -287,6 +287,9 @@ public class CategoryActivity extends ActionBarActivity {
                     .commit();
         } else if (position == categories_urls.length){
             // Enter code here! categories_urls.length -> About MSO
+            Intent AboutMSOActivity = new Intent(this, AboutMSOActivity.class);
+            startActivity(AboutMSOActivity);
+
         } else if (position == categories_urls.length + 1) {
             // categories_urls.length + 1 -> Meet the Team
         }
