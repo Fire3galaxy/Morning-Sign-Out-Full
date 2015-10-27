@@ -399,7 +399,6 @@ class CategoryAdapter extends BaseAdapter {
                     articles.add(SingleRow.newInstance(moreArticles.get(i)));
                 uniqueArticleNames.add(article);
 //                notifyDataSetChanged();
-                Log.d("Nothing","at all");
             }
 
             notifyDataSetChanged();
