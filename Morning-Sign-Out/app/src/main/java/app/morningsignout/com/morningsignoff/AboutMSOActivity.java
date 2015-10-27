@@ -18,12 +18,11 @@ public class AboutMSOActivity extends ActionBarActivity {
         setContentView(R.layout.about_mso);
 
         // setting TextViews to the spannable strings
-        TextView p1 = (TextView)findViewById(R.id.textView5);
-        TextView p2 = (TextView)findViewById(R.id.textView6);
+        TextView p1 = (TextView)findViewById(R.id.textView_aboutUsDesc1);
+        TextView p2 = (TextView)findViewById(R.id.textView_aboutUsDesc2);
 
-        p1.setText(Html.fromHtml(getString(R.string.morning_content)));
-        p2.setText(Html.fromHtml(getString(R.string.sign_out_content)));
-
+        p1.setText(Html.fromHtml(getString(R.string.sign_out_content)));
+        p2.setText(Html.fromHtml(getString(R.string.morning_content)));
     }
 
     @Override
