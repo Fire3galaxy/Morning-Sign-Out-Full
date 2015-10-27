@@ -1,9 +1,15 @@
 package app.morningsignout.com.morningsignoff;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.text.Html;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -14,8 +20,8 @@ public class AboutMSOActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        super.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.about_mso);
+        setupActionBar();
 
         // setting TextViews to the spannable strings
         TextView p1 = (TextView)findViewById(R.id.textView_aboutUsDesc1);
@@ -28,8 +34,20 @@ public class AboutMSOActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_aboutmso, menu);
         return true;
+    }
+
+    public void returnToParent(View view) {
+        NavUtils.navigateUpFromSameTask(this);
+    }
+
+    public void setupActionBar() {
+        ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title, null);
+        ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);
+        this.getSupportActionBar().setCustomView(ib, params);
+        super.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        super.getSupportActionBar().setDisplayShowCustomEnabled(true);
     }
 
     /*@Override
