@@ -1,0 +1,87 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="false"
+    android:background="#FFFFFF"
+    android:id="@+id/scrollView">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="116dp"
+            android:id="@+id/imageView_aboutUsLogo"
+            android:src="@drawable/mso_logo"
+            android:contentDescription="@string/logo_contentDescription"
+            android:layout_gravity="center" />
+
+        <TextView
+            android:text="@string/about_us"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_aboutUsTitle"
+            android:typeface="serif"
+            android:textSize="@dimen/abc_text_size_headline_material"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:textColor="#000000"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:id="@+id/imageView_aboutUsBorder"
+            android:src="@drawable/mso_border"
+            android:contentDescription="@string/border_contentDescription"
+            android:layout_marginTop="-15dp"
+            android:layout_gravity="center_horizontal"
+            android:adjustViewBounds="false"
+            android:padding="10dp" />
+
+        <TextView
+            android:text="@string/why_mso"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_aboutUsQuestion"
+            android:typeface="serif"
+            android:textSize="@dimen/abc_text_size_title_material"
+            android:textStyle="bold"
+            android:layout_marginBottom="20dp"
+            android:layout_gravity="center_horizontal"
+            android:textColor="#000000"/>
+
+        <TextView
+            android:text="@string/sign_out_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_aboutUsDesc1"
+            android:typeface="serif"
+            android:layout_gravity="center_horizontal"
+            android:textColor="#000000" />
+
+        <TextView
+            android:text="@string/morning_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_aboutUsDesc2"
+            android:typeface="serif"
+            android:layout_gravity="center_horizontal"
+            android:textColor="#000000" />
+
+        <TextView
+            android:text="@string/footer_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_aboutUsDesc3"
+            android:typeface="serif"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:textColor="#000000" />
+
+    </LinearLayout>
+</ScrollView>

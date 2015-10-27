@@ -4,9 +4,7 @@
     <string name="app_name">Morning Sign Out</string>
     <string name="action_settings">Settings</string>
     <string name="good_morning">Good Morning!</string>
-    <string name="img_description">Here!</string>
     <string name="latest_articles">Latest articles and images</string>
-    <string name="article_image">Article Image</string>
     <string name="author">The author of the journals</string>
     <string name="article">A flash of blinding light engulfs all of Gravity Falls. Then, everything comes down to earth. The portal, now a mess of tangled wires and metal, glows bright blue. A figure emerges from the portal. The blue light fades behind him. He walks forward, placing a six-fingered hand on the cover of the first journal, then picks it up and places it into the inside pocket of a long, dark coat.</string>
 
@@ -21,8 +19,13 @@
     <!-- In menu_main.xml, we can add items to the action bar! Set showAsAction to strings like never, ifRoom, etc to show!-->
     <string name="title_activity_search">SearchResultsActivity</string>
     <string name="title_activity_test">TestActivity</string>
-    <string name="title_contentDescription">app home button</string>
     <string name="title_slide_menu">Categories menu</string>
+
+    <string name="title_contentDescription">app home button</string>
+    <string name="img_description">Here!</string>
+    <string name="article_image">Article Image</string>
+    <string name="border_contentDescription">blue horizontal border</string>
+    <string name="logo_contentDescription">Morning Sign Out logo</string>
 
     <string name="search_hint">Search MorningSignOut</string>
 
@@ -75,4 +78,34 @@
     </string-array>
 
     <string name="description_error_no_internet">Cannot connect to internet</string>
+
+    <string name="about_us">About Us</string>
+    <string name="why_mso">Why "Morning Sign Out"?</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="sign_out_content">
+        <![CDATA[
+        <b>Sign Out</b> – the process in healthcare where patients are handed over to the
+        next person/team taking care of them. The term is inclusive to all healthcare professionals,
+        not only to physicians; nurses, pharmacists, case-workers, social workers, and several others
+        all practice the art of “signing out” to each other.<p>It’s a critical process. One must
+        accurately summarize who/what/why the patient is here, keeping the sign out simple enough
+        so that the next person isn’t flooded with irrelevant information, but thorough enough so
+        the whole story can be well understood, and so good decisions can be made.</p>
+          ]]>
+    </string>
+    <string name="morning">Morning</string>
+    <string name="morning_content">
+         <![CDATA[
+        <b>Morning</b> sign outs are particularly interesting. All of the activity, labs,
+        studies, and data that had occurred in the last 24 hours are assessed, and the plan for a
+        new day is formulated. Most major medical decisions happen during the day, so the morning
+        sign out is often the launching point for the rest of the day’s events.<p>As a society, there
+        is a large divide between the world of medicine and science and that of the greater public.
+        Often, the relationship between the two is strained and distrustful. This endeavor aims to
+        bridge that divide.</p>
+        ]]>
+        </string>
+    <string name="footer_content">As with a sign out, we hope to turn science and medicine into
+        something understandable for our readers, with enough critical information that leaves them
+        more knowledgeable than before.</string>
 </resources>
