@@ -9,9 +9,11 @@ public class ExecutiveListItem {
 
     public String name;
     public String position;
+    public String hyperlink;
 
-    public ExecutiveListItem (String name, String position) {
+    public ExecutiveListItem (String name, String position, String hyperlink) {
         this.name = name;
         this.position = position;
+        this.hyperlink = hyperlink;
     }
 }
