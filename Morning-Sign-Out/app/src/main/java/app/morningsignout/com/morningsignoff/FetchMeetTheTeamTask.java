@@ -16,17 +16,17 @@ import java.util.Map;
 /**
  * Created by Daniel on 10/30/2015.
  */
-public class FetchMeetTheTeamTask extends AsyncTask<Void, Void, Map<String, List<ExecutiveListItem>>> {
-    Map<String, List<ExecutiveListItem>> refFromCallingActivity;
+public class FetchMeetTheTeamTask extends AsyncTask<Void, Void, Map<String, ArrayList<ExecutiveListItem>>> {
+    Map<String, ArrayList<ExecutiveListItem>> refFromCallingActivity;
 
-    public FetchMeetTheTeamTask(Map<String, List<ExecutiveListItem>> refFromCallingActivity) {
+    public FetchMeetTheTeamTask(Map<String, ArrayList<ExecutiveListItem>> refFromCallingActivity) {
         this.refFromCallingActivity = refFromCallingActivity;
     }
 
     @Override
-    protected Map<String, List<ExecutiveListItem>> doInBackground(Void... params) {
+    protected Map<String, ArrayList<ExecutiveListItem>> doInBackground(Void... params) {
         try {
-            Map<String, List<ExecutiveListItem>> members = new HashMap<String, List<ExecutiveListItem>>();
+            Map<String, ArrayList<ExecutiveListItem>> members = new HashMap<>();
             Document doc = Jsoup.connect("http://morningsignout.com/team/").get();
             Elements groups = doc.getElementsByClass("user-group");
 
@@ -57,7 +57,7 @@ public class FetchMeetTheTeamTask extends AsyncTask<Void, Void, Map<String, List
     }
 
     @Override
-    protected void onPostExecute(Map<String, List<ExecutiveListItem>> members) {
+    protected void onPostExecute(Map<String, ArrayList<ExecutiveListItem>> members) {
         // Assign map to variable of calling activity. ENSURE THAT THIS ASSIGNMENT IS SYNCED.
         /* FIXME: Replace with a synchonized function from calling activity. Also make that
          * FIXME: calling activity the argument for this asynctask, not a reference to the map, so
