@@ -25,11 +25,26 @@ public class FetchMeetTheTeamTask extends AsyncTask<Void, Void, Map<String, Arra
 
     @Override
     protected Map<String, ArrayList<ExecutiveListItem>> doInBackground(Void... params) {
+        return getMembers();
+    }
+
+    @Override
+    protected void onPostExecute(Map<String, ArrayList<ExecutiveListItem>> members) {
+        // Assign map to variable of calling activity. ENSURE THAT THIS ASSIGNMENT IS SYNCED.
+        /* FIXME: Replace with a synchonized function from calling activity. Also make that
+         * FIXME: calling activity the argument for this asynctask, not a reference to the map, so
+         * FIXME: you can call that function.
+         */
+        refFromCallingActivity = members;
+    }
+
+    private Map<String, ArrayList<ExecutiveListItem>> getMembers() {
         try {
             Map<String, ArrayList<ExecutiveListItem>> members = new HashMap<>();
             Document doc = Jsoup.connect("http://morningsignout.com/team/").get();
             Elements groups = doc.getElementsByClass("user-group");
 
+            // iterates through category groups
             for (Element e : groups) {
                 String category = e.select("h2").first().text();
                 members.put(category, new ArrayList<ExecutiveListItem>()); // Each Team Category
@@ -37,6 +52,7 @@ public class FetchMeetTheTeamTask extends AsyncTask<Void, Void, Map<String, Arra
                 // efficiency, less calls to get(list)
                 List<ExecutiveListItem> reference = members.get(category);
 
+                // iterates through users in each category
                 for (Element u : e.getElementsByClass("user")) {
                     Element aTag = u.select("a").first();
                     Element authorInfo = aTag.getElementsByClass("author-information").first();
@@ -48,21 +64,10 @@ public class FetchMeetTheTeamTask extends AsyncTask<Void, Void, Map<String, Arra
                     reference.add(t);
                 }
             }
-
-            return members;
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
-    }
 
-    @Override
-    protected void onPostExecute(Map<String, ArrayList<ExecutiveListItem>> members) {
-        // Assign map to variable of calling activity. ENSURE THAT THIS ASSIGNMENT IS SYNCED.
-        /* FIXME: Replace with a synchonized function from calling activity. Also make that
-         * FIXME: calling activity the argument for this asynctask, not a reference to the map, so
-         * FIXME: you can call that function.
-         */
-        refFromCallingActivity = members;
+        return null;
     }
 }
