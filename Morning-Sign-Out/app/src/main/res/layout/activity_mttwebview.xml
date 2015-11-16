@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <WebView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/webView_mtt"
+        android:layout_gravity="center" />
+
+    <Button
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:text="@string/button_mttPrev"
+        android:id="@+id/button_mttPrev"
+        android:layout_gravity="left|bottom" />
+
+    <Button
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:text="@string/button_mttNext"
+        android:id="@+id/button_mttNext"
+        android:layout_gravity="right|bottom" />
+</FrameLayout>
