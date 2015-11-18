@@ -25,7 +25,9 @@ public class MTTWebViewActivity extends ActionBarActivity {
         setContentView(R.layout.activity_mttwebview);
         super.getSupportActionBar().setDisplayHomeAsUpEnabled(true); //made back arrow in top left corner
 
+        // FIXME: Finish webview. Then test this on authors. Then transition to a ViewPager for the prev/next buttons.
         // Need to initialize list and index variables here
+        String baseUrl = null;
 
         // Need to load webviewclient with correct url here
         WebView webView = (WebView) findViewById(R.id.webView_mtt);
@@ -52,7 +54,7 @@ class MttWebViewClient extends WebViewClient {
             Log.d("SearchWebViewClient", Uri.parse(url).getPath());
 
             // When offline or changing page, do not create intent
-            if (url.contains("?s=" + query))
+            if (url.contains(baseUrl))
                 return false;
 
             Intent intent = new Intent(view.getContext(), ArticleActivity.class);
@@ -62,8 +64,6 @@ class MttWebViewClient extends WebViewClient {
             return true;
         }
 
-//        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-//        view.getContext().startActivity(intent);
         return false;
     }
 
@@ -74,7 +74,7 @@ class MttWebViewClient extends WebViewClient {
         WebResourceResponse wbresponse = super.shouldInterceptRequest(wb, url);
         Uri requestUrl = Uri.parse(url);
 
-        if (!url.contains("?s=" + query))
+        if (!url.contains(baseUrl))
             return wbresponse;
 
         String html = null;
@@ -83,7 +83,7 @@ class MttWebViewClient extends WebViewClient {
         try {
             html = URLToMobileArticle.getOther(requestUrl.toString());
         } catch (IOException e) {
-            Log.e("SearchResultsActivity", e.getMessage());
+            Log.e("MTTWebViewActivity", e.getMessage());
         }
 
         // Let webView load default action (either webpage w/o mobile view, or webpage not found)
