@@ -1,6 +1,7 @@
 package app.morningsignout.com.morningsignoff;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -8,6 +9,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -78,6 +80,17 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         // If the adapter is not set, then create the adapter and add the articles
         // If the adapter is set, then add more articles to the list then notify the data change
         if(listView.getAdapter() == null) {
+            // FIXME: Set header test button. Delete this before merging to master.
+            Button testButton = new Button(c);
+            testButton.setText("Press here to test meet the team - the other buttons now don't work though.");
+            testButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(c, GetTeamAsyncActivity.class);
+                }
+            });
+            listView.addHeaderView(testButton);
+
             CategoryAdapter categoryAdapter = new CategoryAdapter(c, articles);
             listView.setAdapter(categoryAdapter);
         } else {
