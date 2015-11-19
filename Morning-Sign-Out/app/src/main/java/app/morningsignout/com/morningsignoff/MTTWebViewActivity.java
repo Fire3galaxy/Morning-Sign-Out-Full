@@ -11,6 +11,7 @@ import android.webkit.WebViewClient;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Created by Daniel on 11/16/2015.
@@ -18,6 +19,8 @@ import java.io.IOException;
 public class MTTWebViewActivity extends ActionBarActivity {
     // Need ExecutiveListItem list for previous/next buttons
     // Need index of which person on list is picked
+    ArrayList<ExecutiveListItem> teamArray;
+    int index;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -25,15 +28,25 @@ public class MTTWebViewActivity extends ActionBarActivity {
         setContentView(R.layout.activity_mttwebview);
         super.getSupportActionBar().setDisplayHomeAsUpEnabled(true); //made back arrow in top left corner
 
-        // FIXME: Finish webview. Then test this on authors. Then transition to a ViewPager for the prev/next buttons.
-        // Need to initialize list and index variables here
         String baseUrl = null;
+
+        // Need to initialize list and index variables here
+        if (getIntent() != null) {
+            Intent ref = getIntent();
+
+            teamArray = ref.getParcelableArrayListExtra(FetchMeetTheTeamTask.TEAM_KEY);
+            index = ref.getIntExtra(FetchMeetTheTeamTask.TEAM_INDEX_KEY, 0);
+
+            baseUrl = teamArray.get(index).hyperlink;
+        }
 
         // Need to load webviewclient with correct url here
         WebView webView = (WebView) findViewById(R.id.webView_mtt);
         webView.setWebViewClient(new MttWebViewClient(baseUrl));
+        new URLToMobileArticle(webView, true).execute(baseUrl);
 
-        // Need to set up onClickListeners for button here to change url (but still use getOthers)
+        // FIXME: Test, Transition to a ViewPager and make the prev/next buttons scroll the page (not swipe). Think of way to hide buttons when not in use.
+        // set up buttons (URLToMobileArticle)
     }
 }
 

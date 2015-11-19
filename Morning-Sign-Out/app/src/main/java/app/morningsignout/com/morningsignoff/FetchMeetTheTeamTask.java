@@ -28,7 +28,9 @@ public class FetchMeetTheTeamTask extends AsyncTask<Void, Void, Map<String, Arra
     final String notReady = "Fetching team array now!",
                  ready = "Can now click to send array to listview.";
     final String team = "Web Team";
-    final public String TEAM_KEY = "team";
+    final int team_index = 3;
+    static final public String TEAM_KEY = "team";
+    static final public String TEAM_INDEX_KEY = "team_index";
 
     // FIXME: Set the button from GetTeamAsyncActivity here to allow click ONLY when map is set.
     // Pass an intent to Kevin's activity with an arraylist from the FetchMeetTheTeamTask map.
@@ -62,8 +64,9 @@ public class FetchMeetTheTeamTask extends AsyncTask<Void, Void, Map<String, Arra
                 toKevinActivity.get().setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(refFromCallingActivity.get(), ExecutiveActivity.class);
+                        Intent intent = new Intent(refFromCallingActivity.get(), MTTWebViewActivity.class);
                         intent.putParcelableArrayListExtra(TEAM_KEY, members.get(team));
+                        intent.putExtra(TEAM_INDEX_KEY, team_index);
                         refFromCallingActivity.get().startActivity(intent);
                     }
                 });
