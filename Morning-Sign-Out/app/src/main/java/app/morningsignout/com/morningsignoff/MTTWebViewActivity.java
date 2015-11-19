@@ -31,7 +31,7 @@ public class MTTWebViewActivity extends ActionBarActivity {
 
         // Need to load webviewclient with correct url here
         WebView webView = (WebView) findViewById(R.id.webView_mtt);
-        webView.setWebViewClient(new MttWebViewClient());
+        webView.setWebViewClient(new MttWebViewClient(baseUrl));
 
         // Need to set up onClickListeners for button here to change url (but still use getOthers)
     }
