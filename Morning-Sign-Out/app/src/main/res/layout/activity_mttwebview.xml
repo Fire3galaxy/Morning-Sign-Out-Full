@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <WebView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/webView_mtt"
-        android:layout_gravity="center" />
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
 
     <Button
         android:layout_width="70dp"
@@ -22,4 +17,10 @@
         android:text="@string/button_mttNext"
         android:id="@+id/button_mttNext"
         android:layout_gravity="right|bottom" />
+
+    <WebView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/webView_mtt"
+        android:layout_gravity="center_horizontal|top" />
 </FrameLayout>

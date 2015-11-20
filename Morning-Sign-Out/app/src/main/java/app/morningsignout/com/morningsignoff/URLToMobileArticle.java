@@ -75,7 +75,11 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
                 try {
                     return getOther(requestUrl.toString());
                 } catch (IOException e) {
-                    Log.e(LOG_NAME, e.getMessage());
+                    String m = e.getMessage();
+
+                    if (m == null) m = "IOException in getOther()";
+
+                    Log.e(LOG_NAME, m);
                 }
             }
         }

@@ -62,11 +62,18 @@ class MttWebViewClient extends WebViewClient {
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        // If url is an email, send intent to open mail app
+        if (url.startsWith("mailto:")) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            view.getContext().startActivity(intent);
+            return true;
+        }
+
         // if it is morning sign out AND is an article, send url to ArticleActivity
-        if(Uri.parse(url).getHost().endsWith("morningsignout.com")) {
+        else if(Uri.parse(url).getHost().endsWith("morningsignout.com")) {
             Log.d("SearchWebViewClient", Uri.parse(url).getPath());
 
-            // When offline or changing page, do not create intent
+            // When offline or changing page, do not create intent, stay in webviewclient
             if (url.contains(baseUrl))
                 return false;
 
@@ -77,7 +84,9 @@ class MttWebViewClient extends WebViewClient {
             return true;
         }
 
-        return false;
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        view.getContext().startActivity(intent);
+        return true;
     }
 
     // For API # < 21
