@@ -68,6 +68,14 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
+
+        <activity
+            android:name=".GetTeamAsyncActivity">
+        </activity>
+        <activity
+            android:name=".MTTWebViewActivity">
+        </activity>
+
     </application>
 
 </manifest>

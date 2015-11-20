@@ -87,6 +87,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(c, GetTeamAsyncActivity.class);
+                    c.startActivity(intent);
                 }
             });
             listView.addHeaderView(testButton);

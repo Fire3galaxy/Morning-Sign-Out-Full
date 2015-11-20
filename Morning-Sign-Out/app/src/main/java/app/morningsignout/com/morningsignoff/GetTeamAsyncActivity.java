@@ -18,9 +18,12 @@ public class GetTeamAsyncActivity extends ActionBarActivity {
       */
     Map<String, ArrayList<ExecutiveListItem>> teams;
 
+    // set content view in this activity, register new activities in manifest, fixed constructor issue in executiveActivity
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_get_team_async);
         Button toKevinActivity = (Button) findViewById(R.id.button_test);
 
         new FetchMeetTheTeamTask(this, toKevinActivity).execute();
