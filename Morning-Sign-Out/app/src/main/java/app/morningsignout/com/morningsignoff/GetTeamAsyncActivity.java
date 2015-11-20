@@ -21,6 +21,7 @@ public class GetTeamAsyncActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_get_team_async);
         Button toKevinActivity = (Button) findViewById(R.id.button_test);
 
         new FetchMeetTheTeamTask(this, toKevinActivity).execute();

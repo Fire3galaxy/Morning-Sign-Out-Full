@@ -54,6 +54,7 @@ public class FetchMeetTheTeamTask extends AsyncTask<Void, Void, Map<String, Arra
         /* FIXME: Replace with a synchronized function from calling activity. Also make that
          * FIXME: calling activity the argument for this asynctask, not a reference to the map, so
          * FIXME: you can call that function.
+         * FIXME: And come up with something for if call fails
          */
         if (refFromCallingActivity.get() != null) {
             refFromCallingActivity.get().setTeamsMap(members);
@@ -99,6 +100,8 @@ public class FetchMeetTheTeamTask extends AsyncTask<Void, Void, Map<String, Arra
                     reference.add(t);
                 }
             }
+
+            return members;
         } catch (IOException e) {
             e.printStackTrace();
         }

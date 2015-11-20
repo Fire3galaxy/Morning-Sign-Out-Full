@@ -37,7 +37,7 @@ public class ExecutiveActivity extends ActionBarActivity {
 
         ArrayList<ExecutiveListItem> list = new ArrayList<>();
         for (int i = 0; i < names.length(); i++) {
-            list.add(new ExecutiveListItem(names.getString(i), positions.getString(i)));
+            list.add(new ExecutiveListItem(names.getString(i), positions.getString(i), null)); // FIXME: third thing is hyperlink, this may be changed later.
         }
 
 
