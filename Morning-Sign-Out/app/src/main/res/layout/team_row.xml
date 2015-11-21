@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/abc_action_bar_default_padding_material">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Big Man"
+        android:id="@+id/textView_name"
+        android:layout_gravity="center_horizontal" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Morning Sign Out Pikachu"
+        android:id="@+id/textView_position"
+        android:layout_gravity="center_horizontal"
+        android:drawableTop="@drawable/blue_line"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="http://www.morningsignout.com"
+        android:id="@+id/textView_url"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="@dimen/abc_action_bar_icon_vertical_padding_material" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="me@morningsignout.com"
+        android:id="@+id/textView_email"
+        android:layout_gravity="center_horizontal" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hi, I have a website! But I'm not a penguin, I'm a pokemon."
+        android:id="@+id/textView_description"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="@dimen/abc_action_bar_icon_vertical_padding_material" />
+</LinearLayout>

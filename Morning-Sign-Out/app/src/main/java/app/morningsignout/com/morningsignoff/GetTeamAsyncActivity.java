@@ -32,6 +32,4 @@ public class GetTeamAsyncActivity extends ActionBarActivity {
     public void setTeamsMap(Map<String, ArrayList<ExecutiveListItem>> fromTask) {
         teams = fromTask;
     }
-
-
 }
