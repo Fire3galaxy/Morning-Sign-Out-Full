@@ -34,15 +34,15 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
 
     WebView wb;
     String link;
-    boolean isOther;
+    boolean isAuthorMTT;
 
     public URLToMobileArticle(WebView webview) {
         this.wb = webview;
-        this.isOther = false;
+        this.isAuthorMTT = false;
     }
-    public URLToMobileArticle(WebView webView, boolean other) {
+    public URLToMobileArticle(WebView webView, boolean isAuthorMTT) {
         this.wb = webView;
-        this.isOther = other;
+        this.isAuthorMTT = isAuthorMTT;
     }
 
     @Override
@@ -52,6 +52,16 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
 
         Log.d(LOG_NAME, link);
         if (link.contains("/?s=")) Log.d(LOG_NAME, "This is search");
+
+        // Special request: should change authorMTT to a boolean, since isOther boolean isn't used.
+        if (isAuthorMTT) {
+            Log.d(LOG_NAME, "changing webresponse to author (mtt) page");
+            try {
+                return getAuthorMTT(requestUrl.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         // Article Page
         if (requestUrl.getPathSegments().size() == 1) {
@@ -326,6 +336,30 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
     static String getOther(final String urlname) throws IOException {
         Document doc = Jsoup.connect(urlname).get();
         doc.select("header").remove();
+        doc.select("footer").remove();
+        doc.select(".page-title--tag > span").remove();
+        doc.select("h4:containsOwn(Category)").remove();
+        doc.select(".page-title").attr("style", "margin-bottom: 25px");
+        doc.select(".author-bio").attr("style", "margin-top: 5px");
+        doc.select(".content__post").attr("style", "margin: 0px 5px 15px");
+        doc.select(".author-posts > h1").attr("style", "margin: 15px 0px");
+        Elements imgElems = doc.select(".attachment-post-thumbnail, .wp-post-image");
+        for (Element img : imgElems) {
+            img.wrap(String.format("<a href=%s></a>", img.parent().select("a").attr("href")));
+        }
+        return doc.toString();
+    }
+
+    static String getAuthorMTT(final String urlname) throws IOException {
+        Document doc = Jsoup.connect(urlname).get();
+
+        // Remove only most of header, leave logo
+        Element header = doc.select("header").first();
+        header.child(0).remove();                   // remove header_upper
+        Element header_lower = header.child(0);
+        header_lower.select("a").unwrap();          // remove hyperlink from logo
+        header_lower.child(1).remove();             // remove header_lower_nav
+
         doc.select("footer").remove();
         doc.select(".page-title--tag > span").remove();
         doc.select("h4:containsOwn(Category)").remove();

@@ -5,9 +5,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.View;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -20,6 +22,8 @@ public class MTTWebViewActivity extends ActionBarActivity {
     // Need ExecutiveListItem list for previous/next buttons
     // Need index of which person on list is picked
     ArrayList<ExecutiveListItem> teamArray;
+    MttWebViewClient client;
+    WebView webView;
     int index;
 
     @Override
@@ -41,12 +45,25 @@ public class MTTWebViewActivity extends ActionBarActivity {
         }
 
         // Need to load webviewclient with correct url here
-        WebView webView = (WebView) findViewById(R.id.webView_mtt);
-        webView.setWebViewClient(new MttWebViewClient(baseUrl));
+        webView = (WebView) findViewById(R.id.webView_mtt);
+        client = new MttWebViewClient(baseUrl);
+        webView.setWebViewClient(client);
         new URLToMobileArticle(webView, true).execute(baseUrl);
 
         // FIXME: Test, Transition to a ViewPager and make the prev/next buttons scroll the page (not swipe). Think of way to hide buttons when not in use.
         // set up buttons (URLToMobileArticle)
+        Button prev = (Button) findViewById(R.id.button_mttPrev),
+            next = (Button) findViewById(R.id.button_mttNext);
+        prev.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (index > 0) {
+                    client.changeBaseUrl(teamArray.get(index - 1).hyperlink);
+                    webView.loadUrl(teamArray.get(index - 1).hyperlink);
+                    index -= 1;
+                }
+            }
+        });
     }
 }
 
@@ -54,10 +71,16 @@ class MttWebViewClient extends WebViewClient {
     static final String mimeType = "text/html";
     static final String encoding = "gzip"; // Find encoding https://en.wikipedia.org/wiki/HTTP_compression
 
+    // Useful for if team member has articles and pages
     String baseUrl = null;
 
     public MttWebViewClient(String url) {
         baseUrl = url;
+    }
+
+    // Needed if reloading page
+    public void changeBaseUrl(String newBaseUrl) {
+        baseUrl = newBaseUrl;
     }
 
     @Override
@@ -103,7 +126,7 @@ class MttWebViewClient extends WebViewClient {
         ByteArrayInputStream bais;
 
         try {
-            html = URLToMobileArticle.getOther(requestUrl.toString());
+            html = URLToMobileArticle.getAuthorMTT(requestUrl.toString());
         } catch (IOException e) {
             Log.e("MTTWebViewActivity", e.getMessage());
         }
