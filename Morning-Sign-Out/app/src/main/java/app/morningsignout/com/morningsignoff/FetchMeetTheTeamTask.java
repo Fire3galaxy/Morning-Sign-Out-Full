@@ -27,7 +27,7 @@ public class FetchMeetTheTeamTask extends AsyncTask<Void, Void, Map<String, Arra
     WeakReference<Button> toKevinActivity;
     final String notReady = "Fetching team array now!",
                  ready = "Can now click to send array to listview.";
-    final String team = "Web Team";
+    final String team = "Category: Research";
     final int team_index = 3;
     static final public String TEAM_KEY = "team";
     static final public String TEAM_INDEX_KEY = "team_index";

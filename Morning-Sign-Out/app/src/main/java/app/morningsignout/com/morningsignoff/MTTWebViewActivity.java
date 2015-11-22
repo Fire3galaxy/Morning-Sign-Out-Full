@@ -3,13 +3,23 @@ package app.morningsignout.com.morningsignoff;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -22,126 +32,92 @@ public class MTTWebViewActivity extends ActionBarActivity {
     // Need ExecutiveListItem list for previous/next buttons
     // Need index of which person on list is picked
     ArrayList<ExecutiveListItem> teamArray;
-    MttWebViewClient client;
-    WebView webView;
     int index;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_mttwebview);
-        super.getSupportActionBar().setDisplayHomeAsUpEnabled(true); //made back arrow in top left corner
 
-        String baseUrl = null;
+        // Setting up action bar with logo and up button
+        ActionBar actionbar = getSupportActionBar();
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setDisplayShowTitleEnabled(false);
+        View title = getLayoutInflater().inflate(R.layout.title_main, null);
+        actionbar.setCustomView(title);
+        actionbar.setDisplayShowCustomEnabled(true);
 
-        // Need to initialize list and index variables here
+        // Initialize Team Array and Index selected in previous list
         if (getIntent() != null) {
             Intent ref = getIntent();
 
             teamArray = ref.getParcelableArrayListExtra(FetchMeetTheTeamTask.TEAM_KEY);
             index = ref.getIntExtra(FetchMeetTheTeamTask.TEAM_INDEX_KEY, 0);
-
-            baseUrl = teamArray.get(index).hyperlink;
         }
 
-        // Need to load webviewclient with correct url here
-        webView = (WebView) findViewById(R.id.webView_mtt);
-        client = new MttWebViewClient(baseUrl);
-        webView.setWebViewClient(client);
-        new URLToMobileArticle(webView, true).execute(baseUrl);
+        // Set up ViewPager for swiping left/right to other people
+        ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager_mttwebview);
+        MTTWebPagerAdapter adapter = new MTTWebPagerAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(adapter);
+
+        viewPager.setCurrentItem(index, false); // Setting pager to selected person
+
+        // Showing message for swiping left/right for 10 seconds
+        final RelativeLayout swipeMessage = (RelativeLayout) findViewById(R.id.relativeLayout_mtt_swipe);
+        swipeMessage.setVisibility(View.VISIBLE);
+
+        Log.d("", "");  // just because studio didn't properly install debug apk
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                swipeMessage.setVisibility(View.GONE);
+            }
+        };
+        Handler handler = new Handler();
+        handler.postDelayed(runnable, 7 * 1000);
 
         // FIXME: Test, Transition to a ViewPager and make the prev/next buttons scroll the page (not swipe). Think of way to hide buttons when not in use.
-        // set up buttons (URLToMobileArticle)
-        Button prev = (Button) findViewById(R.id.button_mttPrev),
-            next = (Button) findViewById(R.id.button_mttNext);
-        prev.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (index > 0) {
-                    client.changeBaseUrl(teamArray.get(index - 1).hyperlink);
-                    webView.loadUrl(teamArray.get(index - 1).hyperlink);
-                    index -= 1;
-                }
-            }
-        });
-    }
-}
-
-class MttWebViewClient extends WebViewClient {
-    static final String mimeType = "text/html";
-    static final String encoding = "gzip"; // Find encoding https://en.wikipedia.org/wiki/HTTP_compression
-
-    // Useful for if team member has articles and pages
-    String baseUrl = null;
-
-    public MttWebViewClient(String url) {
-        baseUrl = url;
-    }
-
-    // Needed if reloading page
-    public void changeBaseUrl(String newBaseUrl) {
-        baseUrl = newBaseUrl;
+        // Semi-visible arrows could be good way of filling white space and indicating you can scroll sideways
     }
 
     @Override
-    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        // If url is an email, send intent to open mail app
-        if (url.startsWith("mailto:")) {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            view.getContext().startActivity(intent);
-            return true;
-        }
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_aboutmso, menu);
 
-        // if it is morning sign out AND is an article, send url to ArticleActivity
-        else if(Uri.parse(url).getHost().endsWith("morningsignout.com")) {
-            Log.d("SearchWebViewClient", Uri.parse(url).getPath());
-
-            // When offline or changing page, do not create intent, stay in webviewclient
-            if (url.contains(baseUrl))
-                return false;
-
-            Intent intent = new Intent(view.getContext(), ArticleActivity.class);
-            intent.putExtra(Intent.EXTRA_RETURN_RESULT, url); // Put url in intent
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP); // Open w/ old articleActivity if exists
-            view.getContext().startActivity(intent);
-            return true;
-        }
-
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        view.getContext().startActivity(intent);
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
-    // For API # < 21
-    @SuppressWarnings("deprecation")
     @Override
-    public WebResourceResponse shouldInterceptRequest(WebView wb, String url) {
-        WebResourceResponse wbresponse = super.shouldInterceptRequest(wb, url);
-        Uri requestUrl = Uri.parse(url);
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
-        if (!url.contains(baseUrl))
-            return wbresponse;
-
-        String html = null;
-        ByteArrayInputStream bais;
-
-        try {
-            html = URLToMobileArticle.getAuthorMTT(requestUrl.toString());
-        } catch (IOException e) {
-            Log.e("MTTWebViewActivity", e.getMessage());
+    private class MTTWebPagerAdapter extends FragmentStatePagerAdapter {
+        public MTTWebPagerAdapter(FragmentManager fm) {
+            super(fm);
         }
 
-        // Let webView load default action (either webpage w/o mobile view, or webpage not found)
-        if (html == null)
-            return wbresponse;
+        @Override
+        public Fragment getItem(int position) {
+            MTTWebPageFragment teamMember = new MTTWebPageFragment();
+            Bundle args = new Bundle();
+            args.putString(MTTWebPageFragment.MEMBER_URL, teamArray.get(position).hyperlink);
+            teamMember.setArguments(args);
 
-        bais = new ByteArrayInputStream(html.getBytes());
+            return teamMember;
+        }
 
-        wbresponse = new WebResourceResponse(mimeType,
-                encoding,
-                bais);
-
-        return wbresponse;
+        @Override
+        public int getCount() {
+            return teamArray.size();
+        }
     }
 }
 
