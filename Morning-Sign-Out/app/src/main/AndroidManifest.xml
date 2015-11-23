@@ -34,7 +34,12 @@
             android:label="@string/app_name"
             >
 
+
         </activity>
+        <activity
+            android:name=".PersonalPageLink"
+            android:label="@string/app_name"
+            ></activity>
         <activity
             android:launchMode = "singleTop"
             android:name=".CategoryActivity"

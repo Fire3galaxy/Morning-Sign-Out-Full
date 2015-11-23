@@ -10,13 +10,20 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by liukwarm on 10/24/15.
@@ -24,25 +31,41 @@ import java.util.ArrayList;
 public class ExecutiveActivity extends ActionBarActivity {
 
     private SearchView searchView;
+    private ArrayList<ExecutiveListItem> list;
+    public static String EXTRA_LIST = "list";
+    public static String EXTRA_INDEX = "index";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_executive);
 
-        ListView lv = (ListView) findViewById(R.id.listView);
-        TypedArray names = getResources()
-                .obtainTypedArray(R.array.executive_names);
-        TypedArray positions = getResources()
-                .obtainTypedArray(R.array.executive_positions);
+        String teamName = getIntent().getExtras().getString(FetchMeetTheTeamTask.NAME_KEY);
 
-        ArrayList<ExecutiveListItem> list = new ArrayList<>();
-        for (int i = 0; i < names.length(); i++) {
-            list.add(new ExecutiveListItem(names.getString(i), positions.getString(i), null)); // FIXME: third thing is hyperlink, this may be changed later.
-        }
+        ListView lv = (ListView) findViewById(R.id.listView);
+//        TypedArray names = getResources()
+//                .obtainTypedArray(R.array.executive_names);
+//        TypedArray positions = getResources()
+//                .obtainTypedArray(R.array.executive_positions);
+//
+        list = getIntent().getExtras().getParcelableArrayList(FetchMeetTheTeamTask.TEAM_KEY);
+//        for (int i = 0; i < names.length(); i++) {
+//            list.add(new ExecutiveListItem(names.getString(i), positions.getString(i), null)); // FIXME: third thing is hyperlink, this may be changed later.
+//        }
+
+        TextView title = (TextView)findViewById(R.id.title);
+        title.setText(teamName);
 
 
         lv.setAdapter(new ExecutiveListAdapter(getApplicationContext(),
                 list));
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                goToLink(position);
+            }
+        });
 
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
@@ -60,6 +83,14 @@ public class ExecutiveActivity extends ActionBarActivity {
         this.getSupportActionBar().setCustomView(ib, params);
 
         this.getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    private void goToLink(int position) {
+        Intent intent = new Intent(this, PersonalPageLink.class); //DANIEL, THIS IS WHERE YOUR CLASS GOES!!!!!!! Also, delete this comment pls.
+        intent.putParcelableArrayListExtra(EXTRA_LIST, list);
+        intent.putExtra(EXTRA_INDEX, position);
+        startActivity(intent);
     }
 
     @Override
@@ -67,7 +98,6 @@ public class ExecutiveActivity extends ActionBarActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
 //        getMenuInflater().inflate(R.menu.menu_category, menu);
         getMenuInflater().inflate(R.menu.menu_category, menu);
-
         /* Search results in new SearchResultsActivity, clicked article passed back to articleActivity
            Associate searchable configuration with the SearchView */
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
@@ -78,4 +108,6 @@ public class ExecutiveActivity extends ActionBarActivity {
 //        return super.onCreateOptionsMenu(menu);
         return true;
     }
+
+
 }

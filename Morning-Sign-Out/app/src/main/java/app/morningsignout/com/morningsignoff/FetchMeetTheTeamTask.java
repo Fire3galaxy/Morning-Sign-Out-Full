@@ -29,6 +29,7 @@ public class FetchMeetTheTeamTask extends AsyncTask<Void, Void, Map<String, Arra
                  ready = "Can now click to send array to listview.";
     final String team = "Web Team";
     static final public String TEAM_KEY = "team";
+    static final public String NAME_KEY = "teamname";
 
     // FIXME: Set the button from GetTeamAsyncActivity here to allow click ONLY when map is set.
     // Pass an intent to Kevin's activity with an arraylist from the FetchMeetTheTeamTask map.
@@ -65,6 +66,7 @@ public class FetchMeetTheTeamTask extends AsyncTask<Void, Void, Map<String, Arra
                     public void onClick(View v) {
                         Intent intent = new Intent(refFromCallingActivity.get(), ExecutiveActivity.class);
                         intent.putParcelableArrayListExtra(TEAM_KEY, members.get(team));
+                        intent.putExtra(NAME_KEY, team);
                         refFromCallingActivity.get().startActivity(intent);
                     }
                 });
