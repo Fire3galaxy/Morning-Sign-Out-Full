@@ -56,7 +56,6 @@ public class ExecutiveActivity extends ActionBarActivity {
         TextView title = (TextView)findViewById(R.id.title);
         title.setText(teamName);
 
-
         lv.setAdapter(new ExecutiveListAdapter(getApplicationContext(),
                 list));
 

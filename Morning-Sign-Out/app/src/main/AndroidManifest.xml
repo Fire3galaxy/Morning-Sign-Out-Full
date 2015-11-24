@@ -77,6 +77,11 @@
         <activity
             android:name=".GetTeamAsyncActivity">
         </activity>
+
+        <activity
+            android:name=".MTTWebViewActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize">
+        </activity>
     </application>
 
 </manifest>

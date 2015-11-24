@@ -91,7 +91,7 @@ public class SearchResultsActivity extends ActionBarActivity {
                 WebViewClient webViewClient = new SearchWebViewClient(intent.getStringExtra(SearchManager.QUERY));
                 webView.setWebViewClient(webViewClient);
 
-                new URLToMobileArticle(webView, true).execute(searchURI);
+                new URLToMobileArticle(webView).execute(searchURI);
             } else {
                 Log.e("Search", "Error: Failed Search (null string)");
             }

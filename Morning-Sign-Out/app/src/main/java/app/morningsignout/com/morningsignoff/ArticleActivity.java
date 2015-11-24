@@ -178,7 +178,8 @@ public class ArticleActivity extends ActionBarActivity {
                 if (webView != null && webView.canGoBack())    // Go back in webView history
                     webView.goBack();
                 else                     // Return to front page (without recreating parent)
-                    returnToParent(null);
+                    super.onBackPressed(); // Changed to support travel from meet the team, FIXME: Test this with normal behavior
+//                    returnToParent(null);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -382,11 +383,7 @@ class ArticleWebViewClient extends WebViewClient {
                 || requestUrl.getPathSegments().get(0).matches(".*\\.[a-zA-Z]+"))
             return false;
 
-        // article
-        if (requestUrl.getPathSegments().size() == 1)
-            return true;
-            // date/author/tag
-        else
-            return false;
+        // article vs date/author/tag
+        return (requestUrl.getPathSegments().size() == 1);
     }
 }

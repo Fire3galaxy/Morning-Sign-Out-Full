@@ -27,6 +27,7 @@ public class FetchMeetTheTeamTask extends AsyncTask<Void, Void, Map<String, Arra
     WeakReference<Button> toKevinActivity;
     final String notReady = "Fetching team array now!",
                  ready = "Can now click to send array to listview.";
+
     final String team = "Web Team";
     static final public String TEAM_KEY = "team";
     static final public String NAME_KEY = "teamname";
@@ -64,7 +65,7 @@ public class FetchMeetTheTeamTask extends AsyncTask<Void, Void, Map<String, Arra
                 toKevinActivity.get().setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(refFromCallingActivity.get(), ExecutiveActivity.class);
+                        Intent intent = new Intent(refFromCallingActivity.get(), MTTWebViewActivity.class);
                         intent.putParcelableArrayListExtra(TEAM_KEY, members.get(team));
                         intent.putExtra(NAME_KEY, team);
                         refFromCallingActivity.get().startActivity(intent);

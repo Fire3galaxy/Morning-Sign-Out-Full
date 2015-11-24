@@ -18,6 +18,8 @@ public class GetTeamAsyncActivity extends ActionBarActivity {
       */
     Map<String, ArrayList<ExecutiveListItem>> teams;
 
+    // set content view in this activity, register new activities in manifest, fixed constructor issue in executiveActivity
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,6 +32,4 @@ public class GetTeamAsyncActivity extends ActionBarActivity {
     public void setTeamsMap(Map<String, ArrayList<ExecutiveListItem>> fromTask) {
         teams = fromTask;
     }
-
-
 }
