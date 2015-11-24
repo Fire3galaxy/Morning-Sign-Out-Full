@@ -178,7 +178,8 @@ public class ArticleActivity extends ActionBarActivity {
                 if (webView != null && webView.canGoBack())    // Go back in webView history
                     webView.goBack();
                 else                     // Return to front page (without recreating parent)
-                    super.onBackPressed(); // Changed to support travel from meet the team, FIXME: Test this with normal behavior
+                    finish();
+                    //super.onBackPressed(); // Changed to support travel from meet the team, FIXME: Test this with normal behavior
 //                    returnToParent(null);
                 return true;
         }

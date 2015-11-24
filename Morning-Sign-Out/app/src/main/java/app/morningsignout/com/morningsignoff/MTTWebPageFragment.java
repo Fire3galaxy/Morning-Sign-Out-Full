@@ -16,7 +16,6 @@ import android.widget.ProgressBar;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * Created by Daniel on 11/21/2015.

@@ -65,7 +65,7 @@ public class FetchMeetTheTeamTask extends AsyncTask<Void, Void, Map<String, Arra
                 toKevinActivity.get().setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(refFromCallingActivity.get(), MTTWebViewActivity.class);
+                        Intent intent = new Intent(refFromCallingActivity.get(), ExecutiveActivity.class);
                         intent.putParcelableArrayListExtra(TEAM_KEY, members.get(team));
                         intent.putExtra(NAME_KEY, team);
                         refFromCallingActivity.get().startActivity(intent);

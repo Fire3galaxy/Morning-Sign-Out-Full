@@ -1,18 +1,16 @@
 package app.morningsignout.com.morningsignoff;
 
-import android.app.Activity;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
@@ -86,7 +84,7 @@ public class ExecutiveActivity extends ActionBarActivity {
     }
 
     private void goToLink(int position) {
-        Intent intent = new Intent(this, PersonalPageLink.class); //DANIEL, THIS IS WHERE YOUR CLASS GOES!!!!!!! Also, delete this comment pls.
+        Intent intent = new Intent(this, MTTWebViewActivity.class);
         intent.putParcelableArrayListExtra(EXTRA_LIST, list);
         intent.putExtra(EXTRA_INDEX, position);
         startActivity(intent);
@@ -108,5 +106,14 @@ public class ExecutiveActivity extends ActionBarActivity {
         return true;
     }
 
-
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 }

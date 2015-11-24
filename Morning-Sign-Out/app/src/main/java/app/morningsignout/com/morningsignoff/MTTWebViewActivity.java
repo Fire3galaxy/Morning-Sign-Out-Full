@@ -1,11 +1,9 @@
 package app.morningsignout.com.morningsignoff;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -15,10 +13,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebResourceResponse;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.Button;
 import android.widget.RelativeLayout;
 
 import java.io.ByteArrayInputStream;
@@ -52,8 +46,8 @@ public class MTTWebViewActivity extends ActionBarActivity {
         if (getIntent() != null) {
             Intent ref = getIntent();
 
-            teamArray = ref.getParcelableArrayListExtra(FetchMeetTheTeamTask.TEAM_KEY);
-            index = ref.getIntExtra(FetchMeetTheTeamTask.TEAM_INDEX_KEY, 0);
+            teamArray = ref.getParcelableArrayListExtra(ExecutiveActivity.EXTRA_LIST);
+            index = ref.getIntExtra(ExecutiveActivity.EXTRA_INDEX, 0);
         }
 
         // Set up ViewPager for swiping left/right to other people
