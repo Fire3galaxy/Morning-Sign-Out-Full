@@ -50,8 +50,12 @@ public class MTTWebPageFragment extends Fragment {
         webView.setWebViewClient(client);
         webView.setWebChromeClient(new WebChromeClient() {
             public void onProgressChanged(WebView view, int progress) {
-                if (progress < 100)
+                if (progress < 100) {
+                    if (loading.getVisibility() != View.VISIBLE)
+                        loading.setVisibility(View.VISIBLE);
+
                     loading.setProgress(progress);
+                }
                 else if (progress == 100)
                     loading.setVisibility(View.GONE);
             }
