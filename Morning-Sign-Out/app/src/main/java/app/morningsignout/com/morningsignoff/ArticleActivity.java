@@ -21,12 +21,14 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import java.io.ByteArrayInputStream;
@@ -45,6 +47,7 @@ public class ArticleActivity extends ActionBarActivity {
     private RelativeLayout relativeLayout;
 
     private WebView webView;
+    private ProgressBar loading;
     private ArticleWebViewClient webViewClient;
 
     private SearchView searchView;
@@ -83,6 +86,21 @@ public class ArticleActivity extends ActionBarActivity {
             webView.getSettings().setBuiltInZoomControls(true);
             webViewClient = new ArticleWebViewClient(this);
             webView.setWebViewClient(webViewClient);
+
+            // Loading progressBar whenever a page is loading
+            loading = (ProgressBar) findViewById(R.id.progressBar_article);
+            webView.setWebChromeClient(new WebChromeClient() {
+                @Override
+                public void onProgressChanged(WebView view, int newProgress) {
+                    if (newProgress < 100) {
+                        if (loading.getVisibility() != View.VISIBLE)
+                            loading.setVisibility(View.VISIBLE);
+
+                        loading.setProgress(newProgress);
+                    } else
+                        loading.setVisibility(View.GONE);
+                }
+            });
 
             // Setting relativeLayout
             relativeLayout = (RelativeLayout) findViewById(R.id.container_articleBar);

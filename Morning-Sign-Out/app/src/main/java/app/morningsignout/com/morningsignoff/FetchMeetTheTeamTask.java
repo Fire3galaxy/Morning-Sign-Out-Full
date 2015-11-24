@@ -28,7 +28,7 @@ public class FetchMeetTheTeamTask extends AsyncTask<Void, Void, Map<String, Arra
     final String notReady = "Fetching team array now!",
                  ready = "Can now click to send array to listview.";
 
-    final String team = "Web Team";
+    final String team = "Category: Public Health";
     static final public String TEAM_KEY = "team";
     static final public String NAME_KEY = "teamname";
 
