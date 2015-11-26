@@ -223,14 +223,15 @@ public class ArticleActivity extends ActionBarActivity {
         if (searchReturnUrl != null) {
             searchReturnUrl = getIntent().getStringExtra(Intent.EXTRA_RETURN_RESULT);   // copy string
             getIntent().removeExtra(Intent.EXTRA_RETURN_RESULT);        // Return url only valid once, remove it after use
-            new URLToMobileArticle(webView).execute(searchReturnUrl);
+            webView.loadUrl(searchReturnUrl);
             Log.d("ArticleActivity", "Loading: " + intentUrl);
         }
         // 2. App was stopped/return to this myActivity from search w/o a result (do nothing)
         else if (webviewUrl != null && !webviewUrl.isEmpty());
             // 3. App has not loaded its first article yet
         else if (intentUrl != null)
-            new URLToMobileArticle(webView).execute(intentUrl);
+            webView.loadUrl(intentUrl);
+//            new URLToMobileArticle(webView).execute(intentUrl);
 
         if (getSupportActionBar() != null)
             getSupportActionBar().collapseActionView(); // collapse search bar on return from search
@@ -291,10 +292,12 @@ class ArticleWebViewClient extends WebViewClient {
     final int CURRENTYEAR = Calendar.getInstance().get(Calendar.YEAR);
 
     Context c;
+    public String lastArticleSlug;
 
     public ArticleWebViewClient(Context c) {
         super();
         this.c = c;
+        lastArticleSlug = null;
     }
 
     @Override
@@ -351,6 +354,9 @@ class ArticleWebViewClient extends WebViewClient {
         if (requestUrl.getPathSegments().size() == 1) {
             Log.d(LOG_NAME, "changing webresponse to article page");
             html = URLToMobileArticle.getArticle(requestUrl.toString());
+
+            // Prep slug string
+            lastArticleSlug = requestUrl.getLastPathSegment();
 
             // Change share intent to new article
             Intent shareIntent = new Intent();
