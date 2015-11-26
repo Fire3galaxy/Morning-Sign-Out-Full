@@ -1,5 +1,10 @@
 package app.morningsignout.com.morningsignoff;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -44,11 +49,14 @@ public class DisqusDetails {
         disqusMethods = new DisqusMethods();
     }
 
-    // Two internet requests to load comments
+    // LIST_POSTS Disqus: two internet requests to load comments
     ArrayList<Comments> getComments(String slug) {
         String threadId = httpMethods.getMsoThreadId(slug);             // Request 1
         String commentsJson = disqusMethods.getCommentsJson(threadId);  // Request 2
 
+        if (commentsJson != null)
+            return Comments.parseCommentsArray(commentsJson);
+        return null;
     }
 
     private class DisqusMethods {
@@ -64,12 +72,17 @@ public class DisqusDetails {
 
         String getMsoThreadId(String slug) {
             String threadMSO = getHttp(msoPost + slug);
+
+            if (threadMSO == null) return null;
+
             int dsq_thread_id = threadMSO.indexOf(dsqVar) + dsqVarLength;
             int end = threadMSO.indexOf("\"", dsq_thread_id);
             return threadMSO.substring(dsq_thread_id, end);
         }
 
         String getHttp(String _url)  {
+            if (_url == null) return null;
+
             HttpURLConnection urlConnection = null;
             try {
                 URL url = new URL(_url);
@@ -148,5 +161,35 @@ class Comments {
             comments.add(comment);
         }
         return comments;
+    }
+
+    private static Comments parseComment(JsonObject disqusJson){
+        JsonObject author = disqusJson.get("author")
+                .getAsJsonObject();
+
+        String username = parseJsonObject(author, "username");
+        String name = parseJsonObject(author, "name");
+        String profile_url = parseJsonObject(author, "profileUrl");
+        String message = parseJsonObject(disqusJson, "raw_message");
+        String date_posted = parseJsonObject(disqusJson, "createdAt");
+        String id = parseJsonObject(disqusJson, "id");
+        String parent = parseJsonObject(disqusJson, "parent");
+
+
+        //System.out.println(response);
+        return new Comments(username, name, profile_url, message, date_posted, id, parent);
+    }
+
+    private static String parseJsonObject(JsonObject obj, String field) {
+        JsonElement elem = obj.get(field);
+        try {
+            String str = "";
+            if(!elem.isJsonNull()){
+                str = elem.getAsString();
+            }
+            return str;
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
 }

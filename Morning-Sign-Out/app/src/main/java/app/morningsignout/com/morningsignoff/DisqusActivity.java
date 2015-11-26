@@ -1,6 +1,7 @@
 package app.morningsignout.com.morningsignoff;
 
 import android.app.ActionBar;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
@@ -8,16 +9,21 @@ import android.support.v7.app.ActionBar.LayoutParams;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -27,6 +33,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class DisqusActivity extends ActionBarActivity {
     @Override
@@ -44,17 +51,9 @@ public class DisqusActivity extends ActionBarActivity {
                 + disqus_thread_id;
 //        String commentsUrl = "http://morningsignout.com/an-international-patchwork-of-healthcare/";
 
-        WebView webView = (WebView) findViewById(R.id.webView_disqus);
+        ListView commentsView = (ListView) findViewById(R.id.listView_disqus);
 
-        WebSettings webSettings = webView.getSettings();
-        webSettings.setJavaScriptEnabled(true); // needed for Disqus
-        webSettings.setBuiltInZoomControls(true);
-
-        webView.requestFocusFromTouch();
-        webView.setWebViewClient(new DisqusWebViewClient(commentsUrl));
-        webView.setWebChromeClient(new WebChromeClient());
-
-        webView.loadUrl(commentsUrl);
+        new DisqusGetComments(commentsView).execute("how-the-aca-makes-primary-care-visits-more-accessible");
     }
 
     @Override
@@ -98,25 +97,54 @@ public class DisqusActivity extends ActionBarActivity {
     }
 }
 
-class DisqusWebViewClient extends WebViewClient {
-    String url;
+class DisqusAdapter extends BaseAdapter {
+    Context c;
+    ArrayList<Comments> commentsList;
 
-    public DisqusWebViewClient(String myUrl) {
-        url = myUrl;
+    DisqusAdapter(Context c, ArrayList<Comments> commentsList) {
+        this.c = c;
+        this.commentsList = commentsList;
     }
 
     @Override
-    public void onPageFinished(WebView webView, String url) {
-        if (url.contains("logout") || url.contains("disqus.com/next/login-success")) {
-            webView.loadUrl(this.url);
+    public int getCount() {
+        return commentsList.size();
+    }
+
+    @Override
+    public Object getItem(int position) {
+        return commentsList.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        DsqViewHolder viewHolder;
+
+        if (convertView == null) {
+            LayoutInflater inflater = LayoutInflater.from(c);
+            convertView = inflater.inflate(R.layout.comment_row, parent, false);
+
+            viewHolder = new DsqViewHolder();
+            viewHolder.username = (TextView) convertView.findViewById(R.id.textView_userDsq);
+            viewHolder.comment = (TextView) convertView.findViewById(R.id.textView_commentDsq);
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (DsqViewHolder) convertView.getTag();
         }
-        if (url.contains("disqus.com/_ax/twitter/complete") ||
-                url.contains("disqus.com/_ax/facebook/complete") ||
-                url.contains("disqus.com/_ax/google/complete")) {
-            webView.loadUrl(this.url);
-        }
-        if (url.contains("www.morningsignout.com/login.php")) {
-            webView.loadUrl(this.url);
-        }
+
+        viewHolder.username.setText(commentsList.get(position).username);
+        viewHolder.comment.setText(commentsList.get(position).message);
+
+        return convertView;
+    }
+
+    class DsqViewHolder {
+        TextView username;
+        TextView comment;
     }
 }
