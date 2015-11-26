@@ -55,8 +55,6 @@ public class DisqusActivity extends ActionBarActivity {
         webView.setWebChromeClient(new WebChromeClient());
 
         webView.loadUrl(commentsUrl);
-
-        new DoDisqusAPITask().execute("Forgot a needed argument");
     }
 
     @Override
@@ -120,55 +118,5 @@ class DisqusWebViewClient extends WebViewClient {
         if (url.contains("www.morningsignout.com/login.php")) {
             webView.loadUrl(this.url);
         }
-    }
-}
-
-class DoDisqusAPITask extends AsyncTask<String, Void, Void> {
-    final String PARAM = "grant_type=authorization_code&" +
-            "client_id=W7S5K8Iad6l5z9pWLgdWMg58rVTmGtOPSBtx30eZcXBVaDB7gPYYv3XgztKtQDuS&" +
-            "client_secret=P8QbTcCBz9lMn5Dw5sjBSnhB76VFrGfMR4Jb7el6qJmfQOm2CmdbvEjlKTpYbjFR&" +
-            "code=6735fbd2b06240eaa758b97860ec2fbd";
-
-    protected Void doInBackground(String... strings) {
-        HttpURLConnection urlConnection = null;
-        try {
-            URL url = new URL("https://disqus.com/api/oauth/2.0/access_token/");
-            urlConnection = (HttpURLConnection) url.openConnection();
-
-            urlConnection.setRequestMethod("POST");
-
-            urlConnection.setDoOutput(true);
-            DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
-            os.writeBytes(PARAM);
-            os.flush();
-            os.close();
-
-            int responseCode = urlConnection.getResponseCode();
-            Log.d("Disqus", "POST Response Code :: " + responseCode);
-
-            if (responseCode == HttpURLConnection.HTTP_OK) { //success
-                BufferedReader in = new BufferedReader(new InputStreamReader(
-                        urlConnection.getInputStream()));
-                String inputLine;
-                StringBuilder response = new StringBuilder();
-
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-                in.close();
-
-                // print result
-                Log.d("Disqus", response.toString());
-            } else {
-                Log.e("Disqus", "POST request not worked");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (urlConnection != null) urlConnection.disconnect();
-        }
-
-
-        return null;
     }
 }
