@@ -144,6 +144,7 @@ public class ArticleActivity extends ActionBarActivity {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(ArticleActivity.this, DisqusActivity.class);
+                    intent.putExtra(DisqusActivity.SLUG, webViewClient.lastArticleSlug);
                     startActivity(intent);
                 }
             });

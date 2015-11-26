@@ -27,7 +27,6 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
 
     @Override
     protected void onPostExecute(ArrayList<Comments> comments) {
-        Log.d("DisqusTasks", "Comment onPostExecute");
         if (commentsView.get() != null)
             commentsView.get().setAdapter(
                     new DisqusAdapter(commentsView.get().getContext(), comments));

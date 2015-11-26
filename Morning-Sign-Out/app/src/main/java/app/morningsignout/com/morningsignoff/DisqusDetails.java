@@ -56,6 +56,7 @@ public class DisqusDetails {
 
         if (commentsJson != null)
             return Comments.parseCommentsArray(commentsJson);
+
         return null;
     }
 
@@ -73,9 +74,12 @@ public class DisqusDetails {
         String getMsoThreadId(String slug) {
             String threadMSO = getHttp(msoPost + slug);
 
+            // Checks for null
             if (threadMSO == null) return null;
+            int findDsqVar = threadMSO.indexOf(dsqVar);
+            if (findDsqVar == -1) return null;
 
-            int dsq_thread_id = threadMSO.indexOf(dsqVar) + dsqVarLength;
+            int dsq_thread_id = findDsqVar + dsqVarLength;
             int end = threadMSO.indexOf("\"", dsq_thread_id);
             return threadMSO.substring(dsq_thread_id, end);
         }
@@ -146,6 +150,9 @@ class Comments {
     }
 
     static ArrayList<Comments> parseCommentsArray(String jsonString) {
+        if (jsonString == null)
+            return null;
+
         JsonParser parser = new JsonParser();
         JsonObject disqusJson = parser.parse(jsonString).getAsJsonObject();
 
@@ -155,7 +162,6 @@ class Comments {
         ArrayList<Comments> comments = new ArrayList<Comments>();
 
         for (JsonElement postElem : responses) {
-
             JsonObject obj = postElem.getAsJsonObject();
             Comments comment = parseComment(obj);
             comments.add(comment);

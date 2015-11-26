@@ -36,6 +36,8 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class DisqusActivity extends ActionBarActivity {
+    final static String SLUG = "slug";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +55,11 @@ public class DisqusActivity extends ActionBarActivity {
 
         ListView commentsView = (ListView) findViewById(R.id.listView_disqus);
 
-        new DisqusGetComments(commentsView).execute("how-the-aca-makes-primary-care-visits-more-accessible");
+        String slug = null;
+        if (getIntent() != null)
+            slug = getIntent().getStringExtra(SLUG);
+
+        new DisqusGetComments(commentsView).execute(slug);
     }
 
     @Override
