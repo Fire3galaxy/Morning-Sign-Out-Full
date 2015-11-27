@@ -37,6 +37,7 @@ public class DisqusDetails {
             + "refresh_token=";
     static public final String GET_LIST_POSTS_URL = "https://disqus.com/api/3.0/threads/listPosts.json?"
             + "api_key=" + PUBLIC_KEY + "&"
+            + "order=asc&"
             + "forum=morningsignout&thread=";
     static public final String POST_COMMENT_URL = "https://disqus.com/api/3.0/posts/create.json";
     static public final String POST_COMMENT_DATA = "api_key=" + PUBLIC_KEY + "&"; // + ACCESS_TOKEN + THREAD_ID + MESSAGE
@@ -121,6 +122,7 @@ class Comments {
             id,
             parent;
 
+
     public Comments() {
 
     }
@@ -149,24 +151,17 @@ class Comments {
                 username, name, profile_url, message, date_posted, id, parent);
     }
 
-    static ArrayList<Comments> parseCommentsArray(String jsonString) {
-        if (jsonString == null)
+    private static String parseJsonObject(JsonObject obj, String field) {
+        JsonElement elem = obj.get(field);
+        try {
+            String str = "";
+            if(!elem.isJsonNull()){
+                str = elem.getAsString();
+            }
+            return str;
+        } catch (NullPointerException e) {
             return null;
-
-        JsonParser parser = new JsonParser();
-        JsonObject disqusJson = parser.parse(jsonString).getAsJsonObject();
-
-        JsonArray responses = disqusJson.get("response")
-                .getAsJsonArray();
-
-        ArrayList<Comments> comments = new ArrayList<Comments>();
-
-        for (JsonElement postElem : responses) {
-            JsonObject obj = postElem.getAsJsonObject();
-            Comments comment = parseComment(obj);
-            comments.add(comment);
         }
-        return comments;
     }
 
     private static Comments parseComment(JsonObject disqusJson){
@@ -186,16 +181,23 @@ class Comments {
         return new Comments(username, name, profile_url, message, date_posted, id, parent);
     }
 
-    private static String parseJsonObject(JsonObject obj, String field) {
-        JsonElement elem = obj.get(field);
-        try {
-            String str = "";
-            if(!elem.isJsonNull()){
-                str = elem.getAsString();
-            }
-            return str;
-        } catch (NullPointerException e) {
+    static ArrayList<Comments> parseCommentsArray(String jsonString) {
+        if (jsonString == null)
             return null;
+
+        JsonParser parser = new JsonParser();
+        JsonObject disqusJson = parser.parse(jsonString).getAsJsonObject();
+
+        JsonArray responses = disqusJson.get("response")
+                .getAsJsonArray();
+
+        ArrayList<Comments> comments = new ArrayList<Comments>();
+
+        for (JsonElement postElem : responses) {
+            JsonObject obj = postElem.getAsJsonObject();
+            Comments comment = parseComment(obj);
+            comments.add(comment);
         }
+        return comments;
     }
 }

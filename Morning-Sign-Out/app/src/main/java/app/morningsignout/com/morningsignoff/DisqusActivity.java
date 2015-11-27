@@ -3,6 +3,7 @@ package app.morningsignout.com.morningsignoff;
 import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar.LayoutParams;
@@ -24,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -128,7 +130,7 @@ class DisqusAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         DsqViewHolder viewHolder;
 
         if (convertView == null) {
@@ -136,21 +138,29 @@ class DisqusAdapter extends BaseAdapter {
             convertView = inflater.inflate(R.layout.comment_row, parent, false);
 
             viewHolder = new DsqViewHolder();
-            viewHolder.username = (TextView) convertView.findViewById(R.id.textView_userDsq);
+            viewHolder.name = (TextView) convertView.findViewById(R.id.textView_userDsq);
             viewHolder.comment = (TextView) convertView.findViewById(R.id.textView_commentDsq);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (DsqViewHolder) convertView.getTag();
         }
 
-        viewHolder.username.setText(commentsList.get(position).username);
+        viewHolder.name.setText(commentsList.get(position).name);
+        viewHolder.name.setOnClickListener(new View.OnClickListener() { // Link to Disqus Profile
+            @Override
+            public void onClick(View v) {
+                Uri profile = Uri.parse(commentsList.get(position).profile_url);
+                Intent visitProfile = new Intent(Intent.ACTION_VIEW, profile);
+                c.startActivity(visitProfile);
+            }
+        });
         viewHolder.comment.setText(commentsList.get(position).message);
 
         return convertView;
     }
 
     class DsqViewHolder {
-        TextView username;
+        TextView name;
         TextView comment;
     }
 }

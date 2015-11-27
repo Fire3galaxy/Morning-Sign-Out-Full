@@ -57,7 +57,7 @@ public class FetchCategoryImageTask extends AsyncTask<Void, Void, Bitmap> {
     }
 
     // input an imageViewReference URL, get its bitmap
-    private Bitmap downloadBitmap(String url) {
+    static public Bitmap downloadBitmap(String url) {
         if (url == null) return null;
 
         HttpURLConnection urlConnection = null;

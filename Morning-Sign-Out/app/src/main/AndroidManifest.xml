@@ -36,7 +36,6 @@
         </activity>
         <activity
             android:name=".ArticleActivity"
-            android:label="@string/article"
             android:parentActivityName=".CategoryActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:uiOptions="splitActionBarWhenNarrow">
@@ -47,8 +46,7 @@
         <activity
             android:name=".SearchResultsActivity"
             android:launchMode="singleTop"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_search">
+            android:configChanges="orientation|keyboardHidden|screenSize">
 
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
@@ -62,6 +60,7 @@
             android:name=".DisqusActivity"
             android:label="@string/title_activity_disqus"
             android:parentActivityName=".ArticleActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/DisqusTheme">
         </activity>
     </application>
