@@ -63,6 +63,11 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/DisqusTheme">
         </activity>
+        <activity
+            android:name=".DisqusLogin"
+            android:launchMode="singleInstance"
+            android:theme="@style/DisqusTheme"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
     </application>
 
 </manifest>

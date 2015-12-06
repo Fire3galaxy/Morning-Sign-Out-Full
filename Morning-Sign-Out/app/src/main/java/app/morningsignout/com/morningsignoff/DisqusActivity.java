@@ -1,6 +1,7 @@
 package app.morningsignout.com.morningsignoff;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -20,6 +21,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -40,33 +42,34 @@ import java.util.ArrayList;
 public class DisqusActivity extends ActionBarActivity {
     final static String SLUG = "slug";
 
+    String dsq_thread_id;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_disqus);
 
-        // Action Bar
+        // Action Bar: MSO Logo in middle, Up button as X
         setActionBarDetails();
 
-        // Commenting webview
-        long id = 3635144879L; // long-type literals are SO BIG they need L on the end. who knew?
-        String disqus_thread_id = String.valueOf(id);
-        String commentsUrl = "http://www.morningsignout.com/showcomments.php?disqus_id="
-                + disqus_thread_id;
-//        String commentsUrl = "http://morningsignout.com/an-international-patchwork-of-healthcare/";
-
+        // Listview contains comments, button lets you login or post
+        // depending on if access token is stored in Preferences
+        // Button's onClickListener set in DisqusDetails' DisqusGetComments task
         ListView commentsView = (ListView) findViewById(R.id.listView_disqus);
+        Button actionButton = (Button) findViewById(R.id.button_disqus);
 
+        // Slug to get dsq_thread_id from json of article for get disqus thread data
         String slug = null;
         if (getIntent() != null)
             slug = getIntent().getStringExtra(SLUG);
 
-        new DisqusGetComments(commentsView).execute(slug);
+        // Load comments into listview, set button action
+        new DisqusGetComments(commentsView, actionButton).execute(slug);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+        // Menu: just transparent button that shouldn't show
         getMenuInflater().inflate(R.menu.menu_disqus, menu);
 
         return super.onCreateOptionsMenu(menu);
@@ -75,6 +78,8 @@ public class DisqusActivity extends ActionBarActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            // Close disqus activity and return to article. No need to keep it around b/c
+            // logins, refresh, etc.
             case android.R.id.home:
                 finish();
                 return true;
@@ -83,13 +88,27 @@ public class DisqusActivity extends ActionBarActivity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // FIXME
+        if (resultCode == Activity.RESULT_OK) {
+            String code = data.getStringExtra(DisqusDetails.CODE_KEY);
+            Log.d("DisqusActivity", code);
+        } else if (resultCode == Activity.RESULT_CANCELED)
+            Log.d("DisqusActivity", "Cancelled");
+        Log.d("","");
+    }
+
     // view parameter needed for title.xml onClick()
+    // Currently not used because we shouldn't return home using button in comments.
+    // Use home button instead.
     public void returnToParent(View view) {
         Intent intent = new Intent(this, CategoryActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
     }
 
+    // Note: X button is in style.xml
     void setActionBarDetails() {
         // ImageButton is Morning Sign Out logo, which sends user back to home screen (see XML)
         // Setting imageButton to center of actionbar

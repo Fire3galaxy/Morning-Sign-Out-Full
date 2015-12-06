@@ -42,6 +42,9 @@ public class DisqusDetails {
     static public final String POST_COMMENT_URL = "https://disqus.com/api/3.0/posts/create.json";
     static public final String POST_COMMENT_DATA = "api_key=" + PUBLIC_KEY + "&"; // + ACCESS_TOKEN + THREAD_ID + MESSAGE
 
+    // For use in getting code: DisqusLogin and LoginClient
+    static public final String CODE_KEY = "code";
+
     HttpDetails httpMethods;
     DisqusMethods disqusMethods;
 
