@@ -90,10 +90,12 @@ public class DisqusActivity extends ActionBarActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // FIXME
+        // Returns from DisqusLogin
         if (resultCode == Activity.RESULT_OK) {
             String code = data.getStringExtra(DisqusDetails.CODE_KEY);
-            Log.d("DisqusActivity", code);
+            Log.d("DisqusActivity", "Code: " + code);
+
+
         } else if (resultCode == Activity.RESULT_CANCELED)
             Log.d("DisqusActivity", "Cancelled");
         Log.d("","");

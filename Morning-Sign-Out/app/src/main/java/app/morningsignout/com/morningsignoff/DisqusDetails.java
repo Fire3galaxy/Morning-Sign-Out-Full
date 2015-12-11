@@ -7,7 +7,9 @@ import com.google.gson.JsonParser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -64,9 +66,23 @@ public class DisqusDetails {
         return null;
     }
 
+    AccessToken getAccessToken(String code) {
+        String tokenJson = disqusMethods.getAccessTokenFromCode(code);
+        if (tokenJson != null)
+            return AccessToken.parseAccessToken(tokenJson);
+
+        return null;
+    }
+
+    // ------------------------------------------------------------------------------------
+
     private class DisqusMethods {
         String getCommentsJson(String threadId) {
             return httpMethods.getHttp(GET_LIST_POSTS_URL + threadId);
+        }
+
+        String getAccessTokenFromCode(String code) {
+            return httpMethods.postHttp(GET_ACCESS_TOKEN_URL, code);
         }
     }
 
@@ -113,6 +129,115 @@ public class DisqusDetails {
 
             return null;
         }
+
+        String postHttp(String _url, String data) {
+            if (_url == null || data == null) return null;
+
+            HttpURLConnection urlConnection = null;
+            try {
+                // Set up url
+                URL url = new URL(_url);
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("POST");
+                urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                urlConnection.setRequestProperty("Content-Length", String.valueOf(data.length()));
+
+                // Put contents of POST response body in output stream
+                urlConnection.setDoOutput(true);
+                OutputStream os = urlConnection.getOutputStream();
+                os.write(data.getBytes());
+                os.flush();
+                os.close();
+
+                // Get response code
+                int responseCode = urlConnection.getResponseCode();
+                String responseMessage = urlConnection.getResponseMessage();
+                System.out.println("Disqus" + "POST Response Code :: " + responseCode + " - " + responseMessage);
+
+                InputStream rStream = null;
+
+                // Set rStream to returned json or error stream
+                if (responseCode == HttpURLConnection.HTTP_OK) //success
+                    rStream = urlConnection.getInputStream();
+                else
+                    rStream = urlConnection.getErrorStream();
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(
+                        rStream));
+                String inputLine;
+                StringBuilder response = new StringBuilder();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                // Print result
+                return response.toString();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (urlConnection != null) urlConnection.disconnect();
+            }
+
+            return null;
+        }
+    }
+}
+
+class JsonDisqus {
+    public static String parseJsonObject(JsonObject obj, String field) {
+        JsonElement elem = obj.get(field);
+        try {
+            String str = "";
+            if(!elem.isJsonNull()){
+                str = elem.getAsString();
+            }
+            return str;
+        } catch (NullPointerException e) {
+            return null;
+        }
+    }
+}
+
+class AccessToken {
+    String access_token,
+            expires_in,
+            username,
+            refresh_token;
+
+    public AccessToken() {
+
+    }
+
+    // add author param
+    public AccessToken(String _access_token,
+                       String _expires_in,
+                       String _username,
+                       String _refresh_token){
+        access_token = _access_token;
+        expires_in = _expires_in;
+        username = _username;
+        refresh_token = _refresh_token;
+    }
+
+    @Override
+    public String toString(){
+        return String.format(
+                "access_token: %s\nexpires_in: %s\nusername: %s\nrefresh_token: %s\n",
+                access_token, expires_in, username, refresh_token);
+    }
+
+    static AccessToken parseAccessToken(String jsonString){
+        JsonParser parser = new JsonParser();
+        JsonObject disqusJson = parser.parse(jsonString).getAsJsonObject();
+
+        String access_token = JsonDisqus.parseJsonObject(disqusJson, "access_token");
+        String expires_in = JsonDisqus.parseJsonObject(disqusJson, "expires_in");
+        String username = JsonDisqus.parseJsonObject(disqusJson, "username");
+        String refresh_token = JsonDisqus.parseJsonObject(disqusJson, "refresh_token");
+
+        return new AccessToken(access_token, expires_in, username, refresh_token);
     }
 }
 
@@ -154,30 +279,17 @@ class Comments {
                 username, name, profile_url, message, date_posted, id, parent);
     }
 
-    private static String parseJsonObject(JsonObject obj, String field) {
-        JsonElement elem = obj.get(field);
-        try {
-            String str = "";
-            if(!elem.isJsonNull()){
-                str = elem.getAsString();
-            }
-            return str;
-        } catch (NullPointerException e) {
-            return null;
-        }
-    }
-
     private static Comments parseComment(JsonObject disqusJson){
         JsonObject author = disqusJson.get("author")
                 .getAsJsonObject();
 
-        String username = parseJsonObject(author, "username");
-        String name = parseJsonObject(author, "name");
-        String profile_url = parseJsonObject(author, "profileUrl");
-        String message = parseJsonObject(disqusJson, "raw_message");
-        String date_posted = parseJsonObject(disqusJson, "createdAt");
-        String id = parseJsonObject(disqusJson, "id");
-        String parent = parseJsonObject(disqusJson, "parent");
+        String username = JsonDisqus.parseJsonObject(author, "username");
+        String name = JsonDisqus.parseJsonObject(author, "name");
+        String profile_url = JsonDisqus.parseJsonObject(author, "profileUrl");
+        String message = JsonDisqus.parseJsonObject(disqusJson, "raw_message");
+        String date_posted = JsonDisqus.parseJsonObject(disqusJson, "createdAt");
+        String id = JsonDisqus.parseJsonObject(disqusJson, "id");
+        String parent = JsonDisqus.parseJsonObject(disqusJson, "parent");
 
 
         //System.out.println(response);

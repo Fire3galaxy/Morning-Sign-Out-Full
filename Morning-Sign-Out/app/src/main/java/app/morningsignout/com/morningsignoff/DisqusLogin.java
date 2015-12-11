@@ -15,6 +15,7 @@ import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 
+// Used by DisqusActivity
 public class DisqusLogin extends ActionBarActivity {
     WebView webView;
     ProgressBar pb;
@@ -112,11 +113,11 @@ public class DisqusLogin extends ActionBarActivity {
             Uri parsedUrl = Uri.parse(url);
             Log.d("LoginClient", parsedUrl.getHost());
 
-            if (parsedUrl.getHost().equals("morningsignout")) {
+            if (parsedUrl.getHost().equals("morningsignout.com")) {
                 String code = parsedUrl.getQuery();
                 code = code.substring("code=".length());
 
-                Log.d("LoginClient", code);
+                Log.d("LoginClient", "Code: " + code);
 
                 Intent intent = new Intent();
                 intent.putExtra(DisqusDetails.CODE_KEY, code);

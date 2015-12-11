@@ -58,3 +58,19 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
     }
 }
 
+// Called after code is returned in DisqusActivity. Meant to trade code for token, then set button
+// to post. So far have code for getting token done (not tested yet).
+class DisqusGetAccessToken extends AsyncTask<String, Void, AccessToken> {
+    @Override
+    public AccessToken doInBackground(String... code) {
+        DisqusDetails disqus = new DisqusDetails();
+        return disqus.getAccessToken(code[0]);
+    }
+
+    @Override
+    public void onPostExecute(AccessToken token) {
+
+    }
+}
+
+
