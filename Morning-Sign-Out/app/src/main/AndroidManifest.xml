@@ -28,8 +28,7 @@
 
         <activity
             android:launchMode = "singleTop"
-            android:name=".CategoryActivity"
-            android:label="@string/title_activity_category" >
+            android:name=".CategoryActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="app.morningsignout.com.morningsignoff.CategoryActivity" />
@@ -57,17 +56,20 @@
                 android:resource="@xml/searchable" />
         </activity>
         <activity
-            android:name=".DisqusActivity"
-            android:label="@string/title_activity_disqus"
+            android:name=".DisqusMain"
             android:parentActivityName=".ArticleActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:configChanges="orientation|screenSize"
             android:theme="@style/DisqusTheme">
         </activity>
         <activity
             android:name=".DisqusLogin"
             android:launchMode="singleInstance"
             android:theme="@style/DisqusTheme"
-            android:configChanges="orientation|keyboardHidden|screenSize" />
+            android:configChanges="orientation|screenSize" />
+
+        <activity android:name=".DisqusCommentActivity"
+            android:theme="@style/DisqusTheme"
+            android:configChanges="orientation|screenSize|keyboardHidden"/>
     </application>
 
 </manifest>

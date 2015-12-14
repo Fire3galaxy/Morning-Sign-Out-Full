@@ -47,6 +47,10 @@ public class DisqusDetails {
     // For use in getting code: DisqusLogin and LoginClient
     static public final String CODE_KEY = "code";
 
+    // For use in accessing token and thread_id from intent: DisqusCommentActivity and DisqusGetAccessToken
+    static public final String ACCESS_TOKEN = "access token";
+    static public final String DSQ_THREAD_ID = "dsq_thread_id";
+
     HttpDetails httpMethods;
     DisqusMethods disqusMethods;
 
@@ -83,6 +87,16 @@ public class DisqusDetails {
 
         String getAccessTokenFromCode(String code) {
             return httpMethods.postHttp(GET_ACCESS_TOKEN_URL, code);
+        }
+
+        String postComment(String token, String threadId, String message) {
+            return httpMethods.postHttp(POST_COMMENT_URL, createPostCommentData(token, threadId, message));
+        }
+
+        private String createPostCommentData(String accessToken, String threadId, String message) {
+            return POST_COMMENT_DATA + "access_token=" + accessToken + "&"
+                    + "thread=" + threadId + "&"
+                    + "message=" + message;
         }
     }
 

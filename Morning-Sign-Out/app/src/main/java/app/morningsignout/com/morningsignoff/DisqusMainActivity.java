@@ -39,7 +39,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class DisqusActivity extends ActionBarActivity {
+public class DisqusMain extends ActionBarActivity {
     final static String SLUG = "slug";
 
     String dsq_thread_id;
