@@ -56,7 +56,7 @@
                 android:resource="@xml/searchable" />
         </activity>
         <activity
-            android:name=".DisqusMain"
+            android:name=".DisqusMainActivity"
             android:parentActivityName=".ArticleActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@style/DisqusTheme">

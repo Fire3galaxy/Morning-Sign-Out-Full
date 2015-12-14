@@ -39,7 +39,7 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(v.getContext(), DisqusLogin.class);
-                    ((DisqusMain) v.getContext()).startActivityForResult(intent, 1);
+                    ((DisqusMainActivity) v.getContext()).startActivityForResult(intent, 1);
                 }
             });
         }
