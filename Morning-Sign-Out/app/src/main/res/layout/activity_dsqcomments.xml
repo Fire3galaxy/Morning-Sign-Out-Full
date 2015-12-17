@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:hint="@string/comment_hint"
-    android:editable="true">
+    android:editable="true"
+    android:background="@drawable/abc_edit_text_material">
 
 </TextView>
