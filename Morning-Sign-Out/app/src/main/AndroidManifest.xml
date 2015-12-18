@@ -59,7 +59,7 @@
             android:name=".DisqusMainActivity"
             android:parentActivityName=".ArticleActivity"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/DisqusThemeTransparent">
+            android:theme="@style/DisqusTheme">
         </activity>
 
         <activity

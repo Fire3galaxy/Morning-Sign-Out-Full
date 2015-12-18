@@ -155,6 +155,7 @@ class DisqusAdapter extends BaseAdapter {
         DsqViewHolder viewHolder;
 
         if (convertView == null) {
+            //Log.d("","");
             LayoutInflater inflater = LayoutInflater.from(c);
             convertView = inflater.inflate(R.layout.comment_row, parent, false);
 

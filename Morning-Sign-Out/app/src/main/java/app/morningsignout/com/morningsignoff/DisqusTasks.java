@@ -1,10 +1,14 @@
 package app.morningsignout.com.morningsignoff;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -16,10 +20,25 @@ import java.util.ArrayList;
 class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
     WeakReference<ListView> commentsView;
     WeakReference<Button> actionButton;
+    TextView noComments;
 
     DisqusGetComments(ListView commentsView, Button actionButton) {
         this.commentsView = new WeakReference<>(commentsView);
         this.actionButton = new WeakReference<>(actionButton);
+    }
+
+    @Override
+    protected void onPreExecute() {
+        // No comments here yet. Be the first!
+        if (commentsView.get() != null) {
+            noComments = new TextView(commentsView.get().getContext());
+            noComments.setText("No comments here yet. Be the first!");
+            noComments.setPadding(12, 8, 12, 0);
+            noComments.setTypeface(Typeface.DEFAULT);
+            noComments.setTextColor(Color.BLACK);
+
+            commentsView.get().addHeaderView(noComments);
+        }
     }
 
     @Override
@@ -31,9 +50,14 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
 
     @Override
     protected void onPostExecute(ArrayList<Comments> comments) {
-        if (commentsView.get() != null)
+        if (commentsView.get() != null) {
+            // remove header
+            if (!comments.isEmpty())
+                commentsView.get().removeHeaderView(noComments);
+
             commentsView.get().setAdapter(
                     new DisqusAdapter(commentsView.get().getContext(), comments));
+        }
         if (actionButton.get() != null) {
             actionButton.get().setOnClickListener(new View.OnClickListener() {
                 @Override
