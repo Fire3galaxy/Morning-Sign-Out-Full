@@ -139,6 +139,7 @@ public class ArticleActivity extends ActionBarActivity {
                     Intent intent = new Intent(ArticleActivity.this, DisqusMainActivity.class);
                     intent.putExtra(DisqusMainActivity.SLUG, webViewClient.lastArticleSlug);
                     startActivity(intent);
+                    //Log.d("","");
                 }
             });
         }

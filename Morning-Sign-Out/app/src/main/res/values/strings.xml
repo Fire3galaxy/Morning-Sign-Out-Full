@@ -10,6 +10,8 @@
     <string name="action_comment">Comment</string>
     <string name="action_share">Share article</string>
 
+    <string name="disqus_login">Log In - Disqus</string>
+
     <string name="title_contentDescription">app home button</string>
     <string name="title_commentXDescription">close comments</string>
     <string name="title_slide_menu">Categories menu</string>
