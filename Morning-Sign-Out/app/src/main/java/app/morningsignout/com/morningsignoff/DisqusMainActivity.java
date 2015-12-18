@@ -4,12 +4,14 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar.LayoutParams;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -98,7 +100,7 @@ public class DisqusMainActivity extends ActionBarActivity {
 
         } else if (resultCode == Activity.RESULT_CANCELED)
             Log.d("DisqusActivity", "Cancelled");
-        Log.d("","");
+        //Log.d("","");
     }
 
     // view parameter needed for title.xml onClick()
@@ -127,6 +129,9 @@ public class DisqusMainActivity extends ActionBarActivity {
 }
 
 class DisqusAdapter extends BaseAdapter {
+    static final int INDENT = 20;
+    static final int INDENT_MAX = 40;
+
     Context c;
     ArrayList<Comments> commentsList;
 
@@ -167,7 +172,10 @@ class DisqusAdapter extends BaseAdapter {
             viewHolder = (DsqViewHolder) convertView.getTag();
         }
 
-        viewHolder.name.setText(commentsList.get(position).name);
+        if (commentsList.get(position).indent != 0)                     // A subcomment
+            convertView.setPadding(getPxFromDp(INDENT * commentsList.get(position).indent),
+                    0, 0, 0);
+        viewHolder.name.setText(commentsList.get(position).name);       // username
         viewHolder.name.setOnClickListener(new View.OnClickListener() { // Link to Disqus Profile
             @Override
             public void onClick(View v) {
@@ -176,9 +184,14 @@ class DisqusAdapter extends BaseAdapter {
                 c.startActivity(visitProfile);
             }
         });
-        viewHolder.comment.setText(commentsList.get(position).message);
+        viewHolder.comment.setText(commentsList.get(position).message); // comment
 
         return convertView;
+    }
+
+    int getPxFromDp(int dp) {
+        Resources r = c.getResources();
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
     }
 
     class DsqViewHolder {

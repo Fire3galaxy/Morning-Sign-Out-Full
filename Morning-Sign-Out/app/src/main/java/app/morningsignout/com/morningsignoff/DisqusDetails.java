@@ -13,6 +13,12 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
 /**
  * Created by Daniel on 11/25/2015.
@@ -263,11 +269,9 @@ class Comments {
             date_posted,
             id,
             parent;
+    Integer indent;
 
-
-    public Comments() {
-
-    }
+    public Comments() {}
 
     // add author param
     public Comments(String _username,
@@ -284,6 +288,7 @@ class Comments {
         date_posted = _date_posted;
         id = _id;
         parent = _parent;
+        indent = 0;
     }
 
     @Override
@@ -322,11 +327,90 @@ class Comments {
 
         ArrayList<Comments> comments = new ArrayList<Comments>();
 
+//        ArrayList<String> ids = new ArrayList<>();      // For indents: comments
+//        ArrayList<Integer> indents = new ArrayList<>(); // corresponding indent val of comments
+
         for (JsonElement postElem : responses) {
             JsonObject obj = postElem.getAsJsonObject();
             Comments comment = parseComment(obj);
             comments.add(comment);
+
+//            if (!comment.parent.isEmpty()) {
+//                int i = ids.indexOf(comment.parent);
+//
+//                // Adding parent to list
+//                if (i == -1) {
+//                    ids.add(comment.parent);
+//                    indents.add(0);
+//                    i = ids.size() - 1;
+//                }
+//                // Adding child to list with indent parent+1
+//                ids.add(comment.id);
+//                indents.add(indents.get(i) + 1);
+//
+//                // setting comment's indent
+//                comment.indent = indents.get(i) + 1;
+//            }
         }
-        return comments;
+        return handleSubcommenting(comments);
+    }
+
+    static ArrayList<Comments> handleSubcommenting(ArrayList<Comments> comments) {
+//        ArrayList<String> ids = new ArrayList<>();      // For indents: comments
+
+//        for (Comments c : comments)
+//            ids.add(c.id);
+
+        // setup indents of comments
+//        for (Comments c : comments) {
+//            if (!c.parent.isEmpty()) {
+//                int i = ids.indexOf(c.parent);
+//                c.indent = comments.get(i).indent + 1; // setting comment's indent
+//            }
+//        }
+
+        Map<String, Integer> quickIndex = new HashMap<>();
+        for (int i = 0; i < comments.size(); i++)
+            quickIndex.put(comments.get(i).id, i);
+
+        // Create adjacency list of comments to parents (math!)
+        Map<Comments, ArrayList<Comments>> cGraph = new HashMap<>();
+        for (Comments c : comments) {
+            cGraph.put(c, new ArrayList<Comments>());
+
+            if (!c.parent.isEmpty()) {
+                int parent = quickIndex.get(c.parent);
+                cGraph.get(comments.get(parent)).add(c);
+            }
+        }
+
+        // Depth-first search for ordering
+        Set<Comments> unvisited = new HashSet<>();  // For keeping track of which are not sorted yet
+        unvisited.addAll(comments);
+        Stack<Comments> toVisit = new Stack<>();
+        ArrayList<Comments> visited = new ArrayList<>(); // will be returned
+
+        for (Comments c : comments) {
+            if (unvisited.contains(c)) toVisit.push(c); // a root node (comment w/ no indent)
+
+            // Visit all children of root node (all comment w/ indents under root comment)
+            while (!toVisit.empty()) {
+                Comments curr = toVisit.pop();  // deepest children pushed last in stack
+
+                unvisited.remove(curr);         // not to be considered again after while loop
+                visited.add(curr);              // added to list of comments in order
+                if (!curr.parent.isEmpty()) {   // set indent
+                    int parent = quickIndex.get(curr.parent);
+                    curr.indent = comments.get(parent).indent + 1;
+                }
+
+                // Push backwards so earliest post is pushed last in stack (maintain date of posting)
+                List<Comments> children = cGraph.get(curr);
+                for (int i = children.size() - 1; i != -1; i--)
+                    toVisit.push(children.get(i));
+            }
+        }
+
+        return visited;
     }
 }
