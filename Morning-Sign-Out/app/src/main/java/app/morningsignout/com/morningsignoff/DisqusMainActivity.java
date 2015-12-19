@@ -27,6 +27,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +45,9 @@ import java.util.ArrayList;
 public class DisqusMainActivity extends ActionBarActivity {
     final static String SLUG = "slug";
 
+    Button actionButton;
+    TextView commentText;
+
     String dsq_thread_id;
 
     @Override
@@ -54,11 +58,13 @@ public class DisqusMainActivity extends ActionBarActivity {
         // Action Bar: MSO Logo in middle, Up button as X
         setActionBarDetails();
 
-        // Listview contains comments, button lets you login or post
-        // depending on if access token is stored in Preferences
+        // Listview contains comments,
+        // button lets you login or post depending on if access token is stored in Preferences
         // Button's onClickListener set in DisqusDetails' DisqusGetComments task
         ListView commentsView = (ListView) findViewById(R.id.listView_disqus);
-        Button actionButton = (Button) findViewById(R.id.button_disqus);
+        actionButton = (Button) findViewById(R.id.button_disqus);
+
+        ProgressBar pb = (ProgressBar) findViewById(R.id.progressBar_dsq);
 
         // Slug to get dsq_thread_id from json of article for get disqus thread data
         String slug = null;
@@ -66,7 +72,7 @@ public class DisqusMainActivity extends ActionBarActivity {
             slug = getIntent().getStringExtra(SLUG);
 
         // Load comments into listview, set button action
-        new DisqusGetComments(commentsView, actionButton).execute(slug);
+        new DisqusGetComments(commentsView, actionButton, pb).execute(slug);
     }
 
     @Override

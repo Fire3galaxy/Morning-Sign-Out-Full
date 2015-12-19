@@ -4,10 +4,10 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
@@ -20,15 +20,20 @@ import java.util.ArrayList;
 class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
     WeakReference<ListView> commentsView;
     WeakReference<Button> actionButton;
+    WeakReference<ProgressBar> pb;
     TextView noComments;
 
-    DisqusGetComments(ListView commentsView, Button actionButton) {
+    DisqusGetComments(ListView commentsView, Button actionButton, ProgressBar pb) {
         this.commentsView = new WeakReference<>(commentsView);
         this.actionButton = new WeakReference<>(actionButton);
+        this.pb = new WeakReference<>(pb);
     }
 
     @Override
     protected void onPreExecute() {
+        if (pb.get() != null)
+            pb.get().setVisibility(View.VISIBLE);
+
         // No comments here yet. Be the first!
         if (commentsView.get() != null) {
             noComments = new TextView(commentsView.get().getContext());
@@ -50,6 +55,9 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
 
     @Override
     protected void onPostExecute(ArrayList<Comments> comments) {
+        if (pb.get() != null)
+            pb.get().setVisibility(View.GONE);
+
         if (commentsView.get() != null) {
             // remove header
             if (!comments.isEmpty())

@@ -327,48 +327,15 @@ class Comments {
 
         ArrayList<Comments> comments = new ArrayList<Comments>();
 
-//        ArrayList<String> ids = new ArrayList<>();      // For indents: comments
-//        ArrayList<Integer> indents = new ArrayList<>(); // corresponding indent val of comments
-
         for (JsonElement postElem : responses) {
             JsonObject obj = postElem.getAsJsonObject();
             Comments comment = parseComment(obj);
             comments.add(comment);
-
-//            if (!comment.parent.isEmpty()) {
-//                int i = ids.indexOf(comment.parent);
-//
-//                // Adding parent to list
-//                if (i == -1) {
-//                    ids.add(comment.parent);
-//                    indents.add(0);
-//                    i = ids.size() - 1;
-//                }
-//                // Adding child to list with indent parent+1
-//                ids.add(comment.id);
-//                indents.add(indents.get(i) + 1);
-//
-//                // setting comment's indent
-//                comment.indent = indents.get(i) + 1;
-//            }
         }
         return handleSubcommenting(comments);
     }
 
     static ArrayList<Comments> handleSubcommenting(ArrayList<Comments> comments) {
-//        ArrayList<String> ids = new ArrayList<>();      // For indents: comments
-
-//        for (Comments c : comments)
-//            ids.add(c.id);
-
-        // setup indents of comments
-//        for (Comments c : comments) {
-//            if (!c.parent.isEmpty()) {
-//                int i = ids.indexOf(c.parent);
-//                c.indent = comments.get(i).indent + 1; // setting comment's indent
-//            }
-//        }
-
         Map<String, Integer> quickIndex = new HashMap<>();
         for (int i = 0; i < comments.size(); i++)
             quickIndex.put(comments.get(i).id, i);
