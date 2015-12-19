@@ -1,52 +1,35 @@
 package app.morningsignout.com.morningsignoff;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar.LayoutParams;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 
 public class DisqusMainActivity extends ActionBarActivity {
     final static String SLUG = "slug";
 
     Button actionButton;
-    TextView commentText;
+    EditText commentText;
+    ProgressBar dsqPb, dsqTextPb;
 
     String dsq_thread_id;
 
@@ -64,7 +47,7 @@ public class DisqusMainActivity extends ActionBarActivity {
         ListView commentsView = (ListView) findViewById(R.id.listView_disqus);
         actionButton = (Button) findViewById(R.id.button_disqus);
 
-        ProgressBar pb = (ProgressBar) findViewById(R.id.progressBar_dsq);
+        dsqPb = (ProgressBar) findViewById(R.id.progressBar_dsq);
 
         // Slug to get dsq_thread_id from json of article for get disqus thread data
         String slug = null;
@@ -72,7 +55,7 @@ public class DisqusMainActivity extends ActionBarActivity {
             slug = getIntent().getStringExtra(SLUG);
 
         // Load comments into listview, set button action
-        new DisqusGetComments(commentsView, actionButton, pb).execute(slug);
+        new DisqusGetComments(commentsView, actionButton, dsqPb, this).execute(slug, dsq_thread_id);
     }
 
     @Override
@@ -103,10 +86,17 @@ public class DisqusMainActivity extends ActionBarActivity {
             String code = data.getStringExtra(DisqusDetails.CODE_KEY);
             Log.d("DisqusActivity", "Code: " + code);
 
+            commentText = (EditText) findViewById(R.id.editText_commentMain);
+            dsqTextPb = (ProgressBar) findViewById(R.id.progressBar_dsqText);
 
+            new DisqusGetAccessToken(actionButton, commentText, dsqTextPb).execute(code, dsq_thread_id);
         } else if (resultCode == Activity.RESULT_CANCELED)
             Log.d("DisqusActivity", "Cancelled");
         //Log.d("","");
+    }
+
+    public void setDsq_thread_id(String id) {
+        dsq_thread_id = id;
     }
 
     // view parameter needed for title.xml onClick()

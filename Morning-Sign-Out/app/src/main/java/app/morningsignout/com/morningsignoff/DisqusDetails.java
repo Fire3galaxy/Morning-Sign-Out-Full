@@ -1,5 +1,7 @@
 package app.morningsignout.com.morningsignoff;
 
+import android.util.Log;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -10,8 +12,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,7 +40,7 @@ public class DisqusDetails {
     static public final String GET_ACCESS_TOKEN_DATA = "grant_type=authorization_code&"
             + "client_id=" + PUBLIC_KEY + "&"
             + "client_secret=" + SECRET_KEY + "&"
-            + "redirect_uri=http://www.morningsignout.com&"
+            + "redirect_uri=http://www.morningsignout.com/&"
             + "code=";
     static public final String GET_REFRESH_TOKEN_URL = "https://disqus.com/api/oauth/2.0/access_token/";
     static public final String GET_REFRESH_TOKEN_DATA = "grant_type=refresh_token&"
@@ -66,12 +70,14 @@ public class DisqusDetails {
     }
 
     // LIST_POSTS Disqus: two internet requests to load comments
-    ArrayList<Comments> getComments(String slug) {
+    // TEMP: Until we don't need a separate call to get thread id (b/c we already have it from using
+    // primarily JSON for articles, return both comments and thread id.
+    TempCommentsAndThreadId getComments(String slug) {
         String threadId = httpMethods.getMsoThreadId(slug);             // Request 1
         String commentsJson = disqusMethods.getCommentsJson(threadId);  // Request 2
 
         if (commentsJson != null)
-            return Comments.parseCommentsArray(commentsJson);
+            return new TempCommentsAndThreadId(Comments.parseCommentsArray(commentsJson), threadId);
 
         return null;
     }
@@ -84,6 +90,10 @@ public class DisqusDetails {
         return null;
     }
 
+    void postComment(String token, String threadId, String message) {
+        Log.d("DisqusDetails", disqusMethods.postComment(token, threadId, message));
+    }
+
     // ------------------------------------------------------------------------------------
 
     private class DisqusMethods {
@@ -92,7 +102,7 @@ public class DisqusDetails {
         }
 
         String getAccessTokenFromCode(String code) {
-            return httpMethods.postHttp(GET_ACCESS_TOKEN_URL, code);
+            return httpMethods.postHttp(GET_ACCESS_TOKEN_URL, createGetAccessTokenData(code));
         }
 
         String postComment(String token, String threadId, String message) {
@@ -100,9 +110,17 @@ public class DisqusDetails {
         }
 
         private String createPostCommentData(String accessToken, String threadId, String message) {
-            return POST_COMMENT_DATA + "access_token=" + accessToken + "&"
-                    + "thread=" + threadId + "&"
-                    + "message=" + message;
+            try {
+                return POST_COMMENT_DATA + "access_token=" + accessToken + "&"
+                        + "thread=" + threadId + "&"
+                        + "message=" + URLEncoder.encode(message, "UTF8");
+            } catch (UnsupportedEncodingException e) {
+                return null;
+            }
+        }
+
+        private String createGetAccessTokenData(String code) {
+            return GET_ACCESS_TOKEN_DATA + code;
         }
     }
 
@@ -379,5 +397,15 @@ class Comments {
         }
 
         return visited;
+    }
+}
+
+class TempCommentsAndThreadId {
+    ArrayList<Comments> comments;
+    String dsq_thread_id;
+
+    public TempCommentsAndThreadId(ArrayList<Comments> comments, String dsq_thread_id) {
+        this.comments = comments;
+        this.dsq_thread_id = dsq_thread_id;
     }
 }
