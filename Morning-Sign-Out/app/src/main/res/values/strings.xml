@@ -19,6 +19,7 @@
 
     <string name="search_hint">Search Morning Sign Out</string>
     <string name="comment_hint">Type comment here.</string>
+    <string name="comment_label">Post</string>
 
     <string name="category_refresh">If articles do not load, drag down to refresh</string>
     <string name="error">Something went wrong. Please report this bug to the developers in the play

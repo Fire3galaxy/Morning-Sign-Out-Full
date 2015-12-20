@@ -55,8 +55,9 @@
         android:visibility="gone"
         android:hint="@string/comment_hint"
         android:scrollHorizontally="false"
-        android:inputType="textAutoCorrect|textShortMessage"
-        android:imeOptions="actionSend"/>
+        android:inputType="textAutoCorrect|textMultiLine|textCapSentences"
+        android:imeOptions="actionSend"
+        android:imeActionLabel="@string/comment_label"/>
 
     <ProgressBar
         style="?android:attr/progressBarStyleHorizontal"

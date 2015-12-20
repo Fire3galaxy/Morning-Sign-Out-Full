@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -144,9 +145,18 @@ class DisqusGetAccessToken extends AsyncTask<String, Void, AccessToken> {
                 public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                     boolean handled = false;
                     if (actionId == EditorInfo.IME_ACTION_SEND) {
-                        new DisqusPostComment().execute(accessToken.access_token,
-                                thread_id,
-                                v.getText().toString());
+                        // Post comment
+                        String message = v.getText().toString();
+                        if (!message.isEmpty())
+                            new DisqusPostComment().execute(accessToken.access_token,
+                                    thread_id,
+                                    v.getText().toString());
+
+                        v.setText(""); // Clear text from editText
+
+                        // Hide keyboard http://stackoverflow.com/questions/1109022/close-hide-the-android-soft-keyboard
+                        InputMethodManager imm = (InputMethodManager) mk
+
                         handled = true;
                     }
 
