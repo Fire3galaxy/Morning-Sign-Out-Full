@@ -27,10 +27,12 @@ import java.util.ArrayList;
 public class DisqusMainActivity extends ActionBarActivity {
     final static String SLUG = "slug";
 
+    ListView commentsView;
     Button actionButton;
     EditText commentText;
     ProgressBar dsqPb, dsqTextPb;
 
+    String slug;
     String dsq_thread_id;
 
     @Override
@@ -44,18 +46,20 @@ public class DisqusMainActivity extends ActionBarActivity {
         // Listview contains comments,
         // button lets you login or post depending on if access token is stored in Preferences
         // Button's onClickListener set in DisqusDetails' DisqusGetComments task
-        ListView commentsView = (ListView) findViewById(R.id.listView_disqus);
+        commentsView = (ListView) findViewById(R.id.listView_disqus);
         actionButton = (Button) findViewById(R.id.button_disqus);
 
         dsqPb = (ProgressBar) findViewById(R.id.progressBar_dsq);
 
+        // FIXME: Later, when we use json to load an article, dsq_thread_id will be passed in
+        // FIXME: intent, instead of slug
         // Slug to get dsq_thread_id from json of article for get disqus thread data
-        String slug = null;
+        slug = null;
         if (getIntent() != null)
             slug = getIntent().getStringExtra(SLUG);
 
         // Load comments into listview, set button action
-        new DisqusGetComments(commentsView, actionButton, dsqPb, this).execute(slug, dsq_thread_id);
+        new DisqusGetComments(commentsView, actionButton, dsqPb, this).execute(slug);
     }
 
     @Override
@@ -89,10 +93,15 @@ public class DisqusMainActivity extends ActionBarActivity {
             commentText = (EditText) findViewById(R.id.editText_commentMain);
             dsqTextPb = (ProgressBar) findViewById(R.id.progressBar_dsqText);
 
-            new DisqusGetAccessToken(actionButton, commentText, dsqTextPb).execute(code, dsq_thread_id);
+            new DisqusGetAccessToken(actionButton, commentText, dsqTextPb, this)
+                    .execute(code, dsq_thread_id);
         } else if (resultCode == Activity.RESULT_CANCELED)
             Log.d("DisqusActivity", "Cancelled");
-        //Log.d("","");
+        //Log.d("",""); // can delete this. just htc m8 testing bugs.
+    }
+
+    public void refreshComments() {
+        new DisqusGetComments(commentsView, dsqPb).execute(slug);
     }
 
     public void setDsq_thread_id(String id) {

@@ -38,13 +38,23 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
         this.act = new WeakReference<>(act);
     }
 
+    // leave action button and activity null, just refresh commentsView
+    DisqusGetComments(ListView commentsView, ProgressBar pb) {
+        this.commentsView = new WeakReference<>(commentsView);
+        this.pb = new WeakReference<>(pb);
+
+        this.actionButton = new WeakReference<>(null);
+        this.act = new WeakReference<>(null);
+    }
+
     @Override
     protected void onPreExecute() {
+        // Loading
         if (pb.get() != null)
             pb.get().setVisibility(View.VISIBLE);
 
         // No comments here yet. Be the first!
-        if (commentsView.get() != null) {
+        if (commentsView.get() != null && commentsView.get().getHeaderViewsCount() == 0) {
             noComments = new TextView(commentsView.get().getContext());
             noComments.setText("No comments here yet. Be the first!");
             noComments.setPadding(12, 8, 12, 0);
@@ -83,7 +93,7 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
                     new DisqusAdapter(commentsView.get().getContext(), comments));
         }
 
-        // Set up Login Button
+        // Set up Login Button (if relevant)
         if (actionButton.get() != null) {
             actionButton.get().setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -104,10 +114,15 @@ class DisqusGetAccessToken extends AsyncTask<String, Void, AccessToken> {
     WeakReference<EditText> commentText;
     WeakReference<ProgressBar> dsqTextPb;
 
-    public DisqusGetAccessToken(Button actionButton, EditText commentText, ProgressBar dsqTextPb) {
+    // For getComments call in editorAction listener
+    WeakReference<DisqusMainActivity> act;
+
+    public DisqusGetAccessToken(Button actionButton, EditText commentText, ProgressBar dsqTextPb,
+                                DisqusMainActivity act) {
         this.actionButton = new WeakReference<>(actionButton);
         this.commentText = new WeakReference<>(commentText);
         this.dsqTextPb = new WeakReference<>(dsqTextPb);
+        this.act = new WeakReference<>(act);
     }
 
     @Override
@@ -130,11 +145,10 @@ class DisqusGetAccessToken extends AsyncTask<String, Void, AccessToken> {
 
     @Override
     public void onPostExecute(final AccessToken token) {
-        if (actionButton.get() != null && commentText.get() != null && dsqTextPb.get() != null) {
-            // Replace button with EditText widget
-            dsqTextPb.get().setVisibility(View.GONE);
-            actionButton.get().setVisibility(View.GONE);
-            commentText.get().setVisibility(View.VISIBLE);
+        if (actionButton.get() != null && commentText.get() != null &&
+                dsqTextPb.get() != null && act.get() != null) {
+            // Properties to force line wrapping in edit text (not working in xml)
+            commentText.get().setHorizontallyScrolling(false);
 
             // Set up post comment "enter" button
             commentText.get().setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -147,15 +161,16 @@ class DisqusGetAccessToken extends AsyncTask<String, Void, AccessToken> {
                     if (actionId == EditorInfo.IME_ACTION_SEND) {
                         // Post comment
                         String message = v.getText().toString();
-                        if (!message.isEmpty())
+                        if (!message.isEmpty()) {
                             new DisqusPostComment().execute(accessToken.access_token,
                                     thread_id,
                                     v.getText().toString());
 
-                        v.setText(""); // Clear text from editText
+                            v.setText(""); // Clear text from editText
+                            act.get().refreshComments(); // Refresh comments
 
-                        // Hide keyboard http://stackoverflow.com/questions/1109022/close-hide-the-android-soft-keyboard
-                        InputMethodManager imm = (InputMethodManager) mk
+                            Log.d("DisqusPostComments", "Posted!");
+                        }
 
                         handled = true;
                     }
@@ -163,22 +178,21 @@ class DisqusGetAccessToken extends AsyncTask<String, Void, AccessToken> {
                     return handled;
                 }
             });
-        }
 
-//        if (actionButton.get() != null)
-//            actionButton.get().setOnClickListener(new View.OnClickListener() {
-//                AccessToken accessToken = token;
-//                String thread_id = dsq_thread_id;
-//
-//                @Override
-//                public void onClick(View v) {
-//                    Intent intent = new Intent(v.getContext(), DisqusCommentActivity.class);
-//                    intent.putExtra(DisqusDetails.ACCESS_TOKEN, accessToken.access_token);
-//                    intent.putExtra(DisqusDetails.DSQ_THREAD_ID, thread_id);
-//
-//                    v.getContext().startActivity(intent);
-//                }
-//            });
+            // Changing layout
+            dsqTextPb.get().setVisibility(View.GONE);       // Remove progressbar
+            commentText.get().setVisibility(View.VISIBLE);  // Add EditText widget
+
+            // Change action button listener from login to post
+            String post = (String) act.get().getResources().getText(R.string.disqus_post);
+            actionButton.get().setText(post);
+            actionButton.get().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    commentText.get().onEditorAction(EditorInfo.IME_ACTION_SEND);
+                }
+            });
+        }
     }
 }
 

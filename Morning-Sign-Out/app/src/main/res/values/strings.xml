@@ -11,6 +11,7 @@
     <string name="action_share">Share article</string>
 
     <string name="disqus_login">Log In - Disqus</string>
+    <string name="disqus_post">Post</string>
 
     <string name="title_contentDescription">app home button</string>
     <string name="title_commentXDescription">close comments</string>
