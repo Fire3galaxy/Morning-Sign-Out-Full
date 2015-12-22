@@ -53,8 +53,16 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
         if (pb.get() != null)
             pb.get().setVisibility(View.VISIBLE);
 
+        // If listview is null, user probably exited activity early. Don't bother with task.
+        boolean isNotNull = !(commentsView.get() == null);
+        // Don't add header if it already exists
+        boolean noHeader = isNotNull && (commentsView.get().getHeaderViewsCount() == 0);
+        // Don't add header if this is refresh and comments already exist in listview
+        boolean isEmpty = isNotNull &&
+                (commentsView.get().getAdapter() == null || commentsView.get().getCount() == 0);
+
         // No comments here yet. Be the first!
-        if (commentsView.get() != null && commentsView.get().getHeaderViewsCount() == 0) {
+        if (isNotNull && noHeader && isEmpty) {
             noComments = new TextView(commentsView.get().getContext());
             noComments.setText("No comments here yet. Be the first!");
             noComments.setPadding(12, 8, 12, 0);
@@ -72,9 +80,13 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
         DisqusDetails disqus = new DisqusDetails();
 
         TempCommentsAndThreadId ret = disqus.getComments(args[0]);
-        if (act.get() != null) act.get().setDsq_thread_id(ret.dsq_thread_id);
+        if (act.get() != null && ret != null) {
+            act.get().setDsq_thread_id(ret.dsq_thread_id);
 
-        return ret.comments;
+            return ret.comments;
+        }
+
+        return null;
     }
 
     @Override
@@ -82,6 +94,10 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
         // Remove progress bar for comments
         if (pb.get() != null)
             pb.get().setVisibility(View.GONE);
+
+        // If no comments, put nothing.
+        if (comments == null)
+            return;
 
         // Set up list of comments
         if (commentsView.get() != null) {

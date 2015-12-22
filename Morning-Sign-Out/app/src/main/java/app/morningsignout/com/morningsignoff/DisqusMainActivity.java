@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -101,7 +102,14 @@ public class DisqusMainActivity extends ActionBarActivity {
     }
 
     public void refreshComments() {
-        new DisqusGetComments(commentsView, dsqPb).execute(slug);
+        // Delay 2 seconds, then refresh
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                new DisqusGetComments(commentsView, dsqPb).execute(slug);
+            }
+        }, 2 * 1000);
+
     }
 
     public void setDsq_thread_id(String id) {

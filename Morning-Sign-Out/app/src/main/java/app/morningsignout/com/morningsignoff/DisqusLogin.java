@@ -9,7 +9,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
@@ -25,6 +27,10 @@ public class DisqusLogin extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_disquslogin);
 
+        // Do not save login data! Remove cookies.
+//        CookieManager cookieManager = CookieManager.getInstance();
+//        cookieManager.setAcceptCookie(false);
+
         // MSO Logo in center
         setActionBarDetails();
 
@@ -33,7 +39,16 @@ public class DisqusLogin extends ActionBarActivity {
 
         // Webview that loads Disqus login site
         webView = (WebView) findViewById(R.id.webView_login);
-        webView.setWebViewClient(new LoginClient());    // Client only loads disqus and closes activity after login (returning code)
+
+        // Prevent saving login data
+        WebSettings ws = webView.getSettings();
+        ws.setSaveFormData(false);
+        ws.setSavePassword(false); // API < 18
+
+        // Client only loads disqus and closes activity after login (returning code)
+        webView.setWebViewClient(new LoginClient());
+
+        // Progress bar
         webView.setWebChromeClient(new WebChromeClient() {  // Set up a progressbar that shows page loading
             @Override
             public void onProgressChanged(WebView webView, int newProgress) {
@@ -54,6 +69,7 @@ public class DisqusLogin extends ActionBarActivity {
             }
         });
 
+        // Load login site!
         webView.loadUrl(DisqusDetails.AUTHORIZE_URL);
     }
 
