@@ -42,7 +42,7 @@
             android:background="#e4e4e4"
             android:textColor="@android:color/black"
             android:paddingTop="2dp"
-            android:visibility="visible"/>
+            android:visibility="gone"/>
 
         <EditText
             android:layout_width="match_parent"

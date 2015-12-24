@@ -41,7 +41,6 @@ public class DisqusDetails {
             + "client_id=" + PUBLIC_KEY + "&"
             + "client_secret=" + SECRET_KEY + "&"
             + "redirect_uri=http://www.morningsignout.com/&"
-            + "include=name&"
             + "code=";
     static public final String GET_REFRESH_TOKEN_URL = "https://disqus.com/api/oauth/2.0/access_token/";
     static public final String GET_REFRESH_TOKEN_DATA = "grant_type=refresh_token&"
@@ -191,7 +190,7 @@ public class DisqusDetails {
                 // Get response code
                 int responseCode = urlConnection.getResponseCode();
                 String responseMessage = urlConnection.getResponseMessage();
-                System.out.println("Disqus" + "POST Response Code :: " + responseCode + " - " + responseMessage);
+                Log.d("DisqusDetails", "Disqus" + "POST Response Code :: " + responseCode + " - " + responseMessage);
 
                 InputStream rStream = null;
 
@@ -210,8 +209,6 @@ public class DisqusDetails {
                     response.append(inputLine);
                 }
                 in.close();
-
-                System.out.println(response.toString());
 
                 // Print result
                 return response.toString();

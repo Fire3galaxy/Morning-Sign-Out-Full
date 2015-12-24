@@ -1,6 +1,5 @@
 package app.morningsignout.com.morningsignoff;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
@@ -8,8 +7,6 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -26,14 +23,14 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
     WeakReference<ListView> commentsView;
     WeakReference<ProgressBar> pb;
     TextView noComments;
-
     WeakReference<DisqusMainActivity> act; // FIXME: we need to pass in dsq_thread_id, for now we get it here and set it for act.
+    boolean hasToken;
 
-    DisqusGetComments(ListView commentsView, ProgressBar pb, DisqusMainActivity act) {
+    DisqusGetComments(ListView commentsView, ProgressBar pb, DisqusMainActivity act, boolean hasToken) {
         this.commentsView = new WeakReference<>(commentsView);
         this.pb = new WeakReference<>(pb);
-
         this.act = new WeakReference<>(act);
+        this.hasToken = hasToken;
     }
 
     // leave action button and activity null, just refresh commentsView
@@ -82,7 +79,7 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
             return ret.comments;
         }
 
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
@@ -91,23 +88,24 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
         if (pb.get() != null)
             pb.get().setVisibility(View.GONE);
 
-        // If no comments, put nothing.
-        if (comments == null)
-            return;
-
         // Set up list of comments
         if (commentsView.get() != null) {
-            // remove header
-            if (!comments.isEmpty())
-                commentsView.get().removeHeaderView(noComments);
+            // remove header if comments exist
+            if (!comments.isEmpty()) commentsView.get().removeHeaderView(noComments);
 
             commentsView.get().setAdapter(
                     new DisqusAdapter(commentsView.get().getContext(), comments));
         }
 
-        // Set up Login Button (if relevant)
-        if (act.get() != null)
-            act.get().setActionButtonToLogin();
+        // Set up action button (if relevant)
+        if (act.get() != null) {
+            if (!hasToken)
+                act.get().setActionButtonToLogin();
+            else {
+                act.get().setupEditText();
+                act.get().setActionButtonToPost();
+            }
+        }
     }
 }
 
@@ -115,25 +113,19 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
 // to post. So far have code for getting token done (not tested yet).
 class DisqusGetAccessToken extends AsyncTask<String, Void, AccessToken> {
     String dsq_thread_id;
-    WeakReference<EditText> commentText;
     WeakReference<ProgressBar> dsqTextPb;
 
     // For getComments call in editorAction listener
     WeakReference<DisqusMainActivity> act;
 
-    public DisqusGetAccessToken(EditText commentText, ProgressBar dsqTextPb,
-                                DisqusMainActivity act) {
-        this.commentText = new WeakReference<>(commentText);
+    public DisqusGetAccessToken(ProgressBar dsqTextPb, DisqusMainActivity act) {
         this.dsqTextPb = new WeakReference<>(dsqTextPb);
         this.act = new WeakReference<>(act);
     }
 
     @Override
     protected void onPreExecute() {
-        if (commentText.get() != null && dsqTextPb.get() != null) {
-            commentText.get().setText("");
-            dsqTextPb.get().setVisibility(View.VISIBLE);
-        }
+        if (dsqTextPb.get() != null) dsqTextPb.get().setVisibility(View.VISIBLE);
     }
 
     // parameters: code, dsq_thread_id
@@ -148,46 +140,17 @@ class DisqusGetAccessToken extends AsyncTask<String, Void, AccessToken> {
 
     @Override
     public void onPostExecute(final AccessToken token) {
-        if (dsqTextPb.get() != null)                    // Remove progressbar
-            dsqTextPb.get().setVisibility(View.GONE);
+        if (dsqTextPb.get() != null) dsqTextPb.get().setVisibility(View.GONE);
 
-        if (commentText.get() != null && act.get() != null) {
-            // Properties to force line wrapping in edit text (not working in xml)
-            commentText.get().setHorizontallyScrolling(false);
+        if (act.get() != null) {
+            // Save access token
+            act.get().saveLogin(token);
 
-            // Set up post comment "enter" button
-            commentText.get().setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                AccessToken accessToken = token;
-                String thread_id = dsq_thread_id;
-
-                @Override
-                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                    boolean handled = false;
-                    if (actionId == EditorInfo.IME_ACTION_SEND) {
-                        // Post comment
-                        String message = v.getText().toString();
-                        if (!message.isEmpty()) {
-                            new DisqusPostComment().execute(accessToken.access_token,
-                                    thread_id,
-                                    v.getText().toString());
-
-                            v.setText(""); // Clear text from editText
-                            act.get().refreshComments(); // Refresh comments
-
-                            Log.d("DisqusPostComments", "Posted!");
-                        }
-
-                        handled = true;
-                    }
-
-                    return handled;
-                }
-            });
-
-            commentText.get().setVisibility(View.VISIBLE);  // Add EditText widget
+            // Set up EditText widget's EditorActionListener
+            act.get().setupEditText();
 
             // Change action button listener from login to post
-            act.get().setActionButtonToPost(token.username);
+            act.get().setActionButtonToPost();
         }
     }
 }

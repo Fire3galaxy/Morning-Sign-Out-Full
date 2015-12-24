@@ -3,6 +3,7 @@ package app.morningsignout.com.morningsignoff;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -12,6 +13,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,6 +32,11 @@ import java.util.ArrayList;
 
 public class DisqusMainActivity extends ActionBarActivity {
     final static String SLUG = "slug";
+    private final static String LOGIN = "Login",
+            ACCESS_TOKEN = "Access Token",
+            REFRESH_TOKEN = "Refresh Token",
+            EXPIRES_IN = "Expires in",
+            USERNAME = "Username";
 
     ListView commentsView;
     Button actionButton;
@@ -38,6 +45,7 @@ public class DisqusMainActivity extends ActionBarActivity {
 
     String slug;
     String dsq_thread_id;
+    AccessToken accessToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,13 +55,11 @@ public class DisqusMainActivity extends ActionBarActivity {
         // Action Bar: MSO Logo in middle, Up button as X
         setActionBarDetails();
 
-        // Listview contains comments,
-        // button lets you login or post depending on if access token is stored in Preferences
-        // Button's onClickListener set in DisqusDetails' DisqusGetComments task
-        commentsView = (ListView) findViewById(R.id.listView_disqus);
-        actionButton = (Button) findViewById(R.id.button_disqus);
-
-        dsqPb = (ProgressBar) findViewById(R.id.progressBar_dsq);
+        commentsView = (ListView) findViewById(R.id.listView_disqus);   // list of comments
+        actionButton = (Button) findViewById(R.id.button_disqus);       // login/post
+        dsqPb = (ProgressBar) findViewById(R.id.progressBar_dsq);       // pb for comments
+        commentText = (EditText) findViewById(R.id.editText_commentMain);   // editText
+        dsqTextPb = (ProgressBar) findViewById(R.id.progressBar_dsqText);   // pb for button/editText
 
         // FIXME: Later, when we use json to load an article, dsq_thread_id will be passed in
         // FIXME: intent, instead of slug
@@ -63,7 +69,9 @@ public class DisqusMainActivity extends ActionBarActivity {
             slug = getIntent().getStringExtra(SLUG);
 
         // Load comments into listview, set button action
-        new DisqusGetComments(commentsView, dsqPb, this).execute(slug);
+        accessToken = getLogin();
+        boolean hasToken = accessToken != null;
+        new DisqusGetComments(commentsView, dsqPb, this, hasToken).execute(slug);
     }
 
     @Override
@@ -92,12 +100,7 @@ public class DisqusMainActivity extends ActionBarActivity {
         // Returns from DisqusLogin
         if (resultCode == Activity.RESULT_OK) {
             String code = data.getStringExtra(DisqusDetails.CODE_KEY);
-            Log.d("DisqusActivity", "Code: " + code);
-
-            commentText = (EditText) findViewById(R.id.editText_commentMain);
-            dsqTextPb = (ProgressBar) findViewById(R.id.progressBar_dsqText);
-
-            new DisqusGetAccessToken(commentText, dsqTextPb, this).execute(code, dsq_thread_id);
+            new DisqusGetAccessToken(dsqTextPb, this).execute(code, dsq_thread_id);
         } else if (resultCode == Activity.RESULT_CANCELED)
             Log.d("DisqusActivity", "Cancelled");
         //Log.d("",""); // can delete this. just htc m8 testing bugs.
@@ -116,6 +119,38 @@ public class DisqusMainActivity extends ActionBarActivity {
 
     public void setDsq_thread_id(String id) {
         dsq_thread_id = id;
+    }
+
+    public void saveLogin(AccessToken accessToken) {
+        this.accessToken = accessToken;
+
+        SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
+        editor.putBoolean(LOGIN, true);
+
+        // Access token fields
+        editor.putString(ACCESS_TOKEN, accessToken.access_token);
+        editor.putString(REFRESH_TOKEN, accessToken.refresh_token);
+        editor.putString(EXPIRES_IN, accessToken.expires_in);
+        editor.putString(USERNAME, accessToken.username);
+
+        editor.apply(); // .commit() runs on main thread, .apply() does it in background
+    }
+
+    public AccessToken getLogin() {
+        SharedPreferences settings = getPreferences(MODE_PRIVATE);
+        boolean loggedIn = settings.getBoolean(LOGIN, false);
+
+        if (loggedIn) return new AccessToken(settings.getString(ACCESS_TOKEN, ""),
+                    settings.getString(EXPIRES_IN, ""),
+                    settings.getString(USERNAME, ""),
+                    settings.getString(REFRESH_TOKEN, ""));
+        else return null;
+    }
+
+    public void logout() {
+        SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
+        editor.putBoolean(LOGIN, false);
+        editor.commit(); // chose main thread for logout. security?
     }
 
     // view parameter needed for title.xml onClick()
@@ -153,9 +188,11 @@ public class DisqusMainActivity extends ActionBarActivity {
                 ((DisqusMainActivity) v.getContext()).startActivityForResult(intent, 1);
             }
         });
+
+        if (actionButton.getVisibility() == View.GONE) actionButton.setVisibility(View.VISIBLE);
     }
 
-    public void setActionButtonToPost(String username) {
+    public void setActionButtonToPost() {
         // Change action button listener from login to post
         String post = (String) getResources().getText(R.string.disqus_post);
         actionButton.setText(post);
@@ -165,6 +202,40 @@ public class DisqusMainActivity extends ActionBarActivity {
                 commentText.onEditorAction(EditorInfo.IME_ACTION_SEND);
             }
         });
+
+        if (actionButton.getVisibility() == View.GONE) actionButton.setVisibility(View.VISIBLE);
+    }
+
+    public void setupEditText() {
+        commentText.setHorizontallyScrolling(false);
+
+        // Set up post comment "enter" button
+        commentText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                boolean handled = false;
+                if (actionId == EditorInfo.IME_ACTION_SEND) {
+                    // Post comment
+                    String message = v.getText().toString();
+                    if (!message.isEmpty()) {
+                        new DisqusPostComment().execute(accessToken.access_token,
+                                dsq_thread_id,
+                                v.getText().toString());
+
+                        v.setText(""); // Clear text from editText
+                        refreshComments(); // Refresh comments
+
+                        Log.d("DisqusPostComments", "Posted!");
+                    }
+
+                    handled = true;
+                }
+
+                return handled;
+            }
+        });
+
+        commentText.setVisibility(View.VISIBLE);  // Add EditText widget
     }
 }
 
