@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.WrapperListAdapter;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
             pb.get().setVisibility(View.VISIBLE);
 
         // If listview is null, user probably exited activity early. Don't bother with task.
-        boolean isNotNull = !(commentsView.get() == null);
+        boolean isNotNull = commentsView.get() != null;
         // Don't add header if it already exists
         boolean noHeader = isNotNull && (commentsView.get().getHeaderViewsCount() == 0);
         // Don't add header if this is refresh and comments already exist in listview
@@ -93,8 +94,20 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
             // remove header if comments exist
             if (!comments.isEmpty()) commentsView.get().removeHeaderView(noComments);
 
-            commentsView.get().setAdapter(
-                    new DisqusAdapter(commentsView.get().getContext(), comments));
+            DisqusAdapter adapter = (DisqusAdapter) commentsView.get().getAdapter();
+            adapter
+
+//            WrapperListAdapter wrapper = (WrapperListAdapter) commentsView.get().getAdapter();
+//            if (wrapper == null) {
+//                commentsView.get().setAdapter(
+//                        new DisqusAdapter(commentsView.get().getContext(), comments));
+//            } else {
+//                DisqusAdapter adapter = (DisqusAdapter) wrapper.getWrappedAdapter();
+//                adapter.changeList(comments);
+//            }
+
+//            commentsView.get().setAdapter(
+//                    new DisqusAdapter(commentsView.get().getContext(), comments));
         }
 
         // Set up action button (if relevant)

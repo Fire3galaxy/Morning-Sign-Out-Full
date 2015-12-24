@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -54,11 +55,21 @@ public class DisqusMainActivity extends ActionBarActivity {
         // Action Bar: MSO Logo in middle, Up button as X
         setActionBarDetails();
 
+        // Views that will change later
         commentsView = (ListView) findViewById(R.id.listView_disqus);   // list of comments
         actionButton = (Button) findViewById(R.id.button_disqus);       // login/post
         dsqPb = (ProgressBar) findViewById(R.id.progressBar_dsq);       // pb for comments
         commentText = (EditText) findViewById(R.id.editText_commentMain);   // editText
         dsqTextPb = (ProgressBar) findViewById(R.id.progressBar_dsqText);   // pb for button/editText
+
+        // Swipe to refresh
+        SwipeRefreshLayout swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh_disqus);
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshComments(false);
+            }
+        });
 
         // FIXME: Later, when we use json to load an article, dsq_thread_id will be passed in
         // FIXME: intent, instead of slug
@@ -128,14 +139,17 @@ public class DisqusMainActivity extends ActionBarActivity {
         //Log.d("",""); // can delete this. just htc m8 testing bugs.
     }
 
-    public void refreshComments() {
-        // Delay 2 seconds, then refresh
+    public void refreshComments(boolean pause) {
+        int pauseTime = 0;
+        if (pause) pauseTime = 4 * 1000;
+
+        // Delay 4 seconds, then refresh
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 new DisqusGetComments(commentsView, dsqPb).execute(slug);
             }
-        }, 2 * 1000);
+        }, pauseTime);
 
     }
 
@@ -252,7 +266,7 @@ public class DisqusMainActivity extends ActionBarActivity {
                                 v.getText().toString());
 
                         v.setText(""); // Clear text from editText
-                        refreshComments(); // Refresh comments
+                        refreshComments(true); // Refresh comments
 
                         Log.d("DisqusPostComments", "Posted!");
                     }
@@ -279,6 +293,12 @@ class DisqusAdapter extends BaseAdapter {
         this.commentsList = commentsList;
     }
 
+    public void changeList(ArrayList<Comments> list) {
+        commentsList.clear();
+        commentsList.addAll(list);
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getCount() {
         return commentsList.size();
@@ -299,7 +319,6 @@ class DisqusAdapter extends BaseAdapter {
         DsqViewHolder viewHolder;
 
         if (convertView == null) {
-            //Log.d("","");
             LayoutInflater inflater = LayoutInflater.from(c);
             convertView = inflater.inflate(R.layout.comment_row, parent, false);
 

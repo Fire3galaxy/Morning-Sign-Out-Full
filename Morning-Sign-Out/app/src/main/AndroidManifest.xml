@@ -68,9 +68,6 @@
             android:theme="@style/DisqusTheme"
             android:configChanges="orientation|screenSize|keyboardHidden" />
 
-        <activity android:name=".DisqusCommentActivity"
-            android:theme="@style/DisqusTheme"
-            android:configChanges="orientation|screenSize|keyboardHidden"/>
     </application>
 
 </manifest>

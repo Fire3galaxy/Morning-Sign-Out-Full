@@ -331,7 +331,7 @@ class CategoryAdapter extends BaseAdapter {
         return row;
     }
 
-    // This function is called along with .notifyDataSetChange() in Asynctask's onScrollListener function
+    // This function is called along with .notifyDataSetChanged() in Asynctask's onScrollListener function
     // when the viewers scroll to the bottom of the articles
     public synchronized void loadMoreItems(List<Article> moreArticles, int pageNum){
         // if prevent the late page from loading twice
