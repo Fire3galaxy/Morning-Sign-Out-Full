@@ -9,6 +9,8 @@
     <string name="action_scroll">Scroll to top or to previous position</string>
     <string name="action_comment">Comment</string>
     <string name="action_share">Share article</string>
+    <string name="action_login">Log in </string>
+    <string name="action_logout">Log out</string>
 
     <string name="disqus_login">Log In - Disqus</string>
     <string name="disqus_post">Post</string>

@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
@@ -46,6 +44,7 @@ public class DisqusMainActivity extends ActionBarActivity {
     String slug;
     String dsq_thread_id;
     AccessToken accessToken;
+    boolean loggedIn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,9 +89,32 @@ public class DisqusMainActivity extends ActionBarActivity {
             case android.R.id.home:
                 finish();
                 return true;
+            case R.id.action_login:
+                Intent intent = new Intent(this, DisqusLogin.class);
+                startActivityForResult(intent, 1);
+                return true;
+            case R.id.action_logout:
+                logout();
+                commentText.setVisibility(View.GONE);
+                setActionButtonToLogin();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // 0: login, 1: logout
+        if (loggedIn) {
+            menu.getItem(0).setVisible(false);
+            menu.getItem(1).setVisible(true);
+        } else {
+            menu.getItem(0).setVisible(true);
+            menu.getItem(1).setVisible(false);
+        }
+
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -133,12 +155,16 @@ public class DisqusMainActivity extends ActionBarActivity {
         editor.putString(EXPIRES_IN, accessToken.expires_in);
         editor.putString(USERNAME, accessToken.username);
 
-        editor.apply(); // .commit() runs on main thread, .apply() does it in background
+        editor.commit(); // .commit() runs on main thread, .apply() does it in background
+
+        loggedIn = true;
+        invalidateOptionsMenu();
     }
 
     public AccessToken getLogin() {
         SharedPreferences settings = getPreferences(MODE_PRIVATE);
-        boolean loggedIn = settings.getBoolean(LOGIN, false);
+        loggedIn = settings.getBoolean(LOGIN, false);
+        invalidateOptionsMenu(); // Change menu based on value of loggedIn
 
         if (loggedIn) return new AccessToken(settings.getString(ACCESS_TOKEN, ""),
                     settings.getString(EXPIRES_IN, ""),
@@ -148,6 +174,9 @@ public class DisqusMainActivity extends ActionBarActivity {
     }
 
     public void logout() {
+        loggedIn = false;
+        invalidateOptionsMenu(); // Change menu based on value of loggedIn
+
         SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
         editor.putBoolean(LOGIN, false);
         editor.commit(); // chose main thread for logout. security?

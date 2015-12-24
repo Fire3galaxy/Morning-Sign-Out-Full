@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <!-- Invisible button for just spacing purposes, centering the MSO button -->
-    <item android:id="@+id/action_search"
-        android:title="@string/action_search"
-        android:icon="@android:color/transparent"
-        android:enabled="false"
-        app:showAsAction="always"
+    <item android:id="@+id/action_login"
+        android:title="@string/action_login"
+        app:showAsAction="never"
+        android:visible="true"
         android:orderInCategory="1"/>
+    <item android:id="@+id/action_logout"
+        android:title="@string/action_logout"
+        app:showAsAction="never"
+        android:visible="false"
+        android:orderInCategory="2"/>
 </menu>

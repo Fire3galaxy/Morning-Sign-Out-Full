@@ -77,7 +77,7 @@ public class DisqusLogin extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Actionbar is MSO logo in middle, X button on left, and NOTHING in menu
         // but transparent button for spacing purposes.
-        getMenuInflater().inflate(R.menu.menu_disqus, menu);
+        getMenuInflater().inflate(R.menu.menu_justlogo, menu);
 
         return true; // show menu
     }
