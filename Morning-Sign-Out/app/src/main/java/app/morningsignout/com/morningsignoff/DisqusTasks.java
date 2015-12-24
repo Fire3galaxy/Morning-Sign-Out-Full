@@ -24,15 +24,13 @@ import java.util.ArrayList;
 // Argument: Slug of mso post (ArticleWebViewClient)
 class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
     WeakReference<ListView> commentsView;
-    WeakReference<Button> actionButton;
     WeakReference<ProgressBar> pb;
     TextView noComments;
 
-    WeakReference<DisqusMainActivity> act; // FIXME: Will not need once we can just pass in dsq_thread_id
+    WeakReference<DisqusMainActivity> act; // FIXME: we need to pass in dsq_thread_id, for now we get it here and set it for act.
 
-    DisqusGetComments(ListView commentsView, Button actionButton, ProgressBar pb, DisqusMainActivity act) {
+    DisqusGetComments(ListView commentsView, ProgressBar pb, DisqusMainActivity act) {
         this.commentsView = new WeakReference<>(commentsView);
-        this.actionButton = new WeakReference<>(actionButton);
         this.pb = new WeakReference<>(pb);
 
         this.act = new WeakReference<>(act);
@@ -42,8 +40,6 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
     DisqusGetComments(ListView commentsView, ProgressBar pb) {
         this.commentsView = new WeakReference<>(commentsView);
         this.pb = new WeakReference<>(pb);
-
-        this.actionButton = new WeakReference<>(null);
         this.act = new WeakReference<>(null);
     }
 
@@ -62,7 +58,7 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
                 (commentsView.get().getAdapter() == null || commentsView.get().getCount() == 0);
 
         // No comments here yet. Be the first!
-        if (isNotNull && noHeader && isEmpty) {
+        if (noHeader && isEmpty) {
             noComments = new TextView(commentsView.get().getContext());
             noComments.setText("No comments here yet. Be the first!");
             noComments.setPadding(12, 8, 12, 0);
@@ -110,15 +106,8 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
         }
 
         // Set up Login Button (if relevant)
-        if (actionButton.get() != null) {
-            actionButton.get().setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(v.getContext(), DisqusLogin.class);
-                    ((DisqusMainActivity) v.getContext()).startActivityForResult(intent, 1);
-                }
-            });
-        }
+        if (act.get() != null)
+            act.get().setActionButtonToLogin();
     }
 }
 
@@ -126,16 +115,14 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
 // to post. So far have code for getting token done (not tested yet).
 class DisqusGetAccessToken extends AsyncTask<String, Void, AccessToken> {
     String dsq_thread_id;
-    WeakReference<Button> actionButton;
     WeakReference<EditText> commentText;
     WeakReference<ProgressBar> dsqTextPb;
 
     // For getComments call in editorAction listener
     WeakReference<DisqusMainActivity> act;
 
-    public DisqusGetAccessToken(Button actionButton, EditText commentText, ProgressBar dsqTextPb,
+    public DisqusGetAccessToken(EditText commentText, ProgressBar dsqTextPb,
                                 DisqusMainActivity act) {
-        this.actionButton = new WeakReference<>(actionButton);
         this.commentText = new WeakReference<>(commentText);
         this.dsqTextPb = new WeakReference<>(dsqTextPb);
         this.act = new WeakReference<>(act);
@@ -161,8 +148,10 @@ class DisqusGetAccessToken extends AsyncTask<String, Void, AccessToken> {
 
     @Override
     public void onPostExecute(final AccessToken token) {
-        if (actionButton.get() != null && commentText.get() != null &&
-                dsqTextPb.get() != null && act.get() != null) {
+        if (dsqTextPb.get() != null)                    // Remove progressbar
+            dsqTextPb.get().setVisibility(View.GONE);
+
+        if (commentText.get() != null && act.get() != null) {
             // Properties to force line wrapping in edit text (not working in xml)
             commentText.get().setHorizontallyScrolling(false);
 
@@ -195,19 +184,10 @@ class DisqusGetAccessToken extends AsyncTask<String, Void, AccessToken> {
                 }
             });
 
-            // Changing layout
-            dsqTextPb.get().setVisibility(View.GONE);       // Remove progressbar
             commentText.get().setVisibility(View.VISIBLE);  // Add EditText widget
 
             // Change action button listener from login to post
-            String post = (String) act.get().getResources().getText(R.string.disqus_post);
-            actionButton.get().setText(post);
-            actionButton.get().setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    commentText.get().onEditorAction(EditorInfo.IME_ACTION_SEND);
-                }
-            });
+            act.get().setActionButtonToPost(token.username);
         }
     }
 }

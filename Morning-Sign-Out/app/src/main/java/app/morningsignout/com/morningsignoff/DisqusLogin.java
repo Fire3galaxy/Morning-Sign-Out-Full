@@ -28,8 +28,8 @@ public class DisqusLogin extends ActionBarActivity {
         setContentView(R.layout.activity_disquslogin);
 
         // Do not save login data! Remove cookies.
-//        CookieManager cookieManager = CookieManager.getInstance();
-//        cookieManager.setAcceptCookie(false);
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.removeAllCookie(); // Deprecated in 21, but use b/c we go back to 16
 
         // MSO Logo in center
         setActionBarDetails();
@@ -42,8 +42,8 @@ public class DisqusLogin extends ActionBarActivity {
 
         // Prevent saving login data
         WebSettings ws = webView.getSettings();
-        ws.setSaveFormData(false);
-        ws.setSavePassword(false); // API < 18
+//        ws.setSaveFormData(false);
+        ws.setSavePassword(false); // deprecated in 18, but we go back to 16
 
         // Client only loads disqus and closes activity after login (returning code)
         webView.setWebViewClient(new LoginClient());

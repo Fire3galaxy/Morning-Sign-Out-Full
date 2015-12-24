@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
@@ -15,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -60,7 +63,7 @@ public class DisqusMainActivity extends ActionBarActivity {
             slug = getIntent().getStringExtra(SLUG);
 
         // Load comments into listview, set button action
-        new DisqusGetComments(commentsView, actionButton, dsqPb, this).execute(slug);
+        new DisqusGetComments(commentsView, dsqPb, this).execute(slug);
     }
 
     @Override
@@ -94,8 +97,7 @@ public class DisqusMainActivity extends ActionBarActivity {
             commentText = (EditText) findViewById(R.id.editText_commentMain);
             dsqTextPb = (ProgressBar) findViewById(R.id.progressBar_dsqText);
 
-            new DisqusGetAccessToken(actionButton, commentText, dsqTextPb, this)
-                    .execute(code, dsq_thread_id);
+            new DisqusGetAccessToken(commentText, dsqTextPb, this).execute(code, dsq_thread_id);
         } else if (resultCode == Activity.RESULT_CANCELED)
             Log.d("DisqusActivity", "Cancelled");
         //Log.d("",""); // can delete this. just htc m8 testing bugs.
@@ -139,11 +141,35 @@ public class DisqusMainActivity extends ActionBarActivity {
         super.getSupportActionBar().setDisplayShowCustomEnabled(true);
         super.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
+
+    // Methods used to affect UI in asynctask
+    public void setActionButtonToLogin() {
+        String login = (String) getResources().getText(R.string.disqus_login);
+        actionButton.setText(login);
+        actionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), DisqusLogin.class);
+                ((DisqusMainActivity) v.getContext()).startActivityForResult(intent, 1);
+            }
+        });
+    }
+
+    public void setActionButtonToPost(String username) {
+        // Change action button listener from login to post
+        String post = (String) getResources().getText(R.string.disqus_post);
+        actionButton.setText(post);
+        actionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                commentText.onEditorAction(EditorInfo.IME_ACTION_SEND);
+            }
+        });
+    }
 }
 
 class DisqusAdapter extends BaseAdapter {
     static final int INDENT = 20;
-    static final int INDENT_MAX = 40;
 
     Context c;
     ArrayList<Comments> commentsList;
