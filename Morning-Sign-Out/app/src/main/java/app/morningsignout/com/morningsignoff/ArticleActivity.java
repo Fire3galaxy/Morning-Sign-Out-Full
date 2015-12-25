@@ -136,9 +136,11 @@ public class ArticleActivity extends ActionBarActivity {
             commentButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(ArticleActivity.this, DisqusMainActivity.class);
-                    intent.putExtra(DisqusMainActivity.SLUG, webViewClient.lastArticleSlug);
-                    startActivity(intent);
+                    if (webViewClient.lastArticleSlug != null) {
+                        Intent intent = new Intent(ArticleActivity.this, DisqusMainActivity.class);
+                        intent.putExtra(DisqusMainActivity.SLUG, webViewClient.lastArticleSlug);
+                        startActivity(intent);
+                    }
                 }
             });
         }

@@ -41,6 +41,7 @@ public class DisqusMainActivity extends ActionBarActivity {
     Button actionButton;
     EditText commentText;
     ProgressBar dsqPb, dsqTextPb;
+    SwipeRefreshLayout swipeRefresh;
 
     String slug;
     String dsq_thread_id;
@@ -61,13 +62,12 @@ public class DisqusMainActivity extends ActionBarActivity {
         dsqPb = (ProgressBar) findViewById(R.id.progressBar_dsq);       // pb for comments
         commentText = (EditText) findViewById(R.id.editText_commentMain);   // editText
         dsqTextPb = (ProgressBar) findViewById(R.id.progressBar_dsqText);   // pb for button/editText
-
-        // Swipe to refresh
-        SwipeRefreshLayout swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh_disqus);
+        swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh_disqus); // Swipe to refresh
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 refreshComments(false);
+                setRefreshOff();
             }
         });
 
@@ -81,7 +81,7 @@ public class DisqusMainActivity extends ActionBarActivity {
         // Load comments into listview, set button action
         accessToken = getLogin();
         boolean hasToken = accessToken != null;
-        new DisqusGetComments(commentsView, dsqPb, this, hasToken).execute(slug);
+        new DisqusGetComments(commentsView, dsqPb, this, hasToken, false).execute(slug);
     }
 
     @Override
@@ -108,6 +108,9 @@ public class DisqusMainActivity extends ActionBarActivity {
                 logout();
                 commentText.setVisibility(View.GONE);
                 setActionButtonToLogin();
+                return true;
+            case R.id.action_refresh:
+                refreshComments(false);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -143,14 +146,19 @@ public class DisqusMainActivity extends ActionBarActivity {
         int pauseTime = 0;
         if (pause) pauseTime = 4 * 1000;
 
+        final DisqusMainActivity ref = this;
+
         // Delay 4 seconds, then refresh
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                new DisqusGetComments(commentsView, dsqPb).execute(slug);
+                new DisqusGetComments(commentsView, dsqPb, ref, false, true).execute(slug);
             }
         }, pauseTime);
+    }
 
+    public void setRefreshOff() {
+        swipeRefresh.setRefreshing(false);
     }
 
     public void setDsq_thread_id(String id) {

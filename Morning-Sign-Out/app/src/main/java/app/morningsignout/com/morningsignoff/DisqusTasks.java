@@ -3,15 +3,10 @@ package app.morningsignout.com.morningsignoff;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.WrapperListAdapter;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -23,22 +18,17 @@ import java.util.ArrayList;
 class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
     WeakReference<ListView> commentsView;
     WeakReference<ProgressBar> pb;
-    TextView noComments;
     WeakReference<DisqusMainActivity> act; // FIXME: we need to pass in dsq_thread_id, for now we get it here and set it for act.
-    boolean hasToken;
+    TextView noComments = null;
+    TextView errorRefresh = null;
+    boolean hasToken = false, justRefresh = false;
 
-    DisqusGetComments(ListView commentsView, ProgressBar pb, DisqusMainActivity act, boolean hasToken) {
+    DisqusGetComments(ListView commentsView, ProgressBar pb, DisqusMainActivity act, boolean hasToken, boolean justRefresh) {
         this.commentsView = new WeakReference<>(commentsView);
         this.pb = new WeakReference<>(pb);
         this.act = new WeakReference<>(act);
         this.hasToken = hasToken;
-    }
-
-    // leave action button and activity null, just refresh commentsView
-    DisqusGetComments(ListView commentsView, ProgressBar pb) {
-        this.commentsView = new WeakReference<>(commentsView);
-        this.pb = new WeakReference<>(pb);
-        this.act = new WeakReference<>(null);
+        this.justRefresh = justRefresh;
     }
 
     @Override
@@ -47,6 +37,59 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
         if (pb.get() != null)
             pb.get().setVisibility(View.VISIBLE);
 
+        addNoCommentsHeader();
+    }
+
+    // args[0] = slug for article
+    // returns list of comments (thread id stored in reference)
+    @Override
+    protected ArrayList<Comments> doInBackground(String... args) {
+        DisqusDetails disqus = new DisqusDetails();
+
+        TempCommentsAndThreadId ret = disqus.getComments(args[0]);
+        if (ret != null) {
+            // If first time, give activity the thread id
+            if (!justRefresh && act.get() != null)
+                act.get().setDsq_thread_id(ret.dsq_thread_id);
+
+            return ret.comments;
+        }
+
+        return null;
+    }
+
+    @Override
+    protected void onPostExecute(ArrayList<Comments> comments) {
+        // Remove progress bar for comments
+        if (pb.get() != null)
+            pb.get().setVisibility(View.GONE);
+
+        // Set up list of comments
+        if (commentsView.get() != null && comments != null) {
+            // remove header if comments exist
+            if (!comments.isEmpty()) commentsView.get().removeHeaderView(noComments);
+
+            commentsView.get().setAdapter(
+                    new DisqusAdapter(commentsView.get().getContext(), comments));
+
+            if (comments.isEmpty() && commentsView.get().getHeaderViewsCount() == 0)
+                addNoCommentsHeader();
+        }
+
+        // Set up action button (if relevant - first time getting)
+        if (!justRefresh && act.get() != null) {
+            if (!hasToken)
+                act.get().setActionButtonToLogin();
+            else {
+                act.get().setupEditText();
+                act.get().setActionButtonToPost();
+            }
+        }
+//        else
+//            act.get().setRefreshOff(); // Turn off refreshing animation (if relevant - refresh w/ layout)
+    }
+
+    private void addNoCommentsHeader() {
         // If listview is null, user probably exited activity early. Don't bother with task.
         boolean isNotNull = commentsView.get() != null;
         // Don't add header if it already exists
@@ -57,67 +100,16 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
 
         // No comments here yet. Be the first!
         if (noHeader && isEmpty) {
-            noComments = new TextView(commentsView.get().getContext());
-            noComments.setText("No comments here yet. Be the first!");
-            noComments.setPadding(12, 8, 12, 0);
-            noComments.setTypeface(Typeface.DEFAULT);
-            noComments.setTextColor(Color.BLACK);
+            if (noComments == null) {
+                noComments = new TextView(commentsView.get().getContext());
+                noComments.setText("No comments here yet. Be the first!\n\n" +
+                        "Swipe down here or hit refresh in the menu to check for more comments.");
+                noComments.setPadding(12, 8, 12, 0);
+                noComments.setTypeface(Typeface.DEFAULT);
+                noComments.setTextColor(Color.BLACK);
+            }
 
             commentsView.get().addHeaderView(noComments);
-        }
-    }
-
-    // args[0] = slug for article
-    // returns list of comments (thread id stored in reference)
-    @Override
-    protected ArrayList<Comments> doInBackground(String... args) {
-        DisqusDetails disqus = new DisqusDetails();
-
-        TempCommentsAndThreadId ret = disqus.getComments(args[0]);
-        if (act.get() != null && ret != null) {
-            act.get().setDsq_thread_id(ret.dsq_thread_id);
-
-            return ret.comments;
-        }
-
-        return new ArrayList<>();
-    }
-
-    @Override
-    protected void onPostExecute(ArrayList<Comments> comments) {
-        // Remove progress bar for comments
-        if (pb.get() != null)
-            pb.get().setVisibility(View.GONE);
-
-        // Set up list of comments
-        if (commentsView.get() != null) {
-            // remove header if comments exist
-            if (!comments.isEmpty()) commentsView.get().removeHeaderView(noComments);
-
-            DisqusAdapter adapter = (DisqusAdapter) commentsView.get().getAdapter();
-            adapter
-
-//            WrapperListAdapter wrapper = (WrapperListAdapter) commentsView.get().getAdapter();
-//            if (wrapper == null) {
-//                commentsView.get().setAdapter(
-//                        new DisqusAdapter(commentsView.get().getContext(), comments));
-//            } else {
-//                DisqusAdapter adapter = (DisqusAdapter) wrapper.getWrappedAdapter();
-//                adapter.changeList(comments);
-//            }
-
-//            commentsView.get().setAdapter(
-//                    new DisqusAdapter(commentsView.get().getContext(), comments));
-        }
-
-        // Set up action button (if relevant)
-        if (act.get() != null) {
-            if (!hasToken)
-                act.get().setActionButtonToLogin();
-            else {
-                act.get().setupEditText();
-                act.get().setActionButtonToPost();
-            }
         }
     }
 }

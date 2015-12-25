@@ -11,4 +11,9 @@
         app:showAsAction="never"
         android:visible="false"
         android:orderInCategory="2"/>
+    <item android:id="@+id/action_refresh"
+        android:title="@string/action_refresh"
+        app:showAsAction="never"
+        android:visible="true"
+        android:orderInCategory="3"/>
 </menu>

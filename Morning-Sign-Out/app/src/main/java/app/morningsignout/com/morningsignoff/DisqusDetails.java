@@ -162,7 +162,7 @@ public class DisqusDetails {
 
                 return response.toString();
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e("DisqusDetails", "getHttp: " + e.getMessage());
             }
 
             return null;
@@ -213,7 +213,7 @@ public class DisqusDetails {
                 // Print result
                 return response.toString();
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e("DisqusDetails", "postHttp: " + e.getMessage());
             } finally {
                 if (urlConnection != null) urlConnection.disconnect();
             }
