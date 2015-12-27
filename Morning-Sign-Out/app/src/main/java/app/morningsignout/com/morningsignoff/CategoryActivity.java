@@ -287,8 +287,18 @@ public class CategoryActivity extends ActionBarActivity {
                     .commit();
         } else if (position == categories_urls.length){
             // Enter code here! categories_urls.length -> About MSO
+            Log.d("CategoryActivity", "in this if case");
         } else if (position == categories_urls.length + 1) {
             // categories_urls.length + 1 -> Meet the Team
+//            Log.d("CategoryActivity", "Position is " + position + ", length is " + categories_urls.length);
+            this.position = position;
+            CategoryFragment fragment = new CategoryFragment();
+            Bundle args = new Bundle();
+            args.putString(CategoryFragment.EXTRA_TITLE, "Meet the Team");
+            fragment.setArguments(args);
+
+            getSupportFragmentManager().beginTransaction().replace(
+                    R.id.container_category, fragment).commit();
         }
 
         // Highlight the selected item, update the title, and close the drawer

@@ -252,6 +252,7 @@ public class CategoryFragment extends Fragment {
 
         // Set text to category
         TextView textView = new TextView(getActivity(), attrs);
+        Log.d("CategoryFragment", "category is " + category);
         textView.setText(getReadableCategory(category));
 
         return textView;
