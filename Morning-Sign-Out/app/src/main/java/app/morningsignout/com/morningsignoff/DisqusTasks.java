@@ -3,10 +3,12 @@ package app.morningsignout.com.morningsignoff;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -161,17 +163,58 @@ class DisqusGetAccessToken extends AsyncTask<String, Void, AccessToken> {
 }
 
 class DisqusPostComment extends AsyncTask<String, Void, Void> {
+    WeakReference<DisqusMainActivity> act;
+
+    public DisqusPostComment(DisqusMainActivity act) {
+        this.act = new WeakReference<>(act);
+    }
+
     // 1. Access token
     // 2. thread id
     // 3. message (not encoded for url)
     @Override
     protected Void doInBackground(String... args) {
-        if (args.length != 3) return null;
+        if (args.length != 2) return null;
 
-        DisqusDetails details = new DisqusDetails();
-        details.postComment(args[0], args[1], args[2]);
+        if (act.get() != null) {
+            String code = "\"code\":";
 
-        return null;
+            AccessToken token = act.get().getAccessToken();
+            DisqusDetails details = new DisqusDetails();
+
+            // Refresh test
+            Log.d("DisqusPostComment", "Original: " + token);
+
+            AccessToken token2 = details.refreshAccessToken(token.refresh_token);
+            Log.d("DisqusPostComment", "Refresh: " + token2);
+
+            act.get().saveLogin(token2);
+
+//            String response = details.postComment(token.access_token, args[0], args[1]);
+//
+//            // Token is expired. Refresh token, then try again.
+//            if (response.contains(code + "18")) {
+//                AccessToken newToken = details.refreshAccessToken(token.refresh_token);
+//
+//                // FIXME: do this toast with failed comments too.
+//                // Try to comment again, if refresh fails, toast.
+//                if (newToken != null) {
+//                    act.get().saveLogin(newToken);
+//                    details.postComment(token.access_token, args[0], args[1]);
+//                } else {
+//                    Toast.makeText(act.get(), "Error: try again later", Toast.LENGTH_SHORT).show();
+//                }
+//            } else if (response.contains(code + "12")) {
+////                Log.d("DisqusPostComments", "Token: " + token.access_token);
+//
+////                act.get().logout();
+////                act.get().hideCommentText();
+////                act.get().setActionButtonToLogin();
+//            } else
+//                Log.d("DisqusPostComment", "Posted!");
+        }
+
+        return null; // Do nothing
     }
 }
 

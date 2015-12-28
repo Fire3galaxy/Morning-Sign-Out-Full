@@ -165,6 +165,7 @@ public class DisqusMainActivity extends ActionBarActivity {
         dsq_thread_id = id;
     }
 
+    // Save accesstoken, special "set" method
     public void saveLogin(AccessToken accessToken) {
         this.accessToken = accessToken;
 
@@ -183,6 +184,7 @@ public class DisqusMainActivity extends ActionBarActivity {
         invalidateOptionsMenu();
     }
 
+    // Get from sharedpreferences
     public AccessToken getLogin() {
         SharedPreferences settings = getPreferences(MODE_PRIVATE);
         loggedIn = settings.getBoolean(LOGIN, false);
@@ -193,6 +195,11 @@ public class DisqusMainActivity extends ActionBarActivity {
                     settings.getString(USERNAME, ""),
                     settings.getString(REFRESH_TOKEN, ""));
         else return null;
+    }
+
+    // normal "get" method
+    public AccessToken getAccessToken() {
+        return accessToken;
     }
 
     public void logout() {
@@ -258,6 +265,8 @@ public class DisqusMainActivity extends ActionBarActivity {
     }
 
     public void setupEditText() {
+        final DisqusMainActivity ref = this;
+
         commentText.setHorizontallyScrolling(false);
 
         // Set up post comment "enter" button
@@ -269,14 +278,10 @@ public class DisqusMainActivity extends ActionBarActivity {
                     // Post comment
                     String message = v.getText().toString();
                     if (!message.isEmpty()) {
-                        new DisqusPostComment().execute(accessToken.access_token,
-                                dsq_thread_id,
-                                v.getText().toString());
+                        new DisqusPostComment(ref).execute(dsq_thread_id, v.getText().toString());
 
                         v.setText(""); // Clear text from editText
                         refreshComments(true); // Refresh comments
-
-                        Log.d("DisqusPostComments", "Posted!");
                     }
 
                     handled = true;
@@ -287,6 +292,10 @@ public class DisqusMainActivity extends ActionBarActivity {
         });
 
         commentText.setVisibility(View.VISIBLE);  // Add EditText widget
+    }
+
+    public void hideCommentText() {
+        commentText.setVisibility(View.GONE);
     }
 }
 

@@ -90,13 +90,26 @@ public class DisqusDetails {
         return null;
     }
 
-    void postComment(String token, String threadId, String message) {
-        Log.d("DisqusDetails", disqusMethods.postComment(token, threadId, message));
+    String postComment(String token, String threadId, String message) {
+        String result = disqusMethods.postComment(token, threadId, message);
+        Log.d("DisqusDetails", result);
+
+        return result;
+    }
+
+    AccessToken refreshAccessToken(String refreshToken) {
+        String tokenJson = disqusMethods.refreshAccessToken(refreshToken);
+        if (tokenJson != null)
+            return AccessToken.parseAccessToken(tokenJson);
+
+        return null;
     }
 
     // ------------------------------------------------------------------------------------
 
+    // Returns the JSON of the web requests. DisqusDetails handles parsing.
     private class DisqusMethods {
+        // 4 things: login (code & access), get comments, refresh login, post comments
         String getCommentsJson(String threadId) {
             return httpMethods.getHttp(GET_LIST_POSTS_URL + threadId);
         }
@@ -107,6 +120,10 @@ public class DisqusDetails {
 
         String postComment(String token, String threadId, String message) {
             return httpMethods.postHttp(POST_COMMENT_URL, createPostCommentData(token, threadId, message));
+        }
+
+        String refreshAccessToken(String refreshToken) {
+            return httpMethods.postHttp(GET_REFRESH_TOKEN_URL, createGetRefreshTokenData(refreshToken));
         }
 
         private String createPostCommentData(String accessToken, String threadId, String message) {
@@ -121,6 +138,10 @@ public class DisqusDetails {
 
         private String createGetAccessTokenData(String code) {
             return GET_ACCESS_TOKEN_DATA + code;
+        }
+
+        private String createGetRefreshTokenData(String refreshToken) {
+            return GET_REFRESH_TOKEN_DATA + refreshToken;
         }
     }
 
