@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,6 +27,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -56,8 +58,19 @@ public class DisqusMainActivity extends ActionBarActivity {
         // Action Bar: MSO Logo in middle, Up button as X
         setActionBarDetails();
 
+        final DisqusMainActivity ref = this; // FIXME
+
         // Views that will change later
         commentsView = (ListView) findViewById(R.id.listView_disqus);   // list of comments
+        commentsView.setOnItemClickListener(new AdapterView.OnItemClickListener() { // FIXME
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (commentsView.getAdapter() != null) {
+                    Toast.makeText(ref, "Test!", Toast.LENGTH_SHORT).show();
+
+                }
+            }
+        });
         actionButton = (Button) findViewById(R.id.button_disqus);       // login/post
         dsqPb = (ProgressBar) findViewById(R.id.progressBar_dsq);       // pb for comments
         commentText = (EditText) findViewById(R.id.editText_commentMain);   // editText
@@ -302,32 +315,37 @@ public class DisqusMainActivity extends ActionBarActivity {
 
 class DisqusAdapter extends BaseAdapter {
     static final int INDENT = 20;
-
-    EditText test; // FIXME
+    static final int OPTIONS_ROW = 1;
 
     Context c;
     ArrayList<Comments> commentsList;
+    int itemSelected = -1;
+    int extraViews = 0;
 
     DisqusAdapter(Context c, ArrayList<Comments> commentsList) {
         this.c = c;
         this.commentsList = commentsList;
+    }
 
-        test = new EditText(c); // FIXME
+    void selectItem(int itemSelected, int typeSelected) {
+        this.itemSelected = itemSelected;
+        this.extraViews = typeSelected;
+        notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return commentsList.size() + 1; // FIXME
+        return commentsList.size() + extraViews; // Change based on int extraViews
     }
 
     @Override
     public Object getItem(int position) {
-        if (position == 0) // FIXME
+        if (position <= itemSelected)
             return commentsList.get(position);
-        else if (position == 1)
-            return test.getText();
+        else if (position > itemSelected + extraViews)
+            return commentsList.get(position - extraViews);
         else
-            return commentsList.get(position - 1);
+            return "";
     }
 
     @Override
@@ -336,15 +354,28 @@ class DisqusAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, ViewGroup parent) {
         DsqViewHolder viewHolder;
 
         if (convertView == null) {
-            if (position == 1) { // FIXME
-                return test;
-            }
-            else {
-                LayoutInflater inflater = LayoutInflater.from(c);
+            LayoutInflater inflater = LayoutInflater.from(c);
+
+            if (itemSelected != -1) {
+                if (extraViews == 1 && position == itemSelected + 1) {
+                    // Inflate options row.
+                    return null;
+                } else if (extraViews == 2) {
+                    if (position == itemSelected + 1) {
+                        // Inflate post button
+                        return null;
+                    } else if (position == itemSelected + 2) {
+                        // Inflate EditText
+                        return null;
+                    }
+                }
+
+                return null; // should not happen
+            } else {
                 convertView = inflater.inflate(R.layout.comment_row, parent, false);
 
                 viewHolder = new DsqViewHolder();
@@ -353,18 +384,21 @@ class DisqusAdapter extends BaseAdapter {
                 convertView.setTag(viewHolder);
             }
         } else {
-            if (position == 1) return test; // FIXME
+            if (itemSelected != -1 && position > itemSelected && position <= itemSelected + extraViews)
+                return convertView;
 
             viewHolder = (DsqViewHolder) convertView.getTag();
         }
 
-        final int i = (position < 1) ? position : position - 1; // FIXME
+        // If extra views are in listview, then positions will be off from index for comments
+        int pos = position;
+        if (position > itemSelected + extraViews) pos = position - extraViews;
+        final int i = pos;
 
-        // FIXME
-        if (commentsList.get(i).indent != 0)                     // A subcomment
-            convertView.setPadding(getPxFromDp(INDENT * commentsList.get(i).indent),
+        if (commentsList.get(position).indent != 0)                     // A subcomment
+            convertView.setPadding(getPxFromDp(INDENT * commentsList.get(position).indent),
                     0, 0, 0);
-        viewHolder.name.setText(commentsList.get(i).name);       // username
+        viewHolder.name.setText(commentsList.get(position).name);       // username
         viewHolder.name.setOnClickListener(new View.OnClickListener() { // Link to Disqus Profile
             @Override
             public void onClick(View v) {
@@ -373,7 +407,7 @@ class DisqusAdapter extends BaseAdapter {
                 c.startActivity(visitProfile);
             }
         });
-        viewHolder.comment.setText(commentsList.get(i).message); // comment
+        viewHolder.comment.setText(commentsList.get(position).message); // comment
 
         return convertView;
     }
