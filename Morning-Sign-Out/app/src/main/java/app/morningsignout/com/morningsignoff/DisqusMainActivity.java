@@ -66,8 +66,16 @@ public class DisqusMainActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (commentsView.getAdapter() != null) {
-                    Toast.makeText(ref, "Test!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ref, "Test", Toast.LENGTH_SHORT).show();
+                    final DisqusAdapter adapter = (DisqusAdapter) commentsView.getAdapter();
+                    adapter.selectItem(position, DisqusAdapter.OPTIONS_ROW);
 
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
                 }
             }
         });
@@ -307,15 +315,11 @@ public class DisqusMainActivity extends ActionBarActivity {
 
         commentText.setVisibility(View.VISIBLE);  // Add EditText widget
     }
-
-    public void hideCommentText() {
-        commentText.setVisibility(View.GONE);
-    }
 }
 
 class DisqusAdapter extends BaseAdapter {
     static final int INDENT = 20;
-    static final int OPTIONS_ROW = 1;
+    static final int COMMENTS_ROW = 0, OPTIONS_ROW = 1;
 
     Context c;
     ArrayList<Comments> commentsList;
@@ -330,7 +334,6 @@ class DisqusAdapter extends BaseAdapter {
     void selectItem(int itemSelected, int typeSelected) {
         this.itemSelected = itemSelected;
         this.extraViews = typeSelected;
-        notifyDataSetChanged();
     }
 
     @Override
@@ -356,38 +359,65 @@ class DisqusAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         DsqViewHolder viewHolder;
+        LayoutInflater inflater = LayoutInflater.from(c);
 
         if (convertView == null) {
-            LayoutInflater inflater = LayoutInflater.from(c);
-
+            // Extra row
             if (itemSelected != -1) {
-                if (extraViews == 1 && position == itemSelected + 1) {
-                    // Inflate options row.
-                    return null;
+                if (extraViews == OPTIONS_ROW && position == itemSelected + 1) {
+                    View optionsRow = inflater.inflate(R.layout.options_row, parent, false);
+                    viewHolder = new DsqViewHolder();
+                    viewHolder.type = OPTIONS_ROW;
+
+                    return optionsRow;
                 } else if (extraViews == 2) {
                     if (position == itemSelected + 1) {
                         // Inflate post button
-                        return null;
+                        return convertView;
                     } else if (position == itemSelected + 2) {
                         // Inflate EditText
-                        return null;
+                        return convertView;
                     }
                 }
+            }
 
-                return null; // should not happen
-            } else {
+            // Comment row
+            convertView = inflater.inflate(R.layout.comment_row, parent, false);
+            viewHolder = new DsqViewHolder();
+            viewHolder.name = (TextView) convertView.findViewById(R.id.textView_userDsq);
+            viewHolder.comment = (TextView) convertView.findViewById(R.id.textView_commentDsq);
+            viewHolder.type = COMMENTS_ROW;
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (DsqViewHolder) convertView.getTag();
+
+            if (itemSelected != -1) {
+                if (viewHolder.type == OPTIONS_ROW && position == itemSelected + 1) // Is already an option row
+                    return convertView;
+
+                // Need new view
+                if (extraViews == OPTIONS_ROW && position == itemSelected + 1) {
+                    return inflater.inflate(R.layout.options_row, parent, false);
+                } else if (extraViews == 2) {
+                    if (position == itemSelected + 1) {
+                        // Inflate post button
+                        return convertView;
+                    } else if (position == itemSelected + 2) {
+                        // Inflate EditText
+                        return convertView;
+                    }
+                }
+            }
+
+            // Definitely NOT an extra row, must be a comment row
+            if (viewHolder.type != COMMENTS_ROW) {  // Used to be an extra row.
                 convertView = inflater.inflate(R.layout.comment_row, parent, false);
-
                 viewHolder = new DsqViewHolder();
                 viewHolder.name = (TextView) convertView.findViewById(R.id.textView_userDsq);
                 viewHolder.comment = (TextView) convertView.findViewById(R.id.textView_commentDsq);
+                viewHolder.type = COMMENTS_ROW;
                 convertView.setTag(viewHolder);
             }
-        } else {
-            if (itemSelected != -1 && position > itemSelected && position <= itemSelected + extraViews)
-                return convertView;
-
-            viewHolder = (DsqViewHolder) convertView.getTag();
         }
 
         // If extra views are in listview, then positions will be off from index for comments
@@ -395,10 +425,10 @@ class DisqusAdapter extends BaseAdapter {
         if (position > itemSelected + extraViews) pos = position - extraViews;
         final int i = pos;
 
-        if (commentsList.get(position).indent != 0)                     // A subcomment
-            convertView.setPadding(getPxFromDp(INDENT * commentsList.get(position).indent),
+        if (commentsList.get(i).indent != 0)                     // A subcomment
+            convertView.setPadding(getPxFromDp(INDENT * commentsList.get(i).indent),
                     0, 0, 0);
-        viewHolder.name.setText(commentsList.get(position).name);       // username
+        viewHolder.name.setText(commentsList.get(i).name);       // username
         viewHolder.name.setOnClickListener(new View.OnClickListener() { // Link to Disqus Profile
             @Override
             public void onClick(View v) {
@@ -407,7 +437,7 @@ class DisqusAdapter extends BaseAdapter {
                 c.startActivity(visitProfile);
             }
         });
-        viewHolder.comment.setText(commentsList.get(position).message); // comment
+        viewHolder.comment.setText(commentsList.get(i).message); // comment
 
         return convertView;
     }
@@ -417,8 +447,36 @@ class DisqusAdapter extends BaseAdapter {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
     }
 
+    DsqViewHolder setupCommentsViewTag(View convertView) {
+        DsqViewHolder viewHolder = new DsqViewHolder();
+        viewHolder.name = (TextView) convertView.findViewById(R.id.textView_userDsq);
+        viewHolder.comment = (TextView) convertView.findViewById(R.id.textView_commentDsq);
+        convertView.setTag(viewHolder);
+
+        return viewHolder;
+    }
+
+    View getExtraView(int position, LayoutInflater inflater, ViewGroup parent) {
+        if (itemSelected != -1) {
+            if (extraViews == OPTIONS_ROW && position == itemSelected + 1) {
+                return inflater.inflate(R.layout.options_row, parent, false);
+            } else if (extraViews == 2) {
+                if (position == itemSelected + 1) {
+                    // Inflate post button
+                    return null;
+                } else if (position == itemSelected + 2) {
+                    // Inflate EditText
+                    return null;
+                }
+            }
+        }
+
+        return null;
+    }
+
     class DsqViewHolder {
         TextView name;
         TextView comment;
+        int type = 0;
     }
 }
