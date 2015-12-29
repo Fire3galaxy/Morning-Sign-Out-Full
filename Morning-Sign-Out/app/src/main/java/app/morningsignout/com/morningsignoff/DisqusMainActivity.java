@@ -278,8 +278,9 @@ public class DisqusMainActivity extends ActionBarActivity {
                     // Post comment
                     String message = v.getText().toString();
                     if (!message.isEmpty()) {
-                        new DisqusPostComment(ref).execute(dsq_thread_id, v.getText().toString());
+                        new DisqusPostComment(ref).execute(dsq_thread_id, null, v.getText().toString());
 
+                        //"2430241165" // FIXME
                         v.setText(""); // Clear text from editText
                         refreshComments(true); // Refresh comments
                     }
@@ -302,28 +303,31 @@ public class DisqusMainActivity extends ActionBarActivity {
 class DisqusAdapter extends BaseAdapter {
     static final int INDENT = 20;
 
+    EditText test; // FIXME
+
     Context c;
     ArrayList<Comments> commentsList;
 
     DisqusAdapter(Context c, ArrayList<Comments> commentsList) {
         this.c = c;
         this.commentsList = commentsList;
-    }
 
-    public void changeList(ArrayList<Comments> list) {
-        commentsList.clear();
-        commentsList.addAll(list);
-        notifyDataSetChanged();
+        test = new EditText(c); // FIXME
     }
 
     @Override
     public int getCount() {
-        return commentsList.size();
+        return commentsList.size() + 1; // FIXME
     }
 
     @Override
     public Object getItem(int position) {
-        return commentsList.get(position);
+        if (position == 0) // FIXME
+            return commentsList.get(position);
+        else if (position == 1)
+            return test.getText();
+        else
+            return commentsList.get(position - 1);
     }
 
     @Override
@@ -336,30 +340,40 @@ class DisqusAdapter extends BaseAdapter {
         DsqViewHolder viewHolder;
 
         if (convertView == null) {
-            LayoutInflater inflater = LayoutInflater.from(c);
-            convertView = inflater.inflate(R.layout.comment_row, parent, false);
+            if (position == 1) { // FIXME
+                return test;
+            }
+            else {
+                LayoutInflater inflater = LayoutInflater.from(c);
+                convertView = inflater.inflate(R.layout.comment_row, parent, false);
 
-            viewHolder = new DsqViewHolder();
-            viewHolder.name = (TextView) convertView.findViewById(R.id.textView_userDsq);
-            viewHolder.comment = (TextView) convertView.findViewById(R.id.textView_commentDsq);
-            convertView.setTag(viewHolder);
+                viewHolder = new DsqViewHolder();
+                viewHolder.name = (TextView) convertView.findViewById(R.id.textView_userDsq);
+                viewHolder.comment = (TextView) convertView.findViewById(R.id.textView_commentDsq);
+                convertView.setTag(viewHolder);
+            }
         } else {
+            if (position == 1) return test; // FIXME
+
             viewHolder = (DsqViewHolder) convertView.getTag();
         }
 
-        if (commentsList.get(position).indent != 0)                     // A subcomment
-            convertView.setPadding(getPxFromDp(INDENT * commentsList.get(position).indent),
+        final int i = (position < 1) ? position : position - 1; // FIXME
+
+        // FIXME
+        if (commentsList.get(i).indent != 0)                     // A subcomment
+            convertView.setPadding(getPxFromDp(INDENT * commentsList.get(i).indent),
                     0, 0, 0);
-        viewHolder.name.setText(commentsList.get(position).name);       // username
+        viewHolder.name.setText(commentsList.get(i).name);       // username
         viewHolder.name.setOnClickListener(new View.OnClickListener() { // Link to Disqus Profile
             @Override
             public void onClick(View v) {
-                Uri profile = Uri.parse(commentsList.get(position).profile_url);
+                Uri profile = Uri.parse(commentsList.get(i).profile_url);
                 Intent visitProfile = new Intent(Intent.ACTION_VIEW, profile);
                 c.startActivity(visitProfile);
             }
         });
-        viewHolder.comment.setText(commentsList.get(position).message); // comment
+        viewHolder.comment.setText(commentsList.get(i).message); // comment
 
         return convertView;
     }

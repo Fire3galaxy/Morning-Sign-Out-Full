@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="Reply"
+        android:id="@+id/button_reply"
+        android:layout_gravity="center_vertical"
+        android:background="#e4e4e4"
+        android:textColor="@android:color/black"
+        android:textAllCaps="false"/>
+
+    <Button
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="See User"
+        android:id="@+id/button_seeUser"
+        android:layout_gravity="center_vertical"
+        android:background="#e4e4e4"
+        android:textColor="@android:color/black"
+        android:textAllCaps="false"/>
+</LinearLayout>

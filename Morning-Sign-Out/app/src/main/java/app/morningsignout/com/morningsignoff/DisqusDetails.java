@@ -90,15 +90,22 @@ public class DisqusDetails {
         return null;
     }
 
-    String postComment(String token, String threadId, String message) {
-        String result = disqusMethods.postComment(token, threadId, message);
+    DisqusResponse postComment(String token, String threadId, String parentID, String message) {
+        String result = disqusMethods.postComment(token, threadId, parentID, message);
         Log.d("DisqusDetails", result);
 
-        return result;
+        if (result.contains("\"code\":18")) // Credentials are bad: possibly expired token
+            return new DisqusResponse(false, 18);
+        else if (result.contains("\"code\":12")) // Not authorized: possibly null token
+            return new DisqusResponse(false, 12);
+        else
+            return new DisqusResponse(true, -1);
     }
 
     AccessToken refreshAccessToken(String refreshToken) {
         String tokenJson = disqusMethods.refreshAccessToken(refreshToken);
+        Log.d("DisqusDetails", tokenJson); // Issue here with code 18 and 12 (12 was from saving a bad token)
+
         if (tokenJson != null)
             return AccessToken.parseAccessToken(tokenJson);
 
@@ -118,19 +125,26 @@ public class DisqusDetails {
             return httpMethods.postHttp(GET_ACCESS_TOKEN_URL, createGetAccessTokenData(code));
         }
 
-        String postComment(String token, String threadId, String message) {
-            return httpMethods.postHttp(POST_COMMENT_URL, createPostCommentData(token, threadId, message));
+        String postComment(String token, String threadId, String parentID, String message) {
+            return httpMethods.postHttp(POST_COMMENT_URL,
+                    createPostCommentData(token, threadId, parentID, message));
         }
 
         String refreshAccessToken(String refreshToken) {
             return httpMethods.postHttp(GET_REFRESH_TOKEN_URL, createGetRefreshTokenData(refreshToken));
         }
 
-        private String createPostCommentData(String accessToken, String threadId, String message) {
+        private String createPostCommentData(String accessToken, String threadId, String parentID, String message) {
             try {
-                return POST_COMMENT_DATA + "access_token=" + accessToken + "&"
-                        + "thread=" + threadId + "&"
-                        + "message=" + URLEncoder.encode(message, "UTF8");
+                String commentData = POST_COMMENT_DATA + "access_token=" + accessToken + "&"
+                        + "thread=" + threadId + "&";
+
+                if (parentID != null) // put this before message
+                    commentData += "parent=" + parentID + "&";
+
+                commentData += "message=" + URLEncoder.encode(message, "UTF8");
+
+                return commentData;
             } catch (UnsupportedEncodingException e) {
                 return null;
             }
@@ -240,6 +254,26 @@ public class DisqusDetails {
             }
 
             return null;
+        }
+    }
+
+    // Contains code and whether or not API request succeeded.
+    // Used only for DisqusDetails.postComment() right now.
+    class DisqusResponse {
+        private boolean success;
+        private int code;
+
+        public DisqusResponse(boolean success, int code) {
+            this.success = success;
+            this.code = code;
+        }
+
+        public boolean isSuccess() {
+            return success;
+        }
+
+        public int getCode() {
+            return code;
         }
     }
 }

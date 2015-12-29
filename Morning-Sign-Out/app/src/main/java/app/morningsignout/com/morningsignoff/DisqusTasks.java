@@ -5,6 +5,7 @@ import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -73,6 +74,9 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
 
             commentsView.get().setAdapter(
                     new DisqusAdapter(commentsView.get().getContext(), comments));
+
+//            for (Comments c : comments)
+//                Log.d("DisqusGetComments", c.id + ": " + c.message);
 
             if (comments.isEmpty() && commentsView.get().getHeaderViewsCount() == 0)
                 addNoCommentsHeader();
@@ -169,49 +173,40 @@ class DisqusPostComment extends AsyncTask<String, Void, Void> {
         this.act = new WeakReference<>(act);
     }
 
-    // 1. Access token
-    // 2. thread id
-    // 3. message (not encoded for url)
+    // 1. thread id
+    // 2. parent post id
+    // 3. message (not encoded until postComment())
     @Override
     protected Void doInBackground(String... args) {
-        if (args.length != 2) return null;
+        if (args.length != 3) return null;
 
         if (act.get() != null) {
-            String code = "\"code\":";
-
             AccessToken token = act.get().getAccessToken();
             DisqusDetails details = new DisqusDetails();
 
-            // Refresh test
-            Log.d("DisqusPostComment", "Original: " + token);
+            DisqusDetails.DisqusResponse response =
+                    details.postComment(token.access_token, args[0], args[1], args[2]);
 
-            AccessToken token2 = details.refreshAccessToken(token.refresh_token);
-            Log.d("DisqusPostComment", "Refresh: " + token2);
+            // Errors: Should never happen!!!!! Test this like crazy.
+            if (!response.isSuccess()) {
+                // FIXME: Error 18 may not be an indicator of expired token. A token lasts 30 days.
+                // FIXME: What to toast/do if posting comment fails.
+                // Token is expired. Refresh token, then try again.
+                if (response.getCode() == 18) {
+                    AccessToken newToken = details.refreshAccessToken(token.refresh_token);
 
-            act.get().saveLogin(token2);
-
-//            String response = details.postComment(token.access_token, args[0], args[1]);
-//
-//            // Token is expired. Refresh token, then try again.
-//            if (response.contains(code + "18")) {
-//                AccessToken newToken = details.refreshAccessToken(token.refresh_token);
-//
-//                // FIXME: do this toast with failed comments too.
-//                // Try to comment again, if refresh fails, toast.
-//                if (newToken != null) {
-//                    act.get().saveLogin(newToken);
-//                    details.postComment(token.access_token, args[0], args[1]);
-//                } else {
-//                    Toast.makeText(act.get(), "Error: try again later", Toast.LENGTH_SHORT).show();
-//                }
-//            } else if (response.contains(code + "12")) {
-////                Log.d("DisqusPostComments", "Token: " + token.access_token);
-//
-////                act.get().logout();
-////                act.get().hideCommentText();
-////                act.get().setActionButtonToLogin();
-//            } else
-//                Log.d("DisqusPostComment", "Posted!");
+                    if (newToken != null && !newToken.access_token.isEmpty()) { // could return token w/ blank strings on fail.
+                        act.get().saveLogin(newToken);
+                        details.postComment(token.access_token, args[0], args[1], args[2]);
+                    }
+                }
+                // Token is null? Debug this.
+                else if (response.getCode() == 12) {
+                    Log.e("DisqusPostComment", "Error: 12 - null token?");
+                    Log.e("DisqusPostComment", token.toString());
+                }
+            } else
+                Log.d("DisqusPostComment", "Posted!");
         }
 
         return null; // Do nothing
