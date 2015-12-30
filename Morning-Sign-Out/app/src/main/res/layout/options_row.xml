@@ -2,8 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="@dimen/abc_action_button_min_height_material"
-    style="?android:attr/buttonBarStyle"
-    android:animateLayoutChanges="true">
+    style="?android:attr/buttonBarStyle">
 
     <Button
         android:layout_width="0dp"
