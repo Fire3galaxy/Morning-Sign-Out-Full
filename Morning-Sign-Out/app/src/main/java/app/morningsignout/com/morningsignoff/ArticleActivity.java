@@ -28,6 +28,7 @@ import android.widget.RelativeLayout;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.List;
 
 // Activity class created in FetchListArticleTask when user clicks on an article from the ListView
 public class ArticleActivity extends ActionBarActivity {
@@ -75,7 +76,7 @@ public class ArticleActivity extends ActionBarActivity {
 
             // WEBVIEW - Getting article from URL and stripping away extra parts of website for better reading
             webView = (CustomWebView) findViewById(R.id.webView_article);
-            webView.getSettings().setBuiltInZoomControls(true);
+            blockZoom(); // True for images, false for articles.
             webViewClient = new ArticleWebViewClient(this);
             webView.setWebViewClient(webViewClient);
 
@@ -256,6 +257,16 @@ public class ArticleActivity extends ActionBarActivity {
         }
     }
 
+    public void allowZoom() {
+        if (!webView.getSettings().getBuiltInZoomControls())
+            webView.getSettings().setBuiltInZoomControls(true);
+    }
+
+    public void blockZoom() {
+        if (webView.getSettings().getBuiltInZoomControls())
+            webView.getSettings().setBuiltInZoomControls(false);
+    }
+
     LayoutTransition getCustomLayoutTransition() {
         LayoutTransition customTransition = new LayoutTransition();
 //            customTransition.enableTransitionType(LayoutTransition.CHANGING);
@@ -303,6 +314,12 @@ class ArticleWebViewClient extends WebViewClient {
             ((ArticleActivity) c).showArticleBar();
         else
             ((ArticleActivity) c).hideArticleBar();
+
+        // Removes zoom controls
+        if (isImage(url))
+            ((ArticleActivity) c).allowZoom();
+        else
+            ((ArticleActivity) c).blockZoom();
 
         // Reset tumblr scroll button (If new page is loaded)
         ((ArticleActivity) c).resetLastSavedY();
@@ -410,5 +427,18 @@ class ArticleWebViewClient extends WebViewClient {
             // date/author/tag
         else
             return false;
+    }
+
+    boolean isImage(String url) {
+        Uri requestUrl = Uri.parse(url);
+
+        List<String> segments = requestUrl.getPathSegments();
+
+        if (segments.size() >= 2 &&
+                segments.get(0).equals("wp-content") &&
+                segments.get(1).equals("uploads"))
+            return true;
+
+        return false;
     }
 }
