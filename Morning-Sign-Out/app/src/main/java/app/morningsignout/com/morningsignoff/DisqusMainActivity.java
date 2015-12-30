@@ -68,7 +68,7 @@ public class DisqusMainActivity extends ActionBarActivity {
                 if (commentsView.getAdapter() != null) {
                     Toast.makeText(ref, "Test", Toast.LENGTH_SHORT).show();
                     final DisqusAdapter adapter = (DisqusAdapter) commentsView.getAdapter();
-                    adapter.selectItem(position, DisqusAdapter.OPTIONS_ROW);
+                    adapter.selectItem(id, DisqusAdapter.OPTIONS_ROW);
 
                     runOnUiThread(new Runnable() {
                         @Override
@@ -323,15 +323,18 @@ class DisqusAdapter extends BaseAdapter {
 
     Context c;
     ArrayList<Comments> commentsList;
-    int itemSelected = -1;
+    Resources resources;
+    long itemSelected = -1;
     int extraViews = 0;
 
     DisqusAdapter(Context c, ArrayList<Comments> commentsList) {
         this.c = c;
         this.commentsList = commentsList;
+
+        resources = c.getResources();
     }
 
-    void selectItem(int itemSelected, int typeSelected) {
+    void selectItem(long itemSelected, int typeSelected) {
         this.itemSelected = itemSelected;
         this.extraViews = typeSelected;
     }
@@ -351,9 +354,27 @@ class DisqusAdapter extends BaseAdapter {
             return "";
     }
 
+    // Based on index in comments list or which extra view it is
     @Override
     public long getItemId(int position) {
-        return position;
+        if (position <= itemSelected)
+            return position;
+        else if (position > itemSelected + extraViews)
+            return position - extraViews;
+
+        // All extra view ids are after ids of comments
+        return commentsList.size() - 1 + (position - itemSelected);
+    }
+
+    @Override
+    public boolean areAllItemsEnabled() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled(int position) {
+        // True if comments, false if extra view
+        return position <= itemSelected || position > itemSelected + extraViews;
     }
 
     @Override
@@ -368,9 +389,11 @@ class DisqusAdapter extends BaseAdapter {
                     View optionsRow = inflater.inflate(R.layout.options_row, parent, false);
                     viewHolder = new DsqViewHolder();
                     viewHolder.type = OPTIONS_ROW;
+                    optionsRow.setTag(viewHolder);
 
                     return optionsRow;
                 } else if (extraViews == 2) {
+                    Log.e("DisqusAdapter", "error: extra views = 2");
                     if (position == itemSelected + 1) {
                         // Inflate post button
                         return convertView;
@@ -397,7 +420,12 @@ class DisqusAdapter extends BaseAdapter {
 
                 // Need new view
                 if (extraViews == OPTIONS_ROW && position == itemSelected + 1) {
-                    return inflater.inflate(R.layout.options_row, parent, false);
+                    View optionsRow = inflater.inflate(R.layout.options_row, parent, false);
+                    viewHolder = new DsqViewHolder();
+                    viewHolder.type = OPTIONS_ROW;
+                    optionsRow.setTag(viewHolder);
+
+                    return optionsRow;
                 } else if (extraViews == 2) {
                     if (position == itemSelected + 1) {
                         // Inflate post button
@@ -409,7 +437,7 @@ class DisqusAdapter extends BaseAdapter {
                 }
             }
 
-            // Definitely NOT an extra row, must be a comment row
+            // Did not return from code above. Definitely NOT an extra row, must be a comment row
             if (viewHolder.type != COMMENTS_ROW) {  // Used to be an extra row.
                 convertView = inflater.inflate(R.layout.comment_row, parent, false);
                 viewHolder = new DsqViewHolder();
@@ -425,10 +453,12 @@ class DisqusAdapter extends BaseAdapter {
         if (position > itemSelected + extraViews) pos = position - extraViews;
         final int i = pos;
 
-        if (commentsList.get(i).indent != 0)                     // A subcomment
-            convertView.setPadding(getPxFromDp(INDENT * commentsList.get(i).indent),
-                    0, 0, 0);
-        viewHolder.name.setText(commentsList.get(i).name);       // username
+        // Padding will change for views based on where extra views are
+        int padding = getPxFromDp(INDENT * commentsList.get(i).indent);
+
+        if (convertView.getPaddingLeft() != padding)                // A subcomment
+            convertView.setPadding(padding, 0, 0, 0);
+        viewHolder.name.setText(commentsList.get(i).name);          // username
         viewHolder.name.setOnClickListener(new View.OnClickListener() { // Link to Disqus Profile
             @Override
             public void onClick(View v) {
@@ -437,41 +467,14 @@ class DisqusAdapter extends BaseAdapter {
                 c.startActivity(visitProfile);
             }
         });
-        viewHolder.comment.setText(commentsList.get(i).message); // comment
+        viewHolder.comment.setText(commentsList.get(i).message);    // comment
 
         return convertView;
     }
 
     int getPxFromDp(int dp) {
-        Resources r = c.getResources();
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
-    }
-
-    DsqViewHolder setupCommentsViewTag(View convertView) {
-        DsqViewHolder viewHolder = new DsqViewHolder();
-        viewHolder.name = (TextView) convertView.findViewById(R.id.textView_userDsq);
-        viewHolder.comment = (TextView) convertView.findViewById(R.id.textView_commentDsq);
-        convertView.setTag(viewHolder);
-
-        return viewHolder;
-    }
-
-    View getExtraView(int position, LayoutInflater inflater, ViewGroup parent) {
-        if (itemSelected != -1) {
-            if (extraViews == OPTIONS_ROW && position == itemSelected + 1) {
-                return inflater.inflate(R.layout.options_row, parent, false);
-            } else if (extraViews == 2) {
-                if (position == itemSelected + 1) {
-                    // Inflate post button
-                    return null;
-                } else if (position == itemSelected + 2) {
-                    // Inflate EditText
-                    return null;
-                }
-            }
-        }
-
-        return null;
+        return (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, dp, resources.getDisplayMetrics());
     }
 
     class DsqViewHolder {

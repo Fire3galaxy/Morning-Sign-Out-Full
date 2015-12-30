@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="@dimen/abc_action_button_min_height_material">
+    android:layout_height="@dimen/abc_action_button_min_height_material"
+    style="?android:attr/buttonBarStyle"
+    android:animateLayoutChanges="true">
 
     <Button
         android:layout_width="0dp"
@@ -10,9 +12,10 @@
         android:text="Reply"
         android:id="@+id/button_reply"
         android:layout_gravity="center_vertical"
-        android:background="#e4e4e4"
+        android:background="@drawable/button_disqus"
+        style="?android:attr/buttonBarButtonStyle"
         android:textColor="@android:color/black"
-        android:textAllCaps="false"/>
+        android:textAllCaps="false" />
 
     <Button
         android:layout_width="0dp"
@@ -21,7 +24,8 @@
         android:text="See User"
         android:id="@+id/button_seeUser"
         android:layout_gravity="center_vertical"
-        android:background="#e4e4e4"
+        android:background="@drawable/button_disqus"
+        style="?android:attr/buttonBarButtonStyle"
         android:textColor="@android:color/black"
-        android:textAllCaps="false"/>
+        android:textAllCaps="false" />
 </LinearLayout>
