@@ -319,7 +319,7 @@ public class DisqusMainActivity extends ActionBarActivity {
 
 class DisqusAdapter extends BaseAdapter {
     static final int INDENT = 20;
-    static final int COMMENTS_ROW = 0, OPTIONS_ROW = 1;
+    static final int COMMENTS_ROW = 0, OPTIONS_ROW = 1, SUBCOMMENT_ROW = 2;
 
     Context c;
     ArrayList<Comments> commentsList;
@@ -391,6 +391,26 @@ class DisqusAdapter extends BaseAdapter {
                     viewHolder.type = OPTIONS_ROW;
                     optionsRow.setTag(viewHolder);
 
+                    Button reply = (Button) optionsRow.findViewById(R.id.button_reply);
+                    Button seeUser = (Button) optionsRow.findViewById(R.id.button_seeUser);
+                    reply.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+//                            selectItem(itemSelected, SUBCOMMENT_ROW);
+                            Log.d("DisqusAdapter", "Replied!");
+                        }
+                    });
+                    seeUser.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Uri profile = Uri.parse(
+                                    commentsList.get(Long.valueOf(itemSelected).intValue())
+                                            .profile_url);
+                            Intent visitProfile = new Intent(Intent.ACTION_VIEW, profile);
+                            c.startActivity(visitProfile);
+                        }
+                    });
+
                     return optionsRow;
                 } else if (extraViews == 2) {
                     Log.e("DisqusAdapter", "error: extra views = 2");
@@ -424,6 +444,26 @@ class DisqusAdapter extends BaseAdapter {
                     viewHolder = new DsqViewHolder();
                     viewHolder.type = OPTIONS_ROW;
                     optionsRow.setTag(viewHolder);
+
+                    Button reply = (Button) optionsRow.findViewById(R.id.button_reply);
+                    Button seeUser = (Button) optionsRow.findViewById(R.id.button_seeUser);
+                    reply.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+//                            selectItem(itemSelected, SUBCOMMENT_ROW);
+                            Log.d("DisqusAdapter", "Replied!");
+                        }
+                    });
+                    seeUser.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Uri profile = Uri.parse(
+                                    commentsList.get(Long.valueOf(itemSelected).intValue())
+                                            .profile_url);
+                            Intent visitProfile = new Intent(Intent.ACTION_VIEW, profile);
+                            c.startActivity(visitProfile);
+                        }
+                    });
 
                     return optionsRow;
                 } else if (extraViews == 2) {
