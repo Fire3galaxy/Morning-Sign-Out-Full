@@ -21,10 +21,14 @@ public class MeetTheTeamAdapter extends BaseAdapter {
     };
 
     private Integer[] images = {
+//            R.drawable.category_featured, R.drawable.category_humanities, R.drawable.category_research,
+//            R.drawable.category_wellness, R.drawable.category_medicine, R.drawable.category_public_health,
+//            R.drawable.category_healthcare, R.drawable.category_web_team, R.drawable.category_visuals_team,
+//            R.drawable.category_marketing, R.drawable.category_finance, R.drawable.category_humanities
             R.drawable.category_featured, R.drawable.category_humanities, R.drawable.category_research,
             R.drawable.category_wellness, R.drawable.category_medicine, R.drawable.category_public_health,
-            R.drawable.category_healthcare, R.drawable.category_web_team, R.drawable.category_visuals_team,
-            R.drawable.category_marketing, R.drawable.category_finance, R.drawable.category_humanities
+            R.drawable.category_healthcare, R.drawable.web_team, R.drawable.visuals_team,
+            R.drawable.marketing, R.drawable.finance, R.drawable.category_humanities
     };
 
     public MeetTheTeamAdapter(Context c) {
