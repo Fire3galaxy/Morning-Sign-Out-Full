@@ -396,8 +396,8 @@ class DisqusAdapter extends BaseAdapter {
                     reply.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-//                            selectItem(itemSelected, SUBCOMMENT_ROW);
-                            Log.d("DisqusAdapter", "Replied!");
+                            selectItem(itemSelected, SUBCOMMENT_ROW);
+                            notifyDataSetChanged();
                         }
                     });
                     seeUser.setOnClickListener(new View.OnClickListener() {
@@ -413,13 +413,27 @@ class DisqusAdapter extends BaseAdapter {
 
                     return optionsRow;
                 } else if (extraViews == 2) {
-                    Log.e("DisqusAdapter", "error: extra views = 2");
+                    Log.e("DisqusAdapter", "error: extra views = 2 and view was null");
                     if (position == itemSelected + 1) {
                         // Inflate post button
-                        return convertView;
+                        TextView test = new TextView(c);
+                        test.setText("Test");
+
+                        DsqViewHolder holder = new DsqViewHolder();
+                        holder.type = SUBCOMMENT_ROW;
+                        test.setTag(holder);
+
+                        return test;
                     } else if (position == itemSelected + 2) {
                         // Inflate EditText
-                        return convertView;
+                        TextView test = new TextView(c);
+                        test.setText("Test");
+
+                        DsqViewHolder holder = new DsqViewHolder();
+                        holder.type = SUBCOMMENT_ROW;
+                        test.setTag(holder);
+
+                        return test;
                     }
                 }
             }
@@ -450,8 +464,8 @@ class DisqusAdapter extends BaseAdapter {
                     reply.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-//                            selectItem(itemSelected, SUBCOMMENT_ROW);
-                            Log.d("DisqusAdapter", "Replied!");
+                            selectItem(itemSelected, SUBCOMMENT_ROW);
+                            notifyDataSetChanged();
                         }
                     });
                     seeUser.setOnClickListener(new View.OnClickListener() {
@@ -469,10 +483,24 @@ class DisqusAdapter extends BaseAdapter {
                 } else if (extraViews == 2) {
                     if (position == itemSelected + 1) {
                         // Inflate post button
-                        return convertView;
+                        TextView test = new TextView(c);
+                        test.setText("Test");
+
+                        DsqViewHolder holder = new DsqViewHolder();
+                        holder.type = SUBCOMMENT_ROW;
+                        test.setTag(holder);
+
+                        return test;
                     } else if (position == itemSelected + 2) {
                         // Inflate EditText
-                        return convertView;
+                        TextView test = new TextView(c);
+                        test.setText("Test");
+
+                        DsqViewHolder holder = new DsqViewHolder();
+                        holder.type = SUBCOMMENT_ROW;
+                        test.setTag(holder);
+
+                        return test;
                     }
                 }
             }
