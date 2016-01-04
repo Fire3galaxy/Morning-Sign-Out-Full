@@ -29,6 +29,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 public class DisqusMainActivity extends ActionBarActivity {
@@ -449,28 +450,37 @@ class DisqusAdapter extends BaseAdapter {
             viewHolder = (DsqViewHolder) convertView.getTag();
 
             if (itemSelected != -1) {
-                if (viewHolder.type == OPTIONS_ROW && position == itemSelected + 1) // Is already an option row
-                    return convertView;
-
                 // Need new view
                 if (extraViews == OPTIONS_ROW && position == itemSelected + 1) {
-                    View optionsRow = inflater.inflate(R.layout.options_row, parent, false);
+                    if (viewHolder.type == OPTIONS_ROW) // Is already an option row
+                        return convertView;
+
+                    final View optionsRow = inflater.inflate(R.layout.options_row, parent, false);
                     viewHolder = new DsqViewHolder();
                     viewHolder.type = OPTIONS_ROW;
                     optionsRow.setTag(viewHolder);
 
                     Button reply = (Button) optionsRow.findViewById(R.id.button_reply);
-                    Button seeUser = (Button) optionsRow.findViewById(R.id.button_seeUser);
+                    final Button seeUser = (Button) optionsRow.findViewById(R.id.button_seeUser);
                     reply.setOnClickListener(new View.OnClickListener() {
+                        WeakReference<Button> su = new WeakReference<>(seeUser);
+
                         @Override
-                        public void onClick(View v) {
+                        public void onClick(View v) { // Reply to comment
+                            Button b = (Button) v;
+                            b.setText("Post");
+                            b.setOnClickListener(null);
+//                            if (su.get() != null) su.get().setVisibility(View.GONE);
+
+//                            selectItem(-1, COMMENTS_ROW);
+//                            notifyDataSetChanged();
                             selectItem(itemSelected, SUBCOMMENT_ROW);
                             notifyDataSetChanged();
                         }
                     });
                     seeUser.setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void onClick(View v) {
+                        public void onClick(View v) { // See User's Disqus profile
                             Uri profile = Uri.parse(
                                     commentsList.get(Long.valueOf(itemSelected).intValue())
                                             .profile_url);
@@ -483,6 +493,7 @@ class DisqusAdapter extends BaseAdapter {
                 } else if (extraViews == 2) {
                     if (position == itemSelected + 1) {
                         // Inflate post button
+//                        return convertView;
                         TextView test = new TextView(c);
                         test.setText("Test");
 
