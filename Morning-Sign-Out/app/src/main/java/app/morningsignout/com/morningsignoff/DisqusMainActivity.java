@@ -308,6 +308,16 @@ public class DisqusMainActivity extends ActionBarActivity {
 
         commentText.setVisibility(View.VISIBLE);  // Add EditText widget
     }
+
+    public void hideBottomViews() {
+        if (commentText.getVisibility() != View.GONE) commentText.setVisibility(View.GONE);
+        if (actionButton.getVisibility() != View.GONE) actionButton.setVisibility(View.GONE);
+    }
+
+    public void showBottomViews() {
+        if (commentText.getVisibility() != View.VISIBLE) commentText.setVisibility(View.VISIBLE);
+        if (actionButton.getVisibility() != View.VISIBLE) actionButton.setVisibility(View.VISIBLE);
+    }
 }
 
 class DisqusAdapter extends BaseAdapter {
@@ -315,17 +325,17 @@ class DisqusAdapter extends BaseAdapter {
     static final int COMMENTS_ROW = 0, OPTIONS_ROW = 1, SUBCOMMENT_ROW = 2;
     static final int POST = 0, TEXT = 1;
 
-    Context c;
+    DisqusMainActivity act;
     ArrayList<Comments> commentsList;
     Resources resources;
     long itemSelected = -1;
     int extraViews = 0;
 
-    DisqusAdapter(Context c, ArrayList<Comments> commentsList) {
-        this.c = c;
+    DisqusAdapter(DisqusMainActivity act, ArrayList<Comments> commentsList) {
+        this.act = act;
         this.commentsList = commentsList;
 
-        resources = c.getResources();
+        resources = act.getResources();
     }
 
     void selectItem(long itemSelected, int typeSelected) {
@@ -335,13 +345,18 @@ class DisqusAdapter extends BaseAdapter {
         if (itemSelected == this.itemSelected && typeSelected == OPTIONS_ROW) {
             this.itemSelected = -1;
             this.extraViews = COMMENTS_ROW;
-            notifyDataSetChanged();
-            return;
+        } else {
+            this.itemSelected = itemSelected;
+            this.extraViews = typeSelected;
         }
 
-        this.itemSelected = itemSelected;
-        this.extraViews = typeSelected;
         notifyDataSetChanged();
+
+        // Remove or show action button and edittext normally at bottom based on extra views
+        if (extraViews == SUBCOMMENT_ROW)
+            act.hideBottomViews();
+        else
+            act.showBottomViews();
     }
 
     @Override
@@ -385,7 +400,7 @@ class DisqusAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         DsqViewHolder viewHolder;
-        LayoutInflater inflater = LayoutInflater.from(c);
+        LayoutInflater inflater = act.getLayoutInflater();
 
         if (convertView == null) {
             // Extra row
@@ -412,7 +427,7 @@ class DisqusAdapter extends BaseAdapter {
                                     commentsList.get(Long.valueOf(itemSelected).intValue())
                                             .profile_url);
                             Intent visitProfile = new Intent(Intent.ACTION_VIEW, profile);
-                            c.startActivity(visitProfile);
+                            act.startActivity(visitProfile);
                         }
                     });
 
@@ -482,7 +497,7 @@ class DisqusAdapter extends BaseAdapter {
                                     commentsList.get(Long.valueOf(itemSelected).intValue())
                                             .profile_url);
                             Intent visitProfile = new Intent(Intent.ACTION_VIEW, profile);
-                            c.startActivity(visitProfile);
+                            act.startActivity(visitProfile);
                         }
                     });
 
@@ -545,7 +560,7 @@ class DisqusAdapter extends BaseAdapter {
             public void onClick(View v) {
                 Uri profile = Uri.parse(commentsList.get(i).profile_url);
                 Intent visitProfile = new Intent(Intent.ACTION_VIEW, profile);
-                c.startActivity(visitProfile);
+                act.startActivity(visitProfile);
             }
         });
         viewHolder.comment.setText(commentsList.get(i).message);    // comment

@@ -23,7 +23,6 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
     WeakReference<ProgressBar> pb;
     WeakReference<DisqusMainActivity> act; // FIXME: we need to pass in dsq_thread_id, for now we get it here and set it for act.
     TextView noComments = null;
-    TextView errorRefresh = null;
     boolean hasToken = false, justRefresh = false;
 
     DisqusGetComments(ListView commentsView, ProgressBar pb, DisqusMainActivity act, boolean hasToken, boolean justRefresh) {
@@ -68,12 +67,12 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
             pb.get().setVisibility(View.GONE);
 
         // Set up list of comments
-        if (commentsView.get() != null && comments != null) {
+        if (commentsView.get() != null && act.get() != null && comments != null) {
             // remove header if comments exist
             if (!comments.isEmpty()) commentsView.get().removeHeaderView(noComments);
 
             commentsView.get().setAdapter(
-                    new DisqusAdapter(commentsView.get().getContext(), comments));
+                    new DisqusAdapter(act.get(), comments));
 
 //            for (Comments c : comments)
 //                Log.d("DisqusGetComments", c.id + ": " + c.message);
