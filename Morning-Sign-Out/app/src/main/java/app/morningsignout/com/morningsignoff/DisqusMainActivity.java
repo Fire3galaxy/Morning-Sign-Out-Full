@@ -321,6 +321,7 @@ public class DisqusMainActivity extends ActionBarActivity {
 class DisqusAdapter extends BaseAdapter {
     static final int INDENT = 20;
     static final int COMMENTS_ROW = 0, OPTIONS_ROW = 1, SUBCOMMENT_ROW = 2;
+    static final int POST = 0, TEXT = 1;
 
     Context c;
     ArrayList<Comments> commentsList;
@@ -467,13 +468,6 @@ class DisqusAdapter extends BaseAdapter {
 
                         @Override
                         public void onClick(View v) { // Reply to comment
-                            Button b = (Button) v;
-                            b.setText("Post");
-                            b.setOnClickListener(null);
-//                            if (su.get() != null) su.get().setVisibility(View.GONE);
-
-//                            selectItem(-1, COMMENTS_ROW);
-//                            notifyDataSetChanged();
                             selectItem(itemSelected, SUBCOMMENT_ROW);
                             notifyDataSetChanged();
                         }
@@ -492,16 +486,18 @@ class DisqusAdapter extends BaseAdapter {
                     return optionsRow;
                 } else if (extraViews == 2) {
                     if (position == itemSelected + 1) {
+                        if (viewHolder.type == SUBCOMMENT_ROW && viewHolder.subtype == POST)
+                            return convertView;
+
                         // Inflate post button
-//                        return convertView;
-                        TextView test = new TextView(c);
-                        test.setText("Test");
+                        View subcomment = inflater.inflate(R.layout.post_row, parent, false);
 
                         DsqViewHolder holder = new DsqViewHolder();
                         holder.type = SUBCOMMENT_ROW;
-                        test.setTag(holder);
+                        holder.subtype = POST;
+                        subcomment.setTag(holder);
 
-                        return test;
+                        return subcomment;
                     } else if (position == itemSelected + 2) {
                         // Inflate EditText
                         TextView test = new TextView(c);
@@ -509,6 +505,7 @@ class DisqusAdapter extends BaseAdapter {
 
                         DsqViewHolder holder = new DsqViewHolder();
                         holder.type = SUBCOMMENT_ROW;
+                        holder.subtype = TEXT;
                         test.setTag(holder);
 
                         return test;
@@ -560,5 +557,6 @@ class DisqusAdapter extends BaseAdapter {
         TextView name;
         TextView comment;
         int type = 0;
+        int subtype = 0;
     }
 }
