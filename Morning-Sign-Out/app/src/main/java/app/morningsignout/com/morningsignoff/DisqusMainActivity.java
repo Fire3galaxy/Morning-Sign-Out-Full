@@ -67,16 +67,8 @@ public class DisqusMainActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (commentsView.getAdapter() != null) {
-                    Toast.makeText(ref, "Test", Toast.LENGTH_SHORT).show();
                     final DisqusAdapter adapter = (DisqusAdapter) commentsView.getAdapter();
                     adapter.selectItem(id, DisqusAdapter.OPTIONS_ROW);
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            adapter.notifyDataSetChanged();
-                        }
-                    });
                 }
             }
         });
@@ -337,8 +329,19 @@ class DisqusAdapter extends BaseAdapter {
     }
 
     void selectItem(long itemSelected, int typeSelected) {
+        // Clicking comment again after options or subcomment already inflated
+        // Note: if typeSelected is SUBCOMMENT, then selectItem() is called by reply button
+        // else, called by comment click listener
+        if (itemSelected == this.itemSelected && typeSelected == OPTIONS_ROW) {
+            this.itemSelected = -1;
+            this.extraViews = COMMENTS_ROW;
+            notifyDataSetChanged();
+            return;
+        }
+
         this.itemSelected = itemSelected;
         this.extraViews = typeSelected;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -399,7 +402,7 @@ class DisqusAdapter extends BaseAdapter {
                         @Override
                         public void onClick(View v) {
                             selectItem(itemSelected, SUBCOMMENT_ROW);
-                            notifyDataSetChanged();
+
                         }
                     });
                     seeUser.setOnClickListener(new View.OnClickListener() {
@@ -469,7 +472,7 @@ class DisqusAdapter extends BaseAdapter {
                         @Override
                         public void onClick(View v) { // Reply to comment
                             selectItem(itemSelected, SUBCOMMENT_ROW);
-                            notifyDataSetChanged();
+
                         }
                     });
                     seeUser.setOnClickListener(new View.OnClickListener() {
