@@ -499,16 +499,18 @@ class DisqusAdapter extends BaseAdapter {
 
                         return subcomment;
                     } else if (position == itemSelected + 2) {
+                        if (viewHolder.type == SUBCOMMENT_ROW && viewHolder.subtype == TEXT)
+                            return convertView;
+
                         // Inflate EditText
-                        TextView test = new TextView(c);
-                        test.setText("Test");
+                        View editText = inflater.inflate(R.layout.text_row, parent, false);
 
                         DsqViewHolder holder = new DsqViewHolder();
                         holder.type = SUBCOMMENT_ROW;
                         holder.subtype = TEXT;
-                        test.setTag(holder);
+                        editText.setTag(holder);
 
-                        return test;
+                        return editText;
                     }
                 }
             }
