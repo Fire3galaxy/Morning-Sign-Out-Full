@@ -421,24 +421,24 @@ class DisqusAdapter extends BaseAdapter {
                     Log.e("DisqusAdapter", "error: extra views = 2 and view was null");
                     if (position == itemSelected + 1) {
                         // Inflate post button
-                        TextView test = new TextView(c);
-                        test.setText("Test");
+                        View subcomment = inflater.inflate(R.layout.post_row, parent, false);
 
                         DsqViewHolder holder = new DsqViewHolder();
                         holder.type = SUBCOMMENT_ROW;
-                        test.setTag(holder);
+                        holder.subtype = POST;
+                        subcomment.setTag(holder);
 
-                        return test;
+                        return subcomment;
                     } else if (position == itemSelected + 2) {
                         // Inflate EditText
-                        TextView test = new TextView(c);
-                        test.setText("Test");
+                        View editText = inflater.inflate(R.layout.text_row, parent, false);
 
                         DsqViewHolder holder = new DsqViewHolder();
                         holder.type = SUBCOMMENT_ROW;
-                        test.setTag(holder);
+                        holder.subtype = TEXT;
+                        editText.setTag(holder);
 
-                        return test;
+                        return editText;
                     }
                 }
             }
