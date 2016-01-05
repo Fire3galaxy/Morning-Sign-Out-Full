@@ -66,10 +66,13 @@ public class DisqusMainActivity extends ActionBarActivity {
         commentsView.setOnItemClickListener(new AdapterView.OnItemClickListener() { // FIXME
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (commentsView.getAdapter() != null) {
-                    final DisqusAdapter adapter = (DisqusAdapter) commentsView.getAdapter();
-                    adapter.selectItem(id, DisqusAdapter.OPTIONS_ROW);
-                }
+//                if (commentsView.getAdapter() != null) {
+//                    final DisqusAdapter adapter = (DisqusAdapter) commentsView.getAdapter();
+//                    adapter.selectItem(id, DisqusAdapter.OPTIONS_ROW);
+//                }
+                DisqusDialog dialog = new DisqusDialog();
+                dialog.show(DisqusMainActivity.this.getFragmentManager(), "disqus");
+                //Log.d("","");
             }
         });
         actionButton = (Button) findViewById(R.id.button_disqus);       // login/post
