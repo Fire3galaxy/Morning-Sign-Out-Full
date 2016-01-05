@@ -32,7 +32,7 @@ import android.widget.Toast;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
-public class DisqusMainActivity extends ActionBarActivity {
+public class DisqusMainActivity extends ActionBarActivity implements DisqusDialog.OnChangeCommentsListener {
     final static String SLUG = "slug";
     private final static String LOGIN = "Login",
             ACCESS_TOKEN = "Access Token",
@@ -70,8 +70,14 @@ public class DisqusMainActivity extends ActionBarActivity {
 //                    final DisqusAdapter adapter = (DisqusAdapter) commentsView.getAdapter();
 //                    adapter.selectItem(id, DisqusAdapter.OPTIONS_ROW);
 //                }
-                DisqusDialog dialog = new DisqusDialog();
-                dialog.show(DisqusMainActivity.this.getFragmentManager(), "disqus");
+
+               if (commentsView.getAdapter() != null) {
+                   final DisqusAdapter adapter = (DisqusAdapter) commentsView.getAdapter();
+                   Comments comment = (Comments) adapter.getItem(position);
+
+                   DisqusDialog dialog = DisqusDialog.createDisqusDialog(comment.profile_url);
+                   dialog.show(DisqusMainActivity.this.getFragmentManager(), "disqus");
+               }
                 //Log.d("","");
             }
         });
@@ -320,6 +326,11 @@ public class DisqusMainActivity extends ActionBarActivity {
     public void showBottomViews() {
         if (commentText.getVisibility() != View.VISIBLE) commentText.setVisibility(View.VISIBLE);
         if (actionButton.getVisibility() != View.VISIBLE) actionButton.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onChangeComments() {
+        refreshComments(true);
     }
 }
 

@@ -19,6 +19,7 @@
     <string name="disqus_delete">Delete</string>
     <string name="disqus_post">Post</string>
 
+
     <string name="title_contentDescription">app home button</string>
     <string name="title_commentXDescription">close comments</string>
     <string name="title_slide_menu">Categories menu</string>
@@ -74,6 +75,12 @@
         <item>medicine</item>
         <item>public-health</item>
         <item>healthcare</item>
+    </string-array>
+
+    <string-array name="disqus_options">
+        <item>Reply</item>
+        <item>See User</item>
+        <item>Delete</item>
     </string-array>
 
     <string name="description_error_no_internet">Cannot connect to internet</string>
