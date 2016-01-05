@@ -18,7 +18,10 @@
     <string name="disqus_seeUser">See User</string>
     <string name="disqus_delete">Delete</string>
     <string name="disqus_post">Post</string>
-    <string name="disqus_comment">Comment </string>
+    <string name="disqus_dialog1">Comment </string>
+    <string name="disqus_dialog2">Reply to </string>
+    <string name="comment_hint">Type comment here.</string>
+    <string name="comment_label">Post</string>
 
     <string name="title_contentDescription">app home button</string>
     <string name="title_commentXDescription">close comments</string>
@@ -26,8 +29,6 @@
     <string name="title_activity_category">CategoryActivity</string>
 
     <string name="search_hint">Search Morning Sign Out</string>
-    <string name="comment_hint">Type comment here.</string>
-    <string name="comment_label">Post</string>
 
     <string name="category_refresh">If articles do not load, drag down to refresh</string>
     <string name="error">Something went wrong. Please report this bug to the developers in the play

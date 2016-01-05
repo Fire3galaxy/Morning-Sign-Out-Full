@@ -79,7 +79,7 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
                            DisqusDialog.createDisqusDialog(accessToken.access_token, comment);
                    dialog.show(DisqusMainActivity.this.getFragmentManager(), "disqus");
                }
-                //Log.d("","");
+               //Log.d("","");
             }
         });
         actionButton = (Button) findViewById(R.id.button_disqus);       // login/post
