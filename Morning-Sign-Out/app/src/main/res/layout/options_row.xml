@@ -38,5 +38,6 @@
         android:background="@drawable/button_disqus"
         style="?android:attr/buttonBarButtonStyle"
         android:textColor="@android:color/black"
-        android:textAllCaps="false" />
+        android:textAllCaps="false"
+        android:clickable="true" />
 </LinearLayout>

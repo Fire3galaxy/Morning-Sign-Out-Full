@@ -413,11 +413,14 @@ class DisqusAdapter extends BaseAdapter {
 
                     Button reply = (Button) optionsRow.findViewById(R.id.button_reply);
                     Button seeUser = (Button) optionsRow.findViewById(R.id.button_seeUser);
+                    Button delete = (Button) optionsRow.findViewById(R.id.button_delete);
+
                     reply.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            selectItem(itemSelected, SUBCOMMENT_ROW);
+                            Toast.makeText(act, "Try Dialog for subcomment instead", Toast.LENGTH_SHORT).show();
 
+//                            selectItem(itemSelected, SUBCOMMENT_ROW);
                         }
                     });
                     seeUser.setOnClickListener(new View.OnClickListener() {
@@ -428,6 +431,17 @@ class DisqusAdapter extends BaseAdapter {
                                             .profile_url);
                             Intent visitProfile = new Intent(Intent.ACTION_VIEW, profile);
                             act.startActivity(visitProfile);
+                        }
+                    });
+                    delete.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            new DisqusDeleteComment(act)
+                                    .execute(act.getAccessToken().access_token,
+                                            commentsList.get(Long.valueOf(itemSelected).intValue())
+                                                    .id);
+
+                            act.refreshComments(true);
                         }
                     });
 
@@ -480,14 +494,15 @@ class DisqusAdapter extends BaseAdapter {
                     optionsRow.setTag(viewHolder);
 
                     Button reply = (Button) optionsRow.findViewById(R.id.button_reply);
-                    final Button seeUser = (Button) optionsRow.findViewById(R.id.button_seeUser);
-                    reply.setOnClickListener(new View.OnClickListener() {
-                        WeakReference<Button> su = new WeakReference<>(seeUser);
+                    Button seeUser = (Button) optionsRow.findViewById(R.id.button_seeUser);
+                    Button delete = (Button) optionsRow.findViewById(R.id.button_delete);
 
+                    reply.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) { // Reply to comment
-                            selectItem(itemSelected, SUBCOMMENT_ROW);
+                            Toast.makeText(act, "Try Dialog for subcomment instead", Toast.LENGTH_SHORT).show();
 
+//                            selectItem(itemSelected, SUBCOMMENT_ROW);
                         }
                     });
                     seeUser.setOnClickListener(new View.OnClickListener() {
@@ -498,6 +513,18 @@ class DisqusAdapter extends BaseAdapter {
                                             .profile_url);
                             Intent visitProfile = new Intent(Intent.ACTION_VIEW, profile);
                             act.startActivity(visitProfile);
+                        }
+                    });
+                    delete.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Log.d("","");
+                            new DisqusDeleteComment(act)
+                                    .execute(act.getAccessToken().access_token,
+                                            commentsList.get(Long.valueOf(itemSelected).intValue())
+                                                    .id);
+
+                            act.refreshComments(true);
                         }
                     });
 

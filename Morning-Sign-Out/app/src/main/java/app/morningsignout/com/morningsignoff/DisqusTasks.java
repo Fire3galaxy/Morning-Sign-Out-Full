@@ -212,3 +212,27 @@ class DisqusPostComment extends AsyncTask<String, Void, Void> {
     }
 }
 
+class DisqusDeleteComment extends AsyncTask<String, Void, Boolean> {
+    WeakReference<DisqusMainActivity> act;
+
+    DisqusDeleteComment(DisqusMainActivity act) {
+        this.act = new WeakReference<>(act);
+    }
+
+    // params[0] = token
+    // params[1] = post id
+    @Override
+    protected Boolean doInBackground(String... params) {
+        if (params.length != 2) // Fail
+            return false;
+
+        DisqusDetails details = new DisqusDetails();
+        return details.deleteComment(params[0], params[1]);
+    }
+
+    @Override
+    protected void onPostExecute(Boolean b) {
+        if (!b && act.get() != null)
+            Toast.makeText(act.get(), "Delete failed", Toast.LENGTH_SHORT).show();
+    }
+}

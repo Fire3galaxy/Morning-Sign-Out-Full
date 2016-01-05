@@ -53,6 +53,8 @@ public class DisqusDetails {
             + "forum=morningsignout&thread=";
     static public final String POST_COMMENT_URL = "https://disqus.com/api/3.0/posts/create.json";
     static public final String POST_COMMENT_DATA = "api_key=" + PUBLIC_KEY + "&"; // + ACCESS_TOKEN + THREAD_ID + MESSAGE
+    static public final String DELETE_COMMENT_URL = "https://disqus.com/api/3.0/posts/remove.json";
+    static public final String DELETE_COMMENT_DATA = "api_key=" + PUBLIC_KEY + "&"; // + ACCESS_TOKEN + POST_ID
 
     // For use in getting code: DisqusLogin and LoginClient
     static public final String CODE_KEY = "code";
@@ -112,6 +114,10 @@ public class DisqusDetails {
         return null;
     }
 
+    boolean deleteComment(String token, String postId) {
+        return disqusMethods.deleteComment(token, postId);
+    }
+
     // ------------------------------------------------------------------------------------
 
     // Returns the JSON of the web requests. DisqusDetails handles parsing.
@@ -132,6 +138,13 @@ public class DisqusDetails {
 
         String refreshAccessToken(String refreshToken) {
             return httpMethods.postHttp(GET_REFRESH_TOKEN_URL, createGetRefreshTokenData(refreshToken));
+        }
+
+        boolean deleteComment(String token, String postId) {
+            String json = httpMethods.postHttp(DELETE_COMMENT_URL, createDeleteCommentData(token, postId));
+            Log.d("DisqusMethods", json);
+
+            return json.contains("\"code\":0");
         }
 
         private String createPostCommentData(String accessToken, String threadId, String parentID, String message) {
@@ -156,6 +169,10 @@ public class DisqusDetails {
 
         private String createGetRefreshTokenData(String refreshToken) {
             return GET_REFRESH_TOKEN_DATA + refreshToken;
+        }
+
+        private String createDeleteCommentData(String token, String postId) {
+            return DELETE_COMMENT_DATA + "access_token=" + token + "&post=" + postId;
         }
     }
 
