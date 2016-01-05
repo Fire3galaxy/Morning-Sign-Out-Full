@@ -27,12 +27,14 @@ public class DisqusDialog extends DialogFragment {
         void onChangeComments();
     }
 
-    String profileUrl;
+    String accessToken;
+    Comments comment;
     OnChangeCommentsListener listener;
 
-    static public DisqusDialog createDisqusDialog(String disqusUrl) {
+    static public DisqusDialog createDisqusDialog(String accessToken, Comments comment) {
         DisqusDialog dialog = new DisqusDialog();
-        dialog.profileUrl = disqusUrl;
+        dialog.accessToken = accessToken;
+        dialog.comment = comment;
 
         return dialog;
     }
@@ -54,7 +56,7 @@ public class DisqusDialog extends DialogFragment {
         ListView options = (ListView) dialog.findViewById(R.id.listView_options);
         String[] optionStrings = getResources().getStringArray(R.array.disqus_options);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.button_disqus, optionStrings) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.textview_disqusoptions, optionStrings) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 TextView textView = (TextView) super.getView(position, convertView, parent);
@@ -71,12 +73,20 @@ public class DisqusDialog extends DialogFragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 switch(position) {
+                    case REPLY:
+                        listener.onChangeComments();
+                        break;
                     case SEE_USER:
-                        Uri profile = Uri.parse(profileUrl);
+                        Uri profile = Uri.parse(comment.profile_url);
                         Intent visitProfile = new Intent(Intent.ACTION_VIEW, profile);
                         startActivity(visitProfile);
+                        break;
                     case DELETE:
+                        new DisqusDeleteComment(DisqusDialog.this.getActivity())
+                                .execute(accessToken, comment.id);
+
                         listener.onChangeComments();
+                        break;
                 }
 
                 dismiss();

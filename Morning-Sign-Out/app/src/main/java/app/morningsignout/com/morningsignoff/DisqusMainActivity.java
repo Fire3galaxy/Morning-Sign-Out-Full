@@ -75,7 +75,8 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
                    final DisqusAdapter adapter = (DisqusAdapter) commentsView.getAdapter();
                    Comments comment = (Comments) adapter.getItem(position);
 
-                   DisqusDialog dialog = DisqusDialog.createDisqusDialog(comment.profile_url);
+                   DisqusDialog dialog =
+                           DisqusDialog.createDisqusDialog(accessToken.access_token, comment);
                    dialog.show(DisqusMainActivity.this.getFragmentManager(), "disqus");
                }
                 //Log.d("","");

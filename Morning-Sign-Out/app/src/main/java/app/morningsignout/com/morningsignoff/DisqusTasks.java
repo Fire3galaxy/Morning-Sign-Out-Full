@@ -1,5 +1,6 @@
 package app.morningsignout.com.morningsignoff;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
@@ -213,10 +214,10 @@ class DisqusPostComment extends AsyncTask<String, Void, Void> {
 }
 
 class DisqusDeleteComment extends AsyncTask<String, Void, Boolean> {
-    WeakReference<DisqusMainActivity> act;
+    WeakReference<Context> c;
 
-    DisqusDeleteComment(DisqusMainActivity act) {
-        this.act = new WeakReference<>(act);
+    DisqusDeleteComment(Context c) {
+        this.c = new WeakReference<>(c);
     }
 
     // params[0] = token
@@ -232,7 +233,7 @@ class DisqusDeleteComment extends AsyncTask<String, Void, Boolean> {
 
     @Override
     protected void onPostExecute(Boolean b) {
-        if (!b && act.get() != null)
-            Toast.makeText(act.get(), "Delete failed", Toast.LENGTH_SHORT).show();
+        if (!b && c.get() != null)
+            Toast.makeText(c.get(), "Delete failed", Toast.LENGTH_SHORT).show();
     }
 }
