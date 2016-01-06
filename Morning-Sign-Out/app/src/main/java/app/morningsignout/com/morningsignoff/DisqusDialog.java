@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -31,6 +33,9 @@ public class DisqusDialog extends DialogFragment {
     Comments comment;
     OnChangeCommentsListener listener;
 
+    LinearLayout optionsLayout;
+    LinearLayout replyLayout;
+
     static public DisqusDialog createDisqusDialog(String accessToken, Comments comment) {
         DisqusDialog dialog = new DisqusDialog();
         dialog.accessToken = accessToken;
@@ -48,14 +53,19 @@ public class DisqusDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-
-        // First contains listview with options
-        // Underneath, if user chooses to reply, contains reply edittext
         View dialog = getActivity().getLayoutInflater()
                 .inflate(R.layout.fragment_disqusdialog, null); // null passed because parent is dialog
-        ListView options = (ListView) dialog.findViewById(R.id.listView_options);
+
+        /* layout for options: first one visible. made gone when reply is clicked
+         * layout for reply: gone until made visible by clicking reply in options */
+        optionsLayout = (LinearLayout) dialog.findViewById(R.id.layout_options);
+        replyLayout = (LinearLayout) dialog.findViewById(R.id.layout_reply);
+
+        // List of options: reply, see user, delete (if applicable)
+        final ListView options = (ListView) dialog.findViewById(R.id.listView_options);
         String[] optionStrings = getResources().getStringArray(R.array.disqus_options);
 
+        // adapter for options. I can just use array of strings, but I want icons next to text.
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.textview_disqusoptions, optionStrings) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
@@ -67,15 +77,15 @@ public class DisqusDialog extends DialogFragment {
 
         /* optionStrings[0] - reply: change layout
          * optionStrings[1] - see user: intent to browser with user, close dialog
-         * optionStrings[2] - delete: delete comment, refresh comments, close dialog
-         */
+         * optionStrings[2] - delete: delete comment, refresh comments, close dialog */
         options.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                switch(position) {
+                switch (position) {
                     case REPLY:
-                        listener.onChangeComments();
-                        break;
+                        replyLayout.setVisibility(View.VISIBLE);
+                        optionsLayout.setVisibility(View.GONE);
+                        return;
                     case SEE_USER:
                         Uri profile = Uri.parse(comment.profile_url);
                         Intent visitProfile = new Intent(Intent.ACTION_VIEW, profile);
@@ -92,8 +102,11 @@ public class DisqusDialog extends DialogFragment {
                 dismiss();
             }
         });
-
         options.setAdapter(adapter);
+
+        // Need to set horizontal scrolling manually to make this work
+        EditText replyText = (EditText) dialog.findViewById(R.id.editText_reply);
+        replyText.setHorizontallyScrolling(false);
 
         builder.setView(dialog);
 

@@ -4,11 +4,12 @@
     android:layout_height="wrap_content">
 
     <LinearLayout
+        android:id="@+id/layout_reply"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <TextView
             android:layout_width="wrap_content"
@@ -28,7 +29,7 @@
             android:id="@+id/editText_reply"
             android:hint="@string/comment_hint"
             android:layout_gravity="center_horizontal"
-            android:inputType="textAutoCorrect|textCapSentences"
+            android:inputType="textAutoCorrect|textCapSentences|textMultiLine"
             android:imeOptions="actionSend"
             android:imeActionLabel="@string/comment_label"
             android:gravity="top|left"
@@ -49,14 +50,15 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/layout_options"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/disqus_dialog1"
             android:id="@+id/textView_dialog1"
