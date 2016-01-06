@@ -16,6 +16,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.Arrays;
+
 /**
  * Created by Daniel on 1/4/2016.
  */
@@ -29,14 +31,14 @@ public class DisqusDialog extends DialogFragment {
         void onChangeComments();
     }
 
-    String accessToken;
+    AccessToken accessToken;
     Comments comment;
     OnChangeCommentsListener listener;
 
     LinearLayout optionsLayout;
     LinearLayout replyLayout;
 
-    static public DisqusDialog createDisqusDialog(String accessToken, Comments comment) {
+    static public DisqusDialog createDisqusDialog(AccessToken accessToken, Comments comment) {
         DisqusDialog dialog = new DisqusDialog();
         dialog.accessToken = accessToken;
         dialog.comment = comment;
@@ -64,6 +66,10 @@ public class DisqusDialog extends DialogFragment {
         // List of options: reply, see user, delete (if applicable)
         final ListView options = (ListView) dialog.findViewById(R.id.listView_options);
         String[] optionStrings = getResources().getStringArray(R.array.disqus_options);
+
+        // Remove delete if user does not have authority to delete comment.
+        if (!comment.username.equals(accessToken.username))
+            optionStrings = Arrays.copyOf(optionStrings, 2);
 
         // adapter for options. I can just use array of strings, but I want icons next to text.
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.textview_disqusoptions, optionStrings) {
@@ -93,7 +99,8 @@ public class DisqusDialog extends DialogFragment {
                         break;
                     case DELETE:
                         new DisqusDeleteComment(DisqusDialog.this.getActivity())
-                                .execute(accessToken, comment.id);
+                                .execute(accessToken.access_token, comment.id);
+                        // FIXME: If token is expired, do something
 
                         listener.onChangeComments();
                         break;

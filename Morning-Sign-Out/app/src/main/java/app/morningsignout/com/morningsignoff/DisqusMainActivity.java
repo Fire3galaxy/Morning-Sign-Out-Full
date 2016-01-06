@@ -76,7 +76,7 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
                    Comments comment = (Comments) adapter.getItem(position);
 
                    DisqusDialog dialog =
-                           DisqusDialog.createDisqusDialog(accessToken.access_token, comment);
+                           DisqusDialog.createDisqusDialog(accessToken, comment);
                    dialog.show(DisqusMainActivity.this.getFragmentManager(), "disqus");
                }
                //Log.d("","");
@@ -143,13 +143,13 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        // 0: login, 1: logout
+        // 0: refresh, 1: login, 2: logout
         if (loggedIn) {
-            menu.getItem(0).setVisible(false);
-            menu.getItem(1).setVisible(true);
-        } else {
-            menu.getItem(0).setVisible(true);
             menu.getItem(1).setVisible(false);
+            menu.getItem(2).setVisible(true);
+        } else {
+            menu.getItem(1).setVisible(true);
+            menu.getItem(2).setVisible(false);
         }
 
         return super.onPrepareOptionsMenu(menu);
@@ -351,6 +351,16 @@ class DisqusAdapter extends BaseAdapter {
         this.commentsList = commentsList;
 
         resources = act.getResources();
+    }
+
+    public void switchList(ArrayList<Comments> commentsList) {
+        Log.d("DisqusAdapter", "switchList");
+        if (!this.commentsList.equals(commentsList)) {
+            this.commentsList = commentsList;
+            notifyDataSetChanged();
+            Log.d("DisqusAdapter", "switched!");
+            Log.d("","");
+        }
     }
 
     void selectItem(long itemSelected, int typeSelected) {

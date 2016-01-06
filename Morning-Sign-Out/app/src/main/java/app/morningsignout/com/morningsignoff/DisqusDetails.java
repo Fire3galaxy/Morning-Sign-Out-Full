@@ -470,6 +470,26 @@ class Comments {
 
         return visited;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Comments) {
+            Comments c = (Comments) o;
+
+            if (this.username.equals(c.username) && this.name.equals(c.name) &&
+                    this.profile_url.equals(c.profile_url) && this.message.equals(c.message) &&
+                    this.date_posted.equals(c.date_posted) && this.id.equals(c.id) &&
+                    this.parent.equals(c.parent) && this.indent.intValue() == c.indent.intValue())
+                return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
 }
 
 class TempCommentsAndThreadId {

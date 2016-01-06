@@ -4,13 +4,15 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.WrapperListAdapter;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -40,7 +42,7 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
         if (pb.get() != null)
             pb.get().setVisibility(View.VISIBLE);
 
-        addNoCommentsHeader();
+        addNoCommentsHeaderIfNeeded();
     }
 
     // args[0] = slug for article
@@ -72,14 +74,22 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
             // remove header if comments exist
             if (!comments.isEmpty()) commentsView.get().removeHeaderView(noComments);
 
-            commentsView.get().setAdapter(
-                    new DisqusAdapter(act.get(), comments));
+            ListAdapter adapter = commentsView.get().getAdapter();
+            if (adapter == null)                                // Set new list of comments
+                commentsView.get().setAdapter(new DisqusAdapter(act.get(), comments));
+            else if (adapter instanceof DisqusAdapter)          // Change data list of old adapter
+                ((DisqusAdapter) adapter).switchList(comments);
+            else if (adapter instanceof WrapperListAdapter) {   // Adapter was once empty, unwrap first.
+                DisqusAdapter oldAdapter =
+                        (DisqusAdapter) ((WrapperListAdapter) adapter).getWrappedAdapter();
+                oldAdapter.switchList(comments);
+            }
 
 //            for (Comments c : comments)
 //                Log.d("DisqusGetComments", c.id + ": " + c.message);
 
-            if (comments.isEmpty() && commentsView.get().getHeaderViewsCount() == 0)
-                addNoCommentsHeader();
+            // If no comments exist anymore (meaning it had comments but now doesn't), add textview
+            addNoCommentsHeaderIfNeeded();
         }
 
         // Set up action button (if relevant - first time getting)
@@ -95,14 +105,21 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
 //            act.get().setRefreshOff(); // Turn off refreshing animation (if relevant - refresh w/ layout)
     }
 
-    private void addNoCommentsHeader() {
+    private void addNoCommentsHeaderIfNeeded() {
         // If listview is null, user probably exited activity early. Don't bother with task.
         boolean isNotNull = commentsView.get() != null;
         // Don't add header if it already exists
         boolean noHeader = isNotNull && (commentsView.get().getHeaderViewsCount() == 0);
         // Don't add header if this is refresh and comments already exist in listview
-        boolean isEmpty = isNotNull &&
-                (commentsView.get().getAdapter() == null || commentsView.get().getCount() == 0);
+        boolean isEmpty;
+
+        // Can only add header views before adapter is in place until API 19, KITKAT
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
+            isEmpty = isNotNull && commentsView.get().getAdapter() == null;
+        else
+            isEmpty = isNotNull &&
+                    (commentsView.get().getAdapter() == null || commentsView.get().getCount() == 0);
+
 
         // No comments here yet. Be the first!
         if (noHeader && isEmpty) {
