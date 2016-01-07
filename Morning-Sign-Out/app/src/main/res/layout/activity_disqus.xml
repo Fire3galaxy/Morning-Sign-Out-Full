@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true">
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar_dsqText"
+        android:layout_gravity="bottom|center_horizontal"
+        android:paddingBottom="24dp"
+        android:visibility="gone"
+        android:indeterminate="true"
+        android:animateLayoutChanges="true" />
+
+    <LinearLayout
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:animateLayoutChanges="true"
+        android:background="@android:color/white"
+        android:layout_gravity="bottom|center_horizontal">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="9"
+            android:layout_gravity="center_horizontal">
+
+            <android.support.v4.widget.SwipeRefreshLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal|top"
+                android:id="@+id/swipeRefresh_disqus">
+                <ListView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/listView_disqus"
+                    android:headerDividersEnabled="false"/>
+            </android.support.v4.widget.SwipeRefreshLayout>
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/progressBar_dsq"
+                android:layout_gravity="center"
+                android:indeterminate="true"
+                android:visibility="gone" />
+
+        </FrameLayout>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/abc_action_button_min_height_material"
+            android:id="@+id/button_disqus"
+            android:layout_gravity="center"
+            android:text="@string/disqus_login"
+            android:textAllCaps="false"
+            android:background="@drawable/button_disqus"
+            android:textColor="@android:color/black"
+            android:paddingTop="2dp"
+            android:visibility="gone"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/abc_action_button_min_height_material"
+            android:id="@+id/editText_commentMain"
+            android:background="@drawable/horizontal_line"
+            android:paddingTop="2dp"
+            android:hint="@string/comment_hint"
+            android:inputType="textAutoCorrect|textCapSentences"
+            android:imeOptions="actionSend"
+            android:imeActionLabel="@string/comment_label"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</FrameLayout>

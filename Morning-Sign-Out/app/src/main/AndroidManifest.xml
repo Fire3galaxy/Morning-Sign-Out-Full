@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="app.morningsignout.com.morningsignoff"
-    android:versionCode="1">
+    package="app.morningsignout.com.morningsignoff">
+    <!--version number of app (e.g. "1.0") is in build.gradle of app module-->
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -27,21 +27,14 @@
         </activity>
 
         <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name" >
-        </activity>
-        <activity
             android:launchMode = "singleTop"
-            android:name=".CategoryActivity"
-            android:label="@string/title_activity_category"
-            android:parentActivityName=".MainActivity" >
+            android:name=".CategoryActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="app.morningsignout.com.morningsignoff.CategoryActivity" />
         </activity>
         <activity
             android:name=".ArticleActivity"
-            android:label="@string/article"
             android:parentActivityName=".CategoryActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:uiOptions="splitActionBarWhenNarrow">
@@ -52,8 +45,7 @@
         <activity
             android:name=".SearchResultsActivity"
             android:launchMode="singleTop"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_search">
+            android:configChanges="orientation|keyboardHidden|screenSize">
 
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
@@ -68,6 +60,20 @@
             android:name=".AboutMSOActivity"
             android:parentActivityName=".CategoryActivity">
         </activity>
+
+        <activity
+            android:name=".DisqusMainActivity"
+            android:parentActivityName=".ArticleActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:theme="@style/DisqusTheme">
+        </activity>
+
+        <activity
+            android:name=".DisqusLogin"
+            android:launchMode="singleInstance"
+            android:theme="@style/DisqusTheme"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+
     </application>
 
 </manifest>

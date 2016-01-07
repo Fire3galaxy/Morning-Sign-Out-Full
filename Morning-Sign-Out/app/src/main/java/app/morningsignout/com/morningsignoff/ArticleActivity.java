@@ -3,14 +3,11 @@ package app.morningsignout.com.morningsignoff;
 import android.animation.AnimatorInflater;
 import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
-import android.annotation.TargetApi;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -21,7 +18,6 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -32,8 +28,7 @@ import android.widget.RelativeLayout;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 // Activity class created in FetchListArticleTask when user clicks on an article from the ListView
 public class ArticleActivity extends ActionBarActivity {
@@ -64,60 +59,47 @@ public class ArticleActivity extends ActionBarActivity {
         // Set the title for this myActivity to the article title
         Intent intent = getIntent();
         if (intent != null) {
-            // Setting variable category (healthcare, wellness, etc.) and title of myActivity (article name)
+            // VARIABLES/TITLE - Setting variable category (healthcare, wellness, etc.) and title of myActivity (article name)
             category = getIntent().getStringExtra(Intent.EXTRA_TITLE);
             setTitle(getIntent().getStringExtra(Intent.EXTRA_SHORTCUT_NAME));
 
-            // ImageButton is Morning Sign Out logo, which sends user back to home screen (see XML)
-            // Setting imageButton to center of actionbar
-            ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title, null);
+            // ACTION BAR
+            //      ImageButton is Morning Sign Out logo, which sends user back to home screen (see XML)
+            //      Setting imageButton to center of actionbar
+            ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null); // could replace null with new LinearLayout. properties not needed though.
             ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);
             this.getSupportActionBar().setCustomView(ib, params);
 
-            // Disabling title text of actionbar, enabling imagebutton
+            //      Disabling title text of actionbar, enabling imagebutton
             this.getSupportActionBar().setDisplayShowTitleEnabled(false);
             this.getSupportActionBar().setDisplayShowCustomEnabled(true);
 
-            // Getting article from URL and stripping away extra parts of website for better reading
+            // WEBVIEW - Getting article from URL and stripping away extra parts of website for better reading
             webView = (CustomWebView) findViewById(R.id.webView_article);
-            webView.getSettings().setBuiltInZoomControls(true);
+            blockZoom(); // True for images, false for articles.
             webViewClient = new ArticleWebViewClient(this);
             webView.setWebViewClient(webViewClient);
 
-            // Setting relativeLayout
+            // ARTICLE BAR
+            //      Setting relativeLayout
             relativeLayout = (RelativeLayout) findViewById(R.id.container_articleBar);
 
-            // Setting up objectAnimators for articleBar's show/hide animation
+            //      Setting up objectAnimators for articleBar's show/hide animation
             showArticleBar = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.show_article_bar);
             showArticleBar.setTarget(relativeLayout);
             hideArticleBar = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.hide_article_bar);
             hideArticleBar.setTarget(relativeLayout);
 
+            //      How the animation of the articleBar is programmed
             LinearLayout container = (LinearLayout) findViewById(R.id.container_article);
-            LayoutTransition customTransition = new LayoutTransition();
-//            customTransition.enableTransitionType(LayoutTransition.CHANGING);
-//            customTransition.disableTransitionType(LayoutTransition.CHANGE_APPEARING);
-//            customTransition.disableTransitionType(LayoutTransition.CHANGE_DISAPPEARING);
-            customTransition.setAnimator(LayoutTransition.APPEARING, showArticleBar);
-            customTransition.setAnimator(LayoutTransition.DISAPPEARING, hideArticleBar);
-            customTransition.setStartDelay(LayoutTransition.APPEARING, 0);
-            customTransition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
-            customTransition.setStartDelay(LayoutTransition.DISAPPEARING, 0);
-            customTransition.setStartDelay(LayoutTransition.CHANGE_DISAPPEARING, 0);
-//            customTransition.setStartDelay(LayoutTransition.CHANGING, 0);
-            customTransition.setDuration(LayoutTransition.APPEARING, showArticleBar.getDuration());
-            customTransition.setDuration(LayoutTransition.CHANGE_APPEARING, showArticleBar.getDuration());
-            customTransition.setDuration(LayoutTransition.DISAPPEARING, hideArticleBar.getDuration());
-            customTransition.setDuration(LayoutTransition.CHANGE_DISAPPEARING, hideArticleBar.getDuration());
-//            customTransition.setDuration(LayoutTransition.APPEARING, showArticleBar.getDuration());
+            container.setLayoutTransition(getCustomLayoutTransition());
 
-            container.setLayoutTransition(customTransition);
-
-            // Setting up share intent for first web page
+            // SHARE BUTTON
+            //      Setting up share intent for first web page
             shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.putExtra(Intent.EXTRA_TEXT, getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT));
 
-            // Setting up share button
+            //      Setting up share button
             ImageButton shareButton = (ImageButton) findViewById(R.id.button_share);
             shareButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -127,7 +109,8 @@ public class ArticleActivity extends ActionBarActivity {
                 }
             });
 
-            // Setting up "tumblr" scroll button
+            // SCROLL BUTTON
+            //      Setting up "tumblr" scroll button
             ImageButton scrollButton = (ImageButton) findViewById(R.id.button_scroll);
             scrollButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -145,6 +128,19 @@ public class ArticleActivity extends ActionBarActivity {
                             scrollDown.setDuration(400);
                             scrollDown.start();
                         }
+                    }
+                }
+            });
+
+            // COMMENT BUTTON
+            ImageButton commentButton = (ImageButton) findViewById(R.id.button_comment);
+            commentButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (webViewClient.lastArticleSlug != null) {
+                        Intent intent = new Intent(ArticleActivity.this, DisqusMainActivity.class);
+                        intent.putExtra(DisqusMainActivity.SLUG, webViewClient.lastArticleSlug);
+                        startActivity(intent);
                     }
                 }
             });
@@ -222,15 +218,17 @@ public class ArticleActivity extends ActionBarActivity {
 
         // 1. App has returned from search w/ result
         if (searchReturnUrl != null) {
-            searchReturnUrl = new String(getIntent().getStringExtra(Intent.EXTRA_RETURN_RESULT));   // copy string
+            searchReturnUrl = getIntent().getStringExtra(Intent.EXTRA_RETURN_RESULT);   // copy string
             getIntent().removeExtra(Intent.EXTRA_RETURN_RESULT);        // Return url only valid once, remove it after use
-            new URLToMobileArticle(webView).execute(searchReturnUrl);
+            webView.loadUrl(searchReturnUrl);
             Log.d("ArticleActivity", "Loading: " + intentUrl);
         }
         // 2. App was stopped/return to this myActivity from search w/o a result (do nothing)
         else if (webviewUrl != null && !webviewUrl.isEmpty());
             // 3. App has not loaded its first article yet
-        else if (intentUrl != null) new URLToMobileArticle(webView).execute(intentUrl);
+        else if (intentUrl != null)
+            webView.loadUrl(intentUrl);
+//            new URLToMobileArticle(webView).execute(intentUrl);
 
         if (getSupportActionBar() != null)
             getSupportActionBar().collapseActionView(); // collapse search bar on return from search
@@ -238,10 +236,9 @@ public class ArticleActivity extends ActionBarActivity {
 
     // view parameter needed for title.xml onClick()
     public void returnToParent(View view) {
-        Intent intent = NavUtils.getParentActivityIntent(this);
+        Intent intent = new Intent(this, CategoryActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        intent.putExtra(Intent.EXTRA_TITLE, category);
-        NavUtils.navigateUpTo(this, intent);
+        startActivity(intent);
     }
     synchronized public void resetLastSavedY() {
         lastSavedY = 0;
@@ -259,6 +256,37 @@ public class ArticleActivity extends ActionBarActivity {
             relativeLayout.setVisibility(RelativeLayout.GONE);
         }
     }
+
+    public void allowZoom() {
+        if (!webView.getSettings().getBuiltInZoomControls())
+            webView.getSettings().setBuiltInZoomControls(true);
+    }
+
+    public void blockZoom() {
+        if (webView.getSettings().getBuiltInZoomControls())
+            webView.getSettings().setBuiltInZoomControls(false);
+    }
+
+    LayoutTransition getCustomLayoutTransition() {
+        LayoutTransition customTransition = new LayoutTransition();
+//            customTransition.enableTransitionType(LayoutTransition.CHANGING);
+//            customTransition.disableTransitionType(LayoutTransition.CHANGE_APPEARING);
+//            customTransition.disableTransitionType(LayoutTransition.CHANGE_DISAPPEARING);
+        customTransition.setAnimator(LayoutTransition.APPEARING, showArticleBar);
+        customTransition.setAnimator(LayoutTransition.DISAPPEARING, hideArticleBar);
+        customTransition.setStartDelay(LayoutTransition.APPEARING, 0);
+        customTransition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
+        customTransition.setStartDelay(LayoutTransition.DISAPPEARING, 0);
+        customTransition.setStartDelay(LayoutTransition.CHANGE_DISAPPEARING, 0);
+//            customTransition.setStartDelay(LayoutTransition.CHANGING, 0);
+        customTransition.setDuration(LayoutTransition.APPEARING, showArticleBar.getDuration());
+        customTransition.setDuration(LayoutTransition.CHANGE_APPEARING, showArticleBar.getDuration());
+        customTransition.setDuration(LayoutTransition.DISAPPEARING, hideArticleBar.getDuration());
+        customTransition.setDuration(LayoutTransition.CHANGE_DISAPPEARING, hideArticleBar.getDuration());
+//            customTransition.setDuration(LayoutTransition.APPEARING, showArticleBar.getDuration());
+
+        return customTransition;
+    }
 }
 
 
@@ -271,10 +299,12 @@ class ArticleWebViewClient extends WebViewClient {
     final int CURRENTYEAR = Calendar.getInstance().get(Calendar.YEAR);
 
     Context c;
+    public String lastArticleSlug;
 
     public ArticleWebViewClient(Context c) {
         super();
         this.c = c;
+        lastArticleSlug = null;
     }
 
     @Override
@@ -284,6 +314,12 @@ class ArticleWebViewClient extends WebViewClient {
             ((ArticleActivity) c).showArticleBar();
         else
             ((ArticleActivity) c).hideArticleBar();
+
+        // Removes zoom controls
+        if (isImage(url))
+            ((ArticleActivity) c).allowZoom();
+        else
+            ((ArticleActivity) c).blockZoom();
 
         // Reset tumblr scroll button (If new page is loaded)
         ((ArticleActivity) c).resetLastSavedY();
@@ -331,6 +367,9 @@ class ArticleWebViewClient extends WebViewClient {
         if (requestUrl.getPathSegments().size() == 1) {
             Log.d(LOG_NAME, "changing webresponse to article page");
             html = URLToMobileArticle.getArticle(requestUrl.toString());
+
+            // Prep slug string
+            lastArticleSlug = requestUrl.getLastPathSegment();
 
             // Change share intent to new article
             Intent shareIntent = new Intent();
@@ -388,5 +427,18 @@ class ArticleWebViewClient extends WebViewClient {
             // date/author/tag
         else
             return false;
+    }
+
+    boolean isImage(String url) {
+        Uri requestUrl = Uri.parse(url);
+
+        List<String> segments = requestUrl.getPathSegments();
+
+        if (segments.size() >= 2 &&
+                segments.get(0).equals("wp-content") &&
+                segments.get(1).equals("uploads"))
+            return true;
+
+        return false;
     }
 }

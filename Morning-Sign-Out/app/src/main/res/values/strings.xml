@@ -2,32 +2,33 @@
 <resources>
 
     <string name="app_name">Morning Sign Out</string>
-    <string name="action_settings">Settings</string>
-    <string name="good_morning">Good Morning!</string>
-    <string name="latest_articles">Latest articles and images</string>
-    <string name="author">The author of the journals</string>
-    <string name="article">A flash of blinding light engulfs all of Gravity Falls. Then, everything comes down to earth. The portal, now a mess of tangled wires and metal, glows bright blue. A figure emerges from the portal. The blue light fades behind him. He walks forward, placing a six-fingered hand on the cover of the first journal, then picks it up and places it into the inside pocket of a long, dark coat.</string>
 
+    <!--Menu, actionbar, or bottom bar of articles-->
     <string name="action_style">Style!</string>
     <string name="action_search">Search</string>
     <string name="action_scroll">Scroll to top or to previous position</string>
     <string name="action_comment">Comment</string>
     <string name="action_share">Share article</string>
+    <string name="action_login">Log in </string>
+    <string name="action_logout">Log out</string>
+    <string name="action_refresh">Refresh</string>
 
-    <string name="title_activity_category">CategoryActivity</string>
-    <string name="title_activity_article">ArticleActivity</string>
-    <!-- In menu_main.xml, we can add items to the action bar! Set showAsAction to strings like never, ifRoom, etc to show!-->
-    <string name="title_activity_search">SearchResultsActivity</string>
-    <string name="title_activity_test">TestActivity</string>
-    <string name="title_slide_menu">Categories menu</string>
+    <string name="disqus_login">Log In - Disqus</string>
+    <string name="disqus_reply">Reply</string>
+    <string name="disqus_seeUser">See User</string>
+    <string name="disqus_delete">Delete</string>
+    <string name="disqus_post">Post</string>
+    <string name="disqus_dialog1">Comment </string>
+    <string name="disqus_dialog2">Reply to </string>
+    <string name="comment_hint">Type comment here.</string>
+    <string name="comment_label">Post</string>
 
     <string name="title_contentDescription">app home button</string>
-    <string name="img_description">Here!</string>
-    <string name="article_image">Article Image</string>
-    <string name="border_contentDescription">blue horizontal border</string>
-    <string name="logo_contentDescription">Morning Sign Out logo</string>
+    <string name="title_commentXDescription">close comments</string>
+    <string name="title_slide_menu">Categories menu</string>
+    <string name="title_activity_category">CategoryActivity</string>
 
-    <string name="search_hint">Search MorningSignOut</string>
+    <string name="search_hint">Search Morning Sign Out</string>
 
     <string name="category_refresh">If articles do not load, drag down to refresh</string>
     <string name="error">Something went wrong. Please report this bug to the developers in the play
@@ -75,6 +76,12 @@
         <item>medicine</item>
         <item>public-health</item>
         <item>healthcare</item>
+    </string-array>
+
+    <string-array name="disqus_options">
+        <item>Reply</item>
+        <item>See User</item>
+        <item>Delete</item>
     </string-array>
 
     <string name="description_error_no_internet">Cannot connect to internet</string>

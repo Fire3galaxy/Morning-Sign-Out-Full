@@ -133,7 +133,7 @@ public class CategoryActivity extends ActionBarActivity {
 
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title, null);
+        ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null);
         ib.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -148,6 +148,7 @@ public class CategoryActivity extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
+        // Go back to home screen
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_HOME);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -108,6 +108,7 @@ public class CategoryFragment extends Fragment {
         loadingViews.headerTextView = new WeakReference<TextView>((TextView) headerTitle);
         loadingViews.refresh = getArguments().containsKey(EXTRA_REFRESH);
         loadingViews.firstLoad = true;
+        loadingViews.refresh = getArguments().containsKey(EXTRA_REFRESH);
 
         // Header TextView
         listView.addHeaderView(headerTitle);
@@ -385,7 +386,7 @@ class CategoryAdapter extends BaseAdapter {
         return row;
     }
 
-    // This function is called along with .notifyDataSetChange() in Asynctask's onScrollListener function
+    // This function is called along with .notifyDataSetChanged() in Asynctask's onScrollListener function
     // when the viewers scroll to the bottom of the articles
     public synchronized void loadMoreItems(List<Article> moreArticles, int pageNum){
         // if prevent the late page from loading twice

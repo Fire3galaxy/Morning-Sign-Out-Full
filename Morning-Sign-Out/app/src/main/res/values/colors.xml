@@ -5,5 +5,7 @@
 
     <color name="mso_blue">#81bfff</color>
     <color name="single_row_black">#121F1F</color>
+    <color name="disqus_button_gray">#e4e4e4</color>
+    <color name="disqus_button_gray_pressed">#d8d8d8</color>
 
 </resources>

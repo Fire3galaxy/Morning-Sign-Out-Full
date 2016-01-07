@@ -51,7 +51,6 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
         Uri requestUrl = Uri.parse(link);
 
         Log.d(LOG_NAME, link);
-        if (link.contains("/?s=")) Log.d(LOG_NAME, "This is search");
 
         // Article Page
         if (requestUrl.getPathSegments().size() == 1) {
@@ -107,8 +106,6 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
             wb.loadDataWithBaseURL(link, html, "text/html; charset=UTF-8", null, link);
         else
             wb.loadUrl(link);
-
-        Log.d("URLToMobileArticle", "Loaded webpage " + link);
     }
 
     // Sections of html that the content post will specifically be in
