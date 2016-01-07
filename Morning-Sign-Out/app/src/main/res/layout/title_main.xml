@@ -5,4 +5,5 @@
     android:src="@drawable/mso_square_white"
     android:scaleType="centerInside"
     android:background="@android:color/transparent"
-    android:padding="@dimen/abc_action_bar_default_padding_material" />
+    android:padding="@dimen/abc_action_bar_default_padding_material"
+    android:onClick="returnToParent"/>

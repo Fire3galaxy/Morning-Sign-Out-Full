@@ -43,7 +43,7 @@ public class AboutMSOActivity extends ActionBarActivity {
     }
 
     public void setupActionBar() {
-        ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title, null);
+        ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null);
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);
         this.getSupportActionBar().setCustomView(ib, params);
         super.getSupportActionBar().setDisplayHomeAsUpEnabled(true);

@@ -27,6 +27,9 @@
     <string name="title_commentXDescription">close comments</string>
     <string name="title_slide_menu">Categories menu</string>
     <string name="title_activity_category">CategoryActivity</string>
+    <string name="article_image">Article Image</string>
+    <string name="border_contentDescription">blue horizontal border</string>
+    <string name="logo_contentDescription">Morning Sign Out logo</string>
 
     <string name="search_hint">Search Morning Sign Out</string>
 
