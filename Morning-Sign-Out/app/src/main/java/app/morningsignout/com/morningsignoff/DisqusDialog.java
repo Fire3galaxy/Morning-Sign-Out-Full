@@ -7,14 +7,18 @@ import android.app.DialogFragment;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Arrays;
 
@@ -33,15 +37,17 @@ public class DisqusDialog extends DialogFragment {
 
     AccessToken accessToken;
     Comments comment;
+    String threadId;
     OnChangeCommentsListener listener;
 
     LinearLayout optionsLayout;
     LinearLayout replyLayout;
 
-    static public DisqusDialog createDisqusDialog(AccessToken accessToken, Comments comment) {
+    static public DisqusDialog createDisqusDialog(AccessToken accessToken, Comments comment, String threadId) {
         DisqusDialog dialog = new DisqusDialog();
         dialog.accessToken = accessToken;
         dialog.comment = comment;
+        dialog.threadId = threadId;
 
         return dialog;
     }
@@ -54,6 +60,11 @@ public class DisqusDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        /* View is composed of two layouts, one for options buttons like replying or deleting post,
+         * and one for replying if that option is clicked. The first half of the function sets up
+         * the adapter and onClickListners for the listview of the first layout. The second half
+         * sets up the second layout's textview, edittext, and post button.
+         */
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         View dialog = getActivity().getLayoutInflater()
                 .inflate(R.layout.fragment_disqusdialog, null); // null passed because parent is dialog
@@ -111,9 +122,49 @@ public class DisqusDialog extends DialogFragment {
         });
         options.setAdapter(adapter);
 
+        // "Reply to <Name of commenter>"
+        TextView replyTo = (TextView) dialog.findViewById(R.id.textView_dialog2);
+        replyTo.setText(getResources().getString(R.string.disqus_dialog2) + " " + comment.name);
+
         // Need to set horizontal scrolling manually to make this work
-        EditText replyText = (EditText) dialog.findViewById(R.id.editText_reply);
+        final EditText replyText = (EditText) dialog.findViewById(R.id.editText_reply);
         replyText.setHorizontallyScrolling(false);
+        // Post comment & dismiss dialog
+        replyText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                String text = v.getText().toString();
+
+                switch(actionId) {
+                    case EditorInfo.IME_ACTION_SEND:
+                        if (!text.isEmpty()) {
+                            new DisqusPostComment((DisqusMainActivity) getActivity())
+                                    .execute(threadId, comment.id, text);
+                            listener.onChangeComments();
+                            dismiss();
+                            return true;
+                        }
+                        return false;
+                    default:
+                        return false;
+                }
+            }
+        });
+
+        Button postButton = (Button) dialog.findViewById(R.id.button_replyDialog);
+        postButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String text = replyText.getText().toString();
+
+                if (!text.isEmpty()) {
+                    new DisqusPostComment((DisqusMainActivity) getActivity())
+                            .execute(threadId, comment.id, text);
+                    listener.onChangeComments();
+                    dismiss();
+                }
+            }
+        });
 
         builder.setView(dialog);
 

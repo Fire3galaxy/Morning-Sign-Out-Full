@@ -65,7 +65,7 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
                    Comments comment = (Comments) adapter.getItem(position);
 
                    DisqusDialog dialog =
-                           DisqusDialog.createDisqusDialog(accessToken, comment);
+                           DisqusDialog.createDisqusDialog(accessToken, comment, dsq_thread_id);
                    dialog.show(DisqusMainActivity.this.getFragmentManager(), "disqus");
                }
             }
@@ -283,7 +283,6 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
                     if (!message.isEmpty()) {
                         new DisqusPostComment(ref).execute(dsq_thread_id, null, v.getText().toString());
 
-                        //"2430241165" // FIXME
                         v.setText(""); // Clear text from editText
                         refreshComments(true); // Refresh comments
                     }

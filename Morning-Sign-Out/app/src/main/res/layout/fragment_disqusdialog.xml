@@ -14,7 +14,6 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/disqus_dialog2"
             android:id="@+id/textView_dialog2"
             android:textColor="@android:color/black"
             android:textSize="@dimen/abc_text_size_headline_material"
@@ -41,7 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="?android:attr/buttonBarButtonStyle"
-            android:id="@+id/button_reply2"
+            android:id="@+id/button_replyDialog"
             android:text="@string/disqus_post"
             android:textColor="@color/mso_blue"
             android:layout_gravity="center_horizontal"
