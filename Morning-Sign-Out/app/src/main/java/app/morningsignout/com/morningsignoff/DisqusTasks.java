@@ -75,7 +75,7 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
             if (!comments.isEmpty()) commentsView.get().removeHeaderView(noComments);
 
             ListAdapter adapter = commentsView.get().getAdapter();
-            if (adapter == null)                                // Set new list of comments
+            if (adapter == null)         // Set new list of comments
                 commentsView.get().setAdapter(new DisqusAdapter(act.get(), comments));
             else if (adapter instanceof DisqusAdapter)          // Change data list of old adapter
                 ((DisqusAdapter) adapter).switchList(comments);
@@ -132,7 +132,7 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
                 noComments.setTextColor(Color.BLACK);
             }
 
-            commentsView.get().addHeaderView(noComments);
+            commentsView.get().addHeaderView(noComments, null, false);
         }
     }
 }

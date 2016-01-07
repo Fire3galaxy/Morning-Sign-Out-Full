@@ -1,7 +1,6 @@
 package app.morningsignout.com.morningsignoff;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -27,9 +26,6 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 public class DisqusMainActivity extends ActionBarActivity implements DisqusDialog.OnChangeCommentsListener {
@@ -59,18 +55,11 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
         // Action Bar: MSO Logo in middle, Up button as X
         setActionBarDetails();
 
-        final DisqusMainActivity ref = this; // FIXME
-
         // Views that will change later
         commentsView = (ListView) findViewById(R.id.listView_disqus);   // list of comments
         commentsView.setOnItemClickListener(new AdapterView.OnItemClickListener() { // FIXME
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                if (commentsView.getAdapter() != null) {
-//                    final DisqusAdapter adapter = (DisqusAdapter) commentsView.getAdapter();
-//                    adapter.selectItem(id, DisqusAdapter.OPTIONS_ROW);
-//                }
-
                if (commentsView.getAdapter() != null) {
                    final DisqusAdapter adapter = (DisqusAdapter) commentsView.getAdapter();
                    Comments comment = (Comments) adapter.getItem(position);
@@ -79,7 +68,6 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
                            DisqusDialog.createDisqusDialog(accessToken, comment);
                    dialog.show(DisqusMainActivity.this.getFragmentManager(), "disqus");
                }
-               //Log.d("","");
             }
         });
         actionButton = (Button) findViewById(R.id.button_disqus);       // login/post
@@ -235,15 +223,6 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
         editor.commit(); // chose main thread for logout. security?
     }
 
-    // view parameter needed for title.xml onClick()
-    // Currently not used because we shouldn't return home using button in comments.
-    // Use home button instead.
-    public void returnToParent(View view) {
-        Intent intent = new Intent(this, CategoryActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        startActivity(intent);
-    }
-
     // Note: X button is in style.xml
     void setActionBarDetails() {
         // ImageButton is Morning Sign Out logo, which sends user back to home screen (see XML)
@@ -319,16 +298,6 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
         commentText.setVisibility(View.VISIBLE);  // Add EditText widget
     }
 
-    public void hideBottomViews() {
-        if (commentText.getVisibility() != View.GONE) commentText.setVisibility(View.GONE);
-        if (actionButton.getVisibility() != View.GONE) actionButton.setVisibility(View.GONE);
-    }
-
-    public void showBottomViews() {
-        if (commentText.getVisibility() != View.VISIBLE) commentText.setVisibility(View.VISIBLE);
-        if (actionButton.getVisibility() != View.VISIBLE) actionButton.setVisibility(View.VISIBLE);
-    }
-
     @Override
     public void onChangeComments() {
         refreshComments(true);
@@ -337,14 +306,10 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
 
 class DisqusAdapter extends BaseAdapter {
     static final int INDENT = 20;
-    static final int COMMENTS_ROW = 0, OPTIONS_ROW = 1, SUBCOMMENT_ROW = 2;
-    static final int POST = 0, TEXT = 1;
 
     DisqusMainActivity act;
     ArrayList<Comments> commentsList;
     Resources resources;
-    long itemSelected = -1;
-    int extraViews = 0;
 
     DisqusAdapter(DisqusMainActivity act, ArrayList<Comments> commentsList) {
         this.act = act;
@@ -354,268 +319,58 @@ class DisqusAdapter extends BaseAdapter {
     }
 
     public void switchList(ArrayList<Comments> commentsList) {
-        Log.d("DisqusAdapter", "switchList");
         if (!this.commentsList.equals(commentsList)) {
             this.commentsList = commentsList;
             notifyDataSetChanged();
-            Log.d("DisqusAdapter", "switched!");
-            Log.d("","");
         }
-    }
-
-    void selectItem(long itemSelected, int typeSelected) {
-        // Clicking comment again after options or subcomment already inflated
-        // Note: if typeSelected is SUBCOMMENT, then selectItem() is called by reply button
-        // else, called by comment click listener
-        if (itemSelected == this.itemSelected && typeSelected == OPTIONS_ROW) {
-            this.itemSelected = -1;
-            this.extraViews = COMMENTS_ROW;
-        } else {
-            this.itemSelected = itemSelected;
-            this.extraViews = typeSelected;
-        }
-
-        notifyDataSetChanged();
-
-        // Remove or show action button and edittext normally at bottom based on extra views
-        if (extraViews == SUBCOMMENT_ROW)
-            act.hideBottomViews();
-        else
-            act.showBottomViews();
     }
 
     @Override
     public int getCount() {
-        return commentsList.size() + extraViews; // Change based on int extraViews
+        return commentsList.size();
     }
 
     @Override
     public Object getItem(int position) {
-        if (position <= itemSelected)
-            return commentsList.get(position);
-        else if (position > itemSelected + extraViews)
-            return commentsList.get(position - extraViews);
-        else
-            return "";
+        return commentsList.get(position);
     }
 
     // Based on index in comments list or which extra view it is
     @Override
     public long getItemId(int position) {
-        if (position <= itemSelected)
-            return position;
-        else if (position > itemSelected + extraViews)
-            return position - extraViews;
-
-        // All extra view ids are after ids of comments
-        return commentsList.size() - 1 + (position - itemSelected);
+        return position;
     }
 
     @Override
-    public boolean areAllItemsEnabled() {
-        return false;
-    }
-
-    @Override
-    public boolean isEnabled(int position) {
-        // True if comments, false if extra view
-        return position <= itemSelected || position > itemSelected + extraViews;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         DsqViewHolder viewHolder;
         LayoutInflater inflater = act.getLayoutInflater();
 
-        if (convertView == null) {
-            // Extra row
-            if (itemSelected != -1) {
-                if (extraViews == OPTIONS_ROW && position == itemSelected + 1) {
-                    View optionsRow = inflater.inflate(R.layout.options_row, parent, false);
-                    viewHolder = new DsqViewHolder();
-                    viewHolder.type = OPTIONS_ROW;
-                    optionsRow.setTag(viewHolder);
-
-                    Button reply = (Button) optionsRow.findViewById(R.id.button_reply);
-                    Button seeUser = (Button) optionsRow.findViewById(R.id.button_seeUser);
-                    Button delete = (Button) optionsRow.findViewById(R.id.button_delete);
-
-                    reply.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Toast.makeText(act, "Try Dialog for subcomment instead", Toast.LENGTH_SHORT).show();
-
-//                            selectItem(itemSelected, SUBCOMMENT_ROW);
-                        }
-                    });
-                    seeUser.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Uri profile = Uri.parse(
-                                    commentsList.get(Long.valueOf(itemSelected).intValue())
-                                            .profile_url);
-                            Intent visitProfile = new Intent(Intent.ACTION_VIEW, profile);
-                            act.startActivity(visitProfile);
-                        }
-                    });
-                    delete.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            new DisqusDeleteComment(act)
-                                    .execute(act.getAccessToken().access_token,
-                                            commentsList.get(Long.valueOf(itemSelected).intValue())
-                                                    .id);
-
-                            act.refreshComments(true);
-                        }
-                    });
-
-                    return optionsRow;
-                } else if (extraViews == 2) {
-                    Log.e("DisqusAdapter", "error: extra views = 2 and view was null");
-                    if (position == itemSelected + 1) {
-                        // Inflate post button
-                        View subcomment = inflater.inflate(R.layout.post_row, parent, false);
-
-                        DsqViewHolder holder = new DsqViewHolder();
-                        holder.type = SUBCOMMENT_ROW;
-                        holder.subtype = POST;
-                        subcomment.setTag(holder);
-
-                        return subcomment;
-                    } else if (position == itemSelected + 2) {
-                        // Inflate EditText
-                        View editText = inflater.inflate(R.layout.text_row, parent, false);
-
-                        DsqViewHolder holder = new DsqViewHolder();
-                        holder.type = SUBCOMMENT_ROW;
-                        holder.subtype = TEXT;
-                        editText.setTag(holder);
-
-                        return editText;
-                    }
-                }
-            }
-
-            // Comment row
+        if (convertView == null) {// Comment row
             convertView = inflater.inflate(R.layout.comment_row, parent, false);
             viewHolder = new DsqViewHolder();
             viewHolder.name = (TextView) convertView.findViewById(R.id.textView_userDsq);
             viewHolder.comment = (TextView) convertView.findViewById(R.id.textView_commentDsq);
-            viewHolder.type = COMMENTS_ROW;
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (DsqViewHolder) convertView.getTag();
-
-            if (itemSelected != -1) {
-                // Need new view
-                if (extraViews == OPTIONS_ROW && position == itemSelected + 1) {
-                    if (viewHolder.type == OPTIONS_ROW) // Is already an option row
-                        return convertView;
-
-                    final View optionsRow = inflater.inflate(R.layout.options_row, parent, false);
-                    viewHolder = new DsqViewHolder();
-                    viewHolder.type = OPTIONS_ROW;
-                    optionsRow.setTag(viewHolder);
-
-                    Button reply = (Button) optionsRow.findViewById(R.id.button_reply);
-                    Button seeUser = (Button) optionsRow.findViewById(R.id.button_seeUser);
-                    Button delete = (Button) optionsRow.findViewById(R.id.button_delete);
-
-                    reply.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) { // Reply to comment
-                            Toast.makeText(act, "Try Dialog for subcomment instead", Toast.LENGTH_SHORT).show();
-
-//                            selectItem(itemSelected, SUBCOMMENT_ROW);
-                        }
-                    });
-                    seeUser.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) { // See User's Disqus profile
-                            Uri profile = Uri.parse(
-                                    commentsList.get(Long.valueOf(itemSelected).intValue())
-                                            .profile_url);
-                            Intent visitProfile = new Intent(Intent.ACTION_VIEW, profile);
-                            act.startActivity(visitProfile);
-                        }
-                    });
-                    delete.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Log.d("","");
-                            new DisqusDeleteComment(act)
-                                    .execute(act.getAccessToken().access_token,
-                                            commentsList.get(Long.valueOf(itemSelected).intValue())
-                                                    .id);
-
-                            act.refreshComments(true);
-                        }
-                    });
-
-                    return optionsRow;
-                } else if (extraViews == 2) {
-                    if (position == itemSelected + 1) {
-                        if (viewHolder.type == SUBCOMMENT_ROW && viewHolder.subtype == POST)
-                            return convertView;
-
-                        // Inflate post button
-                        View subcomment = inflater.inflate(R.layout.post_row, parent, false);
-
-                        DsqViewHolder holder = new DsqViewHolder();
-                        holder.type = SUBCOMMENT_ROW;
-                        holder.subtype = POST;
-                        subcomment.setTag(holder);
-
-                        return subcomment;
-                    } else if (position == itemSelected + 2) {
-                        if (viewHolder.type == SUBCOMMENT_ROW && viewHolder.subtype == TEXT)
-                            return convertView;
-
-                        // Inflate EditText
-                        View editText = inflater.inflate(R.layout.text_row, parent, false);
-
-                        DsqViewHolder holder = new DsqViewHolder();
-                        holder.type = SUBCOMMENT_ROW;
-                        holder.subtype = TEXT;
-                        editText.setTag(holder);
-
-                        return editText;
-                    }
-                }
-            }
-
-            // Did not return from code above. Definitely NOT an extra row, must be a comment row
-            if (viewHolder.type != COMMENTS_ROW) {  // Used to be an extra row.
-                convertView = inflater.inflate(R.layout.comment_row, parent, false);
-                viewHolder = new DsqViewHolder();
-                viewHolder.name = (TextView) convertView.findViewById(R.id.textView_userDsq);
-                viewHolder.comment = (TextView) convertView.findViewById(R.id.textView_commentDsq);
-                viewHolder.type = COMMENTS_ROW;
-                convertView.setTag(viewHolder);
-            }
         }
 
-        // If extra views are in listview, then positions will be off from index for comments
-        int pos = position;
-        if (position > itemSelected + extraViews) pos = position - extraViews;
-        final int i = pos;
-
         // Padding will change for views based on where extra views are
-        int padding = getPxFromDp(INDENT * commentsList.get(i).indent);
+        int padding = getPxFromDp(INDENT * commentsList.get(position).indent);
 
         if (convertView.getPaddingLeft() != padding)                // A subcomment
             convertView.setPadding(padding, 0, 0, 0);
-        viewHolder.name.setText(commentsList.get(i).name);          // username
+        viewHolder.name.setText(commentsList.get(position).name);          // username
         viewHolder.name.setOnClickListener(new View.OnClickListener() { // Link to Disqus Profile
             @Override
             public void onClick(View v) {
-                Uri profile = Uri.parse(commentsList.get(i).profile_url);
+                Uri profile = Uri.parse(commentsList.get(position).profile_url);
                 Intent visitProfile = new Intent(Intent.ACTION_VIEW, profile);
                 act.startActivity(visitProfile);
             }
         });
-        viewHolder.comment.setText(commentsList.get(i).message);    // comment
+        viewHolder.comment.setText(commentsList.get(position).message);    // comment
 
         return convertView;
     }
@@ -628,7 +383,5 @@ class DisqusAdapter extends BaseAdapter {
     class DsqViewHolder {
         TextView name;
         TextView comment;
-        int type = 0;
-        int subtype = 0;
     }
 }
