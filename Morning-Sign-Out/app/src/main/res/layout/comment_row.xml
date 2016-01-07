@@ -20,8 +20,7 @@
         android:textColor="@android:color/black"
         android:paddingTop="4dp"
         android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:clickable="true" />
+        android:paddingRight="8dp" />
         <!--android:layout_toRightOf="@+id/imageView_profileDsq"-->
         <!--android:layout_toEndOf="@+id/imageView_profileDsq" />-->
 
