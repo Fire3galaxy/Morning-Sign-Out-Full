@@ -246,6 +246,7 @@ class DisqusDeleteComment extends AsyncTask<String, Void, Boolean> {
 
         DisqusDetails details = new DisqusDetails();
         return details.deleteComment(params[0], params[1]);
+        // FIXME: if login expires or delete fails do something to try again
     }
 
     @Override

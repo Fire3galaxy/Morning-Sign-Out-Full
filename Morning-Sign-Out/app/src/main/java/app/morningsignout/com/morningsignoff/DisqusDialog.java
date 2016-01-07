@@ -111,7 +111,6 @@ public class DisqusDialog extends DialogFragment {
                     case DELETE:
                         new DisqusDeleteComment(DisqusDialog.this.getActivity())
                                 .execute(accessToken.access_token, comment.id);
-                        // FIXME: If token is expired, do something
 
                         listener.onChangeComments();
                         break;
@@ -123,8 +122,12 @@ public class DisqusDialog extends DialogFragment {
         options.setAdapter(adapter);
 
         // "Reply to <Name of commenter>"
+        String replied = getResources().getString(R.string.disqus_dialog2);
+        if (comment.username.equals(accessToken.username)) replied += " yourself!";
+        else replied += " " + comment.name;
+
         TextView replyTo = (TextView) dialog.findViewById(R.id.textView_dialog2);
-        replyTo.setText(getResources().getString(R.string.disqus_dialog2) + " " + comment.name);
+        replyTo.setText(replied);
 
         // Need to set horizontal scrolling manually to make this work
         final EditText replyText = (EditText) dialog.findViewById(R.id.editText_reply);
