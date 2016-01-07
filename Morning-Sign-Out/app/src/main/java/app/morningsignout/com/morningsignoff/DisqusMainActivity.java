@@ -361,14 +361,6 @@ class DisqusAdapter extends BaseAdapter {
         if (convertView.getPaddingLeft() != padding)                // A subcomment
             convertView.setPadding(padding, 0, 0, 0);
         viewHolder.name.setText(commentsList.get(position).name);          // username
-        viewHolder.name.setOnClickListener(new View.OnClickListener() { // Link to Disqus Profile
-            @Override
-            public void onClick(View v) {
-                Uri profile = Uri.parse(commentsList.get(position).profile_url);
-                Intent visitProfile = new Intent(Intent.ACTION_VIEW, profile);
-                act.startActivity(visitProfile);
-            }
-        });
         viewHolder.comment.setText(commentsList.get(position).message);    // comment
 
         return convertView;
