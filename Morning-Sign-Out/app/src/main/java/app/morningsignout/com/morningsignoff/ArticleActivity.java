@@ -18,11 +18,13 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import java.io.ByteArrayInputStream;
@@ -76,6 +78,23 @@ public class ArticleActivity extends ActionBarActivity {
 
             // WEBVIEW - Getting article from URL and stripping away extra parts of website for better reading
             webView = (CustomWebView) findViewById(R.id.webView_article);
+            final ProgressBar loadPage = (ProgressBar) findViewById(R.id.progressBar_article);
+            webView.setWebChromeClient(new WebChromeClient() { // Progress bar
+                @Override
+                public void onProgressChanged(WebView v, int newProgress) {
+                    if (newProgress < 100) {
+                        if (loadPage.getVisibility() == View.GONE)
+                            loadPage.setVisibility(View.VISIBLE);
+
+                        loadPage.setProgress(newProgress);
+                    } else if (newProgress == 100) {
+                        loadPage.setProgress(newProgress);
+
+                        if (loadPage.getVisibility() == View.VISIBLE)
+                            loadPage.setVisibility(View.GONE);
+                    }
+                }
+            });
             blockZoom(); // True for images, false for articles.
             webViewClient = new ArticleWebViewClient(this);
             webView.setWebViewClient(webViewClient);

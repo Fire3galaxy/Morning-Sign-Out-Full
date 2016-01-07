@@ -10,7 +10,7 @@
     android:background="@android:color/transparent"
     android:animateLayoutChanges="true">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="9">
@@ -20,12 +20,19 @@
             android:layout_height="match_parent"
             android:id="@+id/webView_article"
             android:layout_gravity="center" />
-    </LinearLayout>
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/progressBar_article"
+            android:visibility="gone"
+            android:layout_gravity="center" />
+    </FrameLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"
-        android:layout_weight="0"
         android:id="@+id/container_articleBar"
         android:layout_gravity="center_horizontal"
         android:background="@color/mso_blue"

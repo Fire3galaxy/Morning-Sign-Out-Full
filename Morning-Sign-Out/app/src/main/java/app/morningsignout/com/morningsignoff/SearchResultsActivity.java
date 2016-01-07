@@ -1,12 +1,10 @@
 package app.morningsignout.com.morningsignoff;
 
-import android.annotation.TargetApi;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
@@ -14,26 +12,51 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.webkit.WebResourceRequest;
+import android.view.View;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
 
 public class SearchResultsActivity extends ActionBarActivity {
     SearchView searchView;
+    WebView webView;
+    SearchWebViewClient searchWebViewClient;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         super.getSupportActionBar().setDisplayHomeAsUpEnabled(true); //made back arrow in top left corner
+
+        // Initialize webview with WebViewClient and WebChromeClient
+        webView = (WebView) findViewById(R.id.webView_search);
+        searchWebViewClient = new SearchWebViewClient(getIntent().getStringExtra(SearchManager.QUERY));
+        webView.setWebViewClient(searchWebViewClient);
+
+        final ProgressBar loadPage = (ProgressBar) findViewById(R.id.progressBar_search);
+        webView.setWebChromeClient(new WebChromeClient() { // Progress bar
+            @Override
+            public void onProgressChanged(WebView v, int newProgress) {
+                if (newProgress < 100) {
+                    if (loadPage.getVisibility() == View.GONE)
+                        loadPage.setVisibility(View.VISIBLE);
+
+                    loadPage.setProgress(newProgress);
+                } else if (newProgress == 100) {
+                    loadPage.setProgress(newProgress);
+
+                    if (loadPage.getVisibility() == View.VISIBLE)
+                        loadPage.setVisibility(View.GONE);
+                }
+            }
+        });
 
         handleSearch(getIntent());
     }
@@ -82,15 +105,13 @@ public class SearchResultsActivity extends ActionBarActivity {
 
         // Create search url and load webView
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            setTitle(intent.getStringExtra(SearchManager.QUERY)); // In actionbar
-            String searchURI = getURI(intent.getStringExtra(SearchManager.QUERY));
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            setTitle(query); // In actionbar
+            String searchURI = getURI(query);
 
             // Open webView with search results of query
             if (searchURI != null) {
-                WebView webView = (WebView) findViewById(R.id.webView_search);
-                WebViewClient webViewClient = new SearchWebViewClient(intent.getStringExtra(SearchManager.QUERY));
-                webView.setWebViewClient(webViewClient);
-
+                searchWebViewClient.setQuery(query);
                 new URLToMobileArticle(webView, true).execute(searchURI);
             } else {
                 Log.e("Search", "Error: Failed Search (null string)");
@@ -134,6 +155,10 @@ class SearchWebViewClient extends WebViewClient {
 
     public SearchWebViewClient(String search) {
         query = search;
+    }
+
+    public void setQuery(String query) {
+        this.query = query;
     }
 
     @Override
