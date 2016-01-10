@@ -4,13 +4,21 @@
     android:layout_height="match_parent"
     android:padding="5dp">
 
+    <EditText
+        android:id="@id/search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/action_search"
+        android:layout_alignParentTop="true"/>
+
     <GridView
         android:id="@+id/meetTheTeamGridView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
         android:numColumns="3"
-        android:stretchMode="columnWidth" />
+        android:stretchMode="columnWidth"
+        android:layout_below="@+id/search_bar"/>
 
 
 </RelativeLayout>
