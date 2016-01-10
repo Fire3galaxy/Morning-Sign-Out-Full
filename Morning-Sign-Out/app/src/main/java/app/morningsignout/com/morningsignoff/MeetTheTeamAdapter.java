@@ -13,22 +13,22 @@ import android.widget.TextView;
  */
 public class MeetTheTeamAdapter extends BaseAdapter {
     Context context;
-    private String[] captions = {
+    private final String[] captions = {
             "Executive", "General Administration", "Research",
             "Wellness", "Medicine", "Public Health",
             "Healthcare", "Web Team", "Visuals Team",
-            "Marketing Team", "Finance Team", "Operations and Admin"
+            "Marketing Team", "Finance Team", "Operations & Admin"
     };
 
-    private Integer[] images = {
+    private final Integer[] images = {
 //            R.drawable.category_featured, R.drawable.category_humanities, R.drawable.category_research,
 //            R.drawable.category_wellness, R.drawable.category_medicine, R.drawable.category_public_health,
 //            R.drawable.category_healthcare, R.drawable.category_web_team, R.drawable.category_visuals_team,
 //            R.drawable.category_marketing, R.drawable.category_finance, R.drawable.category_humanities
-            R.drawable.category_featured, R.drawable.category_humanities, R.drawable.category_research,
-            R.drawable.category_wellness, R.drawable.category_medicine, R.drawable.category_public_health,
-            R.drawable.category_healthcare, R.drawable.web_team, R.drawable.visuals_team,
-            R.drawable.marketing, R.drawable.finance, R.drawable.category_humanities
+            R.drawable.executive_team, R.drawable.admin_team, R.drawable.research_team,
+            R.drawable.wellness_team, R.drawable.medicine_team, R.drawable.public_health_team,
+            R.drawable.healthcare_team, R.drawable.web_team, R.drawable.visuals_team,
+            R.drawable.marketing_team, R.drawable.finance_team, R.drawable.admin_team
     };
 
     public MeetTheTeamAdapter(Context c) {
@@ -55,8 +55,8 @@ public class MeetTheTeamAdapter extends BaseAdapter {
             LayoutInflater inflater = ((MeetTheTeamActivity) context).getLayoutInflater();
             row = inflater.inflate(R.layout.meet_the_team_row, parent, false);
 
-            TextView textViewTitle = (TextView) row.findViewById(R.id.textView);
-            ImageView imageView = (ImageView) row.findViewById(R.id.imageView);
+            TextView textViewTitle = (TextView) row.findViewById(R.id.textView_mtt);
+            ImageView imageView = (ImageView) row.findViewById(R.id.imageView_mtt);
 
             textViewTitle.setText(this.captions[position]);
             imageView.setImageResource(this.images[position]);

@@ -15,7 +15,6 @@ import android.view.KeyEvent;
  * Created by tanvikamath on 12/26/15.
  */
 public class MeetTheTeamActivity extends ActionBarActivity {
-
     EditText searchBar;
     GridView gridView;
     MeetTheTeamAdapter gridViewCustomAdapter;
@@ -33,7 +32,7 @@ public class MeetTheTeamActivity extends ActionBarActivity {
                 if (actionId == EditorInfo.IME_ACTION_SEND) {
                     String query = v.getText().toString();
                     if (!query.isEmpty()) {
-
+                        Log.d("","");
                     }
                 }
                 return false;

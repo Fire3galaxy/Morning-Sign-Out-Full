@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="5dp">
+    android:orientation="vertical">
 
     <EditText
         android:id="@id/search_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/action_search"
-        android:layout_alignParentTop="true"/>
+        android:hint="@string/action_search"/>
 
     <GridView
         android:id="@+id/meetTheTeamGridView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="9"
         android:gravity="center"
-        android:numColumns="3"
-        android:stretchMode="columnWidth"
-        android:layout_below="@+id/search_bar"/>
+        android:columnWidth="110dp"
+        android:numColumns="auto_fit"
+        android:stretchMode="spacingWidthUniform"
+        android:scrollbars="none"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" />
 
 
-</RelativeLayout>
+</LinearLayout>
