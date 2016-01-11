@@ -57,23 +57,7 @@ public class MTTListViewActivity extends ActionBarActivity {
             }
         });
 
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null);
-        ib.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent categoryPageIntent = new Intent(getApplicationContext(), CategoryActivity.class);
-                categoryPageIntent.putExtra(Intent.EXTRA_TITLE, 0);
-                finish();
-                startActivity(categoryPageIntent);
-            }
-        });
-        ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);
-        this.getSupportActionBar().setCustomView(ib, params);
-
-        this.getSupportActionBar().setDisplayShowCustomEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setupActionBar();
     }
 
     private void goToLink(int position) {
@@ -104,5 +88,15 @@ public class MTTListViewActivity extends ActionBarActivity {
     // view parameter needed for title.xml onClick()
     public void returnToParent(View view) {
         finish();
+    }
+
+    void setupActionBar() {
+        ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null);
+        ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);
+        this.getSupportActionBar().setCustomView(ib, params);
+
+        this.getSupportActionBar().setDisplayShowTitleEnabled(false);
+        this.getSupportActionBar().setDisplayShowCustomEnabled(true);
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 }
