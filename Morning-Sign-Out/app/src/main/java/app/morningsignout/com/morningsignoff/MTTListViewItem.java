@@ -6,18 +6,18 @@ import android.os.Parcelable;
 /**
  * Created by liukwarm on 10/24/15.
  */
-public class ExecutiveListItem implements Parcelable {
+public class MTTListViewItem implements Parcelable {
     public String name;
     public String position;
     public String hyperlink;
 
-    public ExecutiveListItem (String name, String position, String hyperlink) {
+    public MTTListViewItem(String name, String position, String hyperlink) {
         this.name = name;
         this.position = position;
         this.hyperlink = hyperlink;
     }
 
-    private ExecutiveListItem(Parcel in) {
+    private MTTListViewItem(Parcel in) {
         this.name = in.readString();
         this.position = in.readString();
         this.hyperlink = in.readString();
@@ -33,14 +33,14 @@ public class ExecutiveListItem implements Parcelable {
         out.writeString(hyperlink);
     }
 
-    public static final Parcelable.Creator<ExecutiveListItem> CREATOR
-            = new Parcelable.Creator<ExecutiveListItem>() {
-        public ExecutiveListItem createFromParcel(Parcel in) {
-            return new ExecutiveListItem(in);
+    public static final Parcelable.Creator<MTTListViewItem> CREATOR
+            = new Parcelable.Creator<MTTListViewItem>() {
+        public MTTListViewItem createFromParcel(Parcel in) {
+            return new MTTListViewItem(in);
         }
 
-        public ExecutiveListItem[] newArray(int size) {
-            return new ExecutiveListItem[size];
+        public MTTListViewItem[] newArray(int size) {
+            return new MTTListViewItem[size];
         }
     };
 }

@@ -302,17 +302,17 @@ public class CategoryActivity extends ActionBarActivity {
         mDrawerLayout.closeDrawer(mDrawerList);
     }
 
-    // courtesy of http://developer.android.com/training/monitoring-device-state/connectivity-monitoring.html
-    public boolean checkForInternet() {
-        ConnectivityManager cm =
-                (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        return activeNetwork != null &&
-                activeNetwork.isConnectedOrConnecting();
-    }
-
-    public String getCurrentCategoryUrl() {
-        return categories_urls[position];
-    }
+//    // courtesy of http://developer.android.com/training/monitoring-device-state/connectivity-monitoring.html
+//    public boolean checkForInternet() {
+//        ConnectivityManager cm =
+//                (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+//
+//        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+//        return activeNetwork != null &&
+//                activeNetwork.isConnectedOrConnecting();
+//    }
+//
+//    public String getCurrentCategoryUrl() {
+//        return categories_urls[position];
+//    }
 }

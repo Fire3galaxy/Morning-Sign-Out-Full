@@ -15,8 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -25,7 +23,7 @@ import java.util.ArrayList;
 public class MTTWebViewActivity extends ActionBarActivity {
     // Need ExecutiveListItem list for previous/next buttons
     // Need index of which person on list is picked
-    ArrayList<ExecutiveListItem> teamArray;
+    ArrayList<MTTListViewItem> teamArray;
     int index;
 
     @Override
@@ -46,8 +44,8 @@ public class MTTWebViewActivity extends ActionBarActivity {
         if (getIntent() != null) {
             Intent ref = getIntent();
 
-            teamArray = ref.getParcelableArrayListExtra(ExecutiveActivity.EXTRA_LIST);
-            index = ref.getIntExtra(ExecutiveActivity.EXTRA_INDEX, 0);
+            teamArray = ref.getParcelableArrayListExtra(MTTListViewActivity.EXTRA_LIST);
+            index = ref.getIntExtra(MTTListViewActivity.EXTRA_INDEX, 0);
         }
 
         // Set up ViewPager for swiping left/right to other people

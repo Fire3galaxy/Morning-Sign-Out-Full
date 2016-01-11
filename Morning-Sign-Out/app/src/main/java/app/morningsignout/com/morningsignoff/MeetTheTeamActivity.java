@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -78,7 +77,7 @@ public class MeetTheTeamActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void setTeamsMap(final Map<String, ArrayList<ExecutiveListItem>> fromTask) {
+    public void setTeamsMap(final Map<String, ArrayList<MTTListViewItem>> fromTask) {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -87,7 +86,7 @@ public class MeetTheTeamActivity extends ActionBarActivity {
                 MeetTheTeamAdapter.TeamTitle team =
                         (MeetTheTeamAdapter.TeamTitle) gridViewCustomAdapter.getItem(position);
 
-                Intent intent = new Intent(MeetTheTeamActivity.this, ExecutiveActivity.class);
+                Intent intent = new Intent(MeetTheTeamActivity.this, MTTListViewActivity.class);
                 intent.putParcelableArrayListExtra(FetchMeetTheTeamTask.TEAM_KEY, fromTask.get(team.realName));
                 intent.putExtra(FetchMeetTheTeamTask.NAME_KEY, team.caption);
                 startActivity(intent);
@@ -101,7 +100,7 @@ public class MeetTheTeamActivity extends ActionBarActivity {
     }
 
     public void cancel() {
-        Toast.makeText(this, "Could not finish request. Is there an internet issue?", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Could not finish request, try again later?", Toast.LENGTH_SHORT).show();
         finish();
     }
 

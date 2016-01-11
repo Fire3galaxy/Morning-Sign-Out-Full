@@ -1,9 +1,6 @@
 package app.morningsignout.com.morningsignoff;
 
-import android.content.Intent;
 import android.os.AsyncTask;
-import android.view.View;
-import android.widget.Button;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -20,7 +17,7 @@ import java.util.Map;
 /**
  * Created by Daniel on 10/30/2015.
  */
-public class FetchMeetTheTeamTask extends AsyncTask<Void, Void, Map<String, ArrayList<ExecutiveListItem>>> {
+public class FetchMeetTheTeamTask extends AsyncTask<Void, Void, Map<String, ArrayList<MTTListViewItem>>> {
     WeakReference<MeetTheTeamActivity> refFromCallingActivity;
 
     static final public String TEAM_KEY = "team";
@@ -33,12 +30,12 @@ public class FetchMeetTheTeamTask extends AsyncTask<Void, Void, Map<String, Arra
     }
 
     @Override
-    protected Map<String, ArrayList<ExecutiveListItem>> doInBackground(Void... params) {
+    protected Map<String, ArrayList<MTTListViewItem>> doInBackground(Void... params) {
         return getMembers();
     }
 
     @Override
-    protected void onPostExecute(final Map<String, ArrayList<ExecutiveListItem>> members) {
+    protected void onPostExecute(final Map<String, ArrayList<MTTListViewItem>> members) {
         // Assign map to variable of calling activity. ENSURE THAT THIS ASSIGNMENT IS SYNCED.
         if (refFromCallingActivity.get() != null) {
             if (members != null) {
@@ -49,26 +46,26 @@ public class FetchMeetTheTeamTask extends AsyncTask<Void, Void, Map<String, Arra
         }
     }
 
-    private Map<String, ArrayList<ExecutiveListItem>> getMembers() {
+    private Map<String, ArrayList<MTTListViewItem>> getMembers() {
         try {
-            Map<String, ArrayList<ExecutiveListItem>> members = new HashMap<>();
+            Map<String, ArrayList<MTTListViewItem>> members = new HashMap<>();
             Document doc = Jsoup.connect("http://morningsignout.com/team/").get();
             Elements groups = doc.getElementsByClass("user-group");
 
             // iterates through category groups
             for (Element e : groups) {
                 String category = e.select("h2").first().text();
-                members.put(category, new ArrayList<ExecutiveListItem>()); // Each Team Category
+                members.put(category, new ArrayList<MTTListViewItem>()); // Each Team Category
 
                 // efficiency, less calls to get(list)
-                List<ExecutiveListItem> reference = members.get(category);
+                List<MTTListViewItem> reference = members.get(category);
 
                 // iterates through users in each category
                 for (Element u : e.getElementsByClass("user")) {
                     Element aTag = u.select("a").first();
                     Element authorInfo = aTag.getElementsByClass("author-information").first();
 
-                    ExecutiveListItem t = new ExecutiveListItem(authorInfo.select("h1").first().text(), // Name
+                    MTTListViewItem t = new MTTListViewItem(authorInfo.select("h1").first().text(), // Name
                             authorInfo.select("h2").first().text(),                                     // Position
                             aTag.attr("href"));                                                         // Hyperlink
 

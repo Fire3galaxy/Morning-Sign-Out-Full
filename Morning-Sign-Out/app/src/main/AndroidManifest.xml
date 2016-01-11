@@ -85,7 +85,7 @@
             android:configChanges="orientation|screenSize|keyboardHidden" />
 
         <activity
-            android:name=".ExecutiveActivity"/>
+            android:name=".MTTListViewActivity"/>
 
         <activity
             android:name=".MTTWebViewActivity"

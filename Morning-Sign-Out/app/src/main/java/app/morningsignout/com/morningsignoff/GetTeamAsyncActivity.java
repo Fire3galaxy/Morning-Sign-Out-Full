@@ -16,7 +16,7 @@ public class GetTeamAsyncActivity extends ActionBarActivity {
         There is a layout file for this file in the res folder.
         FetchMeetTheTeamTask changes the button in this activity, is given argument in constructor for this button.
       */
-    Map<String, ArrayList<ExecutiveListItem>> teams;
+    Map<String, ArrayList<MTTListViewItem>> teams;
 
     // set content view in this activity, register new activities in manifest, fixed constructor issue in executiveActivity
 
@@ -29,7 +29,7 @@ public class GetTeamAsyncActivity extends ActionBarActivity {
         //new FetchMeetTheTeamTask(this, toKevinActivity).execute();
     }
 
-    public void setTeamsMap(Map<String, ArrayList<ExecutiveListItem>> fromTask) {
+    public void setTeamsMap(Map<String, ArrayList<MTTListViewItem>> fromTask) {
         teams = fromTask;
     }
 }

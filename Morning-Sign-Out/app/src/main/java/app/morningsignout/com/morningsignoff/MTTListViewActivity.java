@@ -1,8 +1,5 @@
 package app.morningsignout.com.morningsignoff;
 
-import android.app.SearchManager;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -17,26 +14,22 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by liukwarm on 10/24/15.
  */
-public class ExecutiveActivity extends ActionBarActivity {
+public class MTTListViewActivity extends ActionBarActivity {
 
     private SearchView searchView;
-    private ArrayList<ExecutiveListItem> list;
+    private ArrayList<MTTListViewItem> list;
     public static String EXTRA_LIST = "list";
     public static String EXTRA_INDEX = "index";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_executive);
+        setContentView(R.layout.activity_mttlistview);
 
         String teamName = getIntent().getExtras().getString(FetchMeetTheTeamTask.NAME_KEY);
 
@@ -54,7 +47,7 @@ public class ExecutiveActivity extends ActionBarActivity {
         TextView title = (TextView)findViewById(R.id.title);
         title.setText(teamName);
 
-        lv.setAdapter(new ExecutiveListAdapter(getApplicationContext(),
+        lv.setAdapter(new MTTListViewAdapter(getApplicationContext(),
                 list));
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -92,17 +85,8 @@ public class ExecutiveActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_category, menu);
-        getMenuInflater().inflate(R.menu.menu_category, menu);
-        /* Search results in new SearchResultsActivity, clicked article passed back to articleActivity
-           Associate searchable configuration with the SearchView */
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        getMenuInflater().inflate(R.menu.menu_justlogo, menu);
 
-        ComponentName componentName = new ComponentName(this, SearchResultsActivity.class);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
-//        return super.onCreateOptionsMenu(menu);
         return true;
     }
 
