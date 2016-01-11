@@ -56,7 +56,7 @@ public class MeetTheTeamActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_grid_view, menu);
+        getMenuInflater().inflate(R.menu.menu_justlogo, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -68,7 +68,7 @@ public class MeetTheTeamActivity extends ActionBarActivity {
     void setupActionBar() {
         // ImageButton is Morning Sign Out logo, which sends user back to home screen (see XML)
         // Setting imageButton to center of actionbar
-        ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title, null);
+        ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_disqus, null);
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);
         this.getSupportActionBar().setCustomView(ib, params);
 
