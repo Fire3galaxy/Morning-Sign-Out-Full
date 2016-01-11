@@ -13,6 +13,13 @@ import android.widget.TextView;
  */
 public class MeetTheTeamAdapter extends BaseAdapter {
     Context context;
+    private final String[] realNames = {
+            "Executive", "General Administration", "Category: Research",
+            "Category: Wellness", "Category: Medicine", "Category: Public Health",
+            "Category: Healthcare", "Web Team", "Visuals Team",
+            "Marketing Team", "Finance Team", "Operations & Admin"
+    };
+
     private final String[] captions = {
             "Executive", "General Administration", "Research",
             "Wellness", "Medicine", "Public Health",
@@ -40,11 +47,11 @@ public class MeetTheTeamAdapter extends BaseAdapter {
     }
 
     public Object getItem(int position) {
-        return null;
+        return new TeamTitle(realNames[position], captions[position]);
     }
 
     public long getItemId(int position) {
-        return 0;
+        return position;
     }
 
     @Override
@@ -74,5 +81,15 @@ public class MeetTheTeamAdapter extends BaseAdapter {
     private class MTTViewHolder {
         TextView textViewTitle;
         ImageView imageView;
+    }
+
+    public class TeamTitle {
+        String realName;
+        String caption;
+
+        public TeamTitle(String realName, String caption) {
+            this.realName = realName;
+            this.caption = caption;
+        }
     }
 }

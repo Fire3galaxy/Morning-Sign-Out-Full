@@ -11,19 +11,27 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.view.KeyEvent;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Created by tanvikamath on 12/26/15.
  */
 public class MeetTheTeamActivity extends ActionBarActivity {
-    EditText searchBar;
     GridView gridView;
     MeetTheTeamAdapter gridViewCustomAdapter;
+    LinearLayout mttLayout;
+    ProgressBar taskProgress;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,7 +40,7 @@ public class MeetTheTeamActivity extends ActionBarActivity {
         setupActionBar();
 
         // Background of edittext, menu of actionbar to disqus (blank) menu, asynctask for mso staff
-        searchBar = (EditText) findViewById(R.id.search_bar);
+        EditText searchBar = (EditText) findViewById(R.id.search_bar);
         searchBar.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -52,6 +60,11 @@ public class MeetTheTeamActivity extends ActionBarActivity {
         gridViewCustomAdapter = new MeetTheTeamAdapter(this);
         // Set the Adapter to GridView
         gridView.setAdapter(gridViewCustomAdapter);
+
+        mttLayout = (LinearLayout) findViewById(R.id.layout_mtt);
+        taskProgress = (ProgressBar) findViewById(R.id.progressBar_mttTask);
+
+        new FetchMeetTheTeamTask(this).execute();
     }
 
     @Override
@@ -65,10 +78,37 @@ public class MeetTheTeamActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void setTeamsMap(final Map<String, ArrayList<ExecutiveListItem>> fromTask) {
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // NOTE: The exact order of the team is hardcoded, button click is assumed
+                // to correctly correspond to team
+                MeetTheTeamAdapter.TeamTitle team =
+                        (MeetTheTeamAdapter.TeamTitle) gridViewCustomAdapter.getItem(position);
+
+                Intent intent = new Intent(MeetTheTeamActivity.this, ExecutiveActivity.class);
+                intent.putParcelableArrayListExtra(FetchMeetTheTeamTask.TEAM_KEY, fromTask.get(team.realName));
+                intent.putExtra(FetchMeetTheTeamTask.NAME_KEY, team.caption);
+                startActivity(intent);
+            }
+        });
+    }
+
+    public void showActivity() {
+        taskProgress.setVisibility(View.GONE);
+        mttLayout.setVisibility(View.VISIBLE);
+    }
+
+    public void cancel() {
+        Toast.makeText(this, "Could not finish request. Is there an internet issue?", Toast.LENGTH_SHORT).show();
+        finish();
+    }
+
     void setupActionBar() {
         // ImageButton is Morning Sign Out logo, which sends user back to home screen (see XML)
         // Setting imageButton to center of actionbar
-        ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_disqus, null);
+        ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null);
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);
         this.getSupportActionBar().setCustomView(ib, params);
 

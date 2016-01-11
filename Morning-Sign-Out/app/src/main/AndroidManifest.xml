@@ -69,8 +69,7 @@
 
         <activity
             android:name=".AboutMSOActivity"
-            android:parentActivityName=".CategoryActivity">
-        </activity>
+            android:parentActivityName=".CategoryActivity"/>
 
         <activity
             android:name=".DisqusMainActivity"
@@ -85,6 +84,12 @@
             android:theme="@style/DisqusTheme"
             android:configChanges="orientation|screenSize|keyboardHidden" />
 
+        <activity
+            android:name=".ExecutiveActivity"/>
+
+        <activity
+            android:name=".MTTWebViewActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
     </application>
 
 </manifest>

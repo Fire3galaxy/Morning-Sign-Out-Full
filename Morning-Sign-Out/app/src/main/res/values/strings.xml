@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <!--App stuff asa whole or outdated stuff-->
     <string name="app_name">Morning Sign Out</string>
 
     <!--Menu, actionbar, or bottom bar of articles-->
@@ -39,6 +39,9 @@
     <string name="mtt_search_hint">Search for names</string>
 
     <string name="category_refresh">If articles do not load, drag down to refresh</string>
+    <string name="button_mttPrev">Prev</string>
+    <string name="button_mttNext">Next</string>
+
     <string name="error">Something went wrong. Please report this bug to the developers in the play
         store comment section.</string>
     <string name="error_no_internet_1">We cannot connect to</string>
@@ -90,6 +93,26 @@
         <item>Reply</item>
         <item>See User</item>
         <item>Delete</item>
+    </string-array>
+
+    <string-array name ="executive_names">
+        <item>Andrew Lee</item>
+        <item>Asal Homayouni</item>
+        <item>Gloria Ye</item>
+        <item>Katy Cohen</item>
+        <item>Kevin Jiang</item>
+        <item>Sofia Dhanani</item>
+        <item>Stephanie Chang</item>
+    </string-array>
+
+    <string-array name ="executive_positions">
+        <item>Executive Chairman and Founder</item>
+        <item>Chief Operating Officer</item>
+        <item>Director of Development and Growth Analytics</item>
+        <item>Creative Director</item>
+        <item>Chief Technical Director</item>
+        <item>Chief Executive Officer</item>
+        <item>Director of Operations and Administration</item>
     </string-array>
 
     <string name="description_error_no_internet">Cannot connect to internet</string>

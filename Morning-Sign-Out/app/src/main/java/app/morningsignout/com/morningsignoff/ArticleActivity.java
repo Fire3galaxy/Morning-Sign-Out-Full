@@ -42,6 +42,7 @@ public class ArticleActivity extends ActionBarActivity {
     private RelativeLayout relativeLayout;
 
     private WebView webView;
+    private ProgressBar loading;
     private ArticleWebViewClient webViewClient;
 
     private SearchView searchView;
@@ -99,8 +100,22 @@ public class ArticleActivity extends ActionBarActivity {
             webViewClient = new ArticleWebViewClient(this);
             webView.setWebViewClient(webViewClient);
 
-            // ARTICLE BAR
-            //      Setting relativeLayout
+            // Loading progressBar whenever a page is loading
+            loading = (ProgressBar) findViewById(R.id.progressBar_article);
+            webView.setWebChromeClient(new WebChromeClient() {
+                @Override
+                public void onProgressChanged(WebView view, int newProgress) {
+                    if (newProgress < 100) {
+                        if (loading.getVisibility() != View.VISIBLE)
+                            loading.setVisibility(View.VISIBLE);
+
+                        loading.setProgress(newProgress);
+                    } else
+                        loading.setVisibility(View.GONE);
+                }
+            });
+
+            // Setting relativeLayout
             relativeLayout = (RelativeLayout) findViewById(R.id.container_articleBar);
 
             //      Setting up objectAnimators for articleBar's show/hide animation
@@ -193,7 +208,9 @@ public class ArticleActivity extends ActionBarActivity {
                 if (webView != null && webView.canGoBack())    // Go back in webView history
                     webView.goBack();
                 else                     // Return to front page (without recreating parent)
-                    returnToParent(null);
+                    finish();
+                    //super.onBackPressed(); // Changed to support travel from meet the team, FIXME: Test this with normal behavior
+//                    returnToParent(null);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -440,12 +457,8 @@ class ArticleWebViewClient extends WebViewClient {
                 || requestUrl.getPathSegments().get(0).matches(".*\\.[a-zA-Z]+"))
             return false;
 
-        // article
-        if (requestUrl.getPathSegments().size() == 1)
-            return true;
-            // date/author/tag
-        else
-            return false;
+        // article vs date/author/tag
+        return (requestUrl.getPathSegments().size() == 1);
     }
 
     boolean isImage(String url) {
