@@ -27,6 +27,8 @@
     <string name="search_hint">Search MorningSignOut</string>
 
     <string name="meet_the_team">Meet the Team</string>
+    <string name="mso_staff">MSO Staff</string>
+    <string name="mtt_row_content_description">Morning Sign Out Staff Department</string>
 
     <string name="category_refresh">If articles do not load, drag down to refresh</string>
     <string name="error">Something went wrong. Please report this bug to the developers in the play

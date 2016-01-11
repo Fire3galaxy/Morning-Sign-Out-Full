@@ -44,8 +44,7 @@
             android:label="@string/meet_the_team"
             android:parentActivityName=".CategoryActivity"
             android:launchMode="singleTop"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:uiOptions="splitActionBarWhenNarrow">
+            android:configChanges="orientation|keyboardHidden|screenSize">
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -56,8 +55,7 @@
             android:name=".ArticleActivity"
             android:label="@string/article"
             android:parentActivityName=".CategoryActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:uiOptions="splitActionBarWhenNarrow">
+            android:configChanges="orientation|keyboardHidden|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="app.morningsignout.com.morningsignoff.CategoryActivity" />

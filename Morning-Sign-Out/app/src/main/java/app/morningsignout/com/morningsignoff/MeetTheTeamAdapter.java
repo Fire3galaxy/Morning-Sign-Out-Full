@@ -50,18 +50,29 @@ public class MeetTheTeamAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
+        MTTViewHolder viewHolder;
 
         if (row == null) {
+            viewHolder = new MTTViewHolder();
+
             LayoutInflater inflater = ((MeetTheTeamActivity) context).getLayoutInflater();
             row = inflater.inflate(R.layout.meet_the_team_row, parent, false);
 
-            TextView textViewTitle = (TextView) row.findViewById(R.id.textView_mtt);
-            ImageView imageView = (ImageView) row.findViewById(R.id.imageView_mtt);
-
-            textViewTitle.setText(this.captions[position]);
-            imageView.setImageResource(this.images[position]);
+            viewHolder.textViewTitle = (TextView) row.findViewById(R.id.textView_mtt);
+            viewHolder.imageView = (ImageView) row.findViewById(R.id.imageView_mtt);
+            row.setTag(viewHolder);
+        } else {
+            viewHolder = (MTTViewHolder) row.getTag();
         }
+
+        viewHolder.textViewTitle.setText(this.captions[position]);
+        viewHolder.imageView.setImageResource(this.images[position]);
+
         return row;
     }
 
+    private class MTTViewHolder {
+        TextView textViewTitle;
+        ImageView imageView;
+    }
 }
