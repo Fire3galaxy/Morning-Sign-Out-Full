@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/mso_staff"
+        android:id="@+id/textView_staff"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@android:color/black"
+        android:textStyle="bold"
+        android:textSize="@dimen/abc_text_size_headline_material"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp" />
+
+    <EditText
+        android:id="@id/search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/action_search"/>
+
+    <GridView
+        android:id="@+id/meetTheTeamGridView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="9"
+        android:gravity="center"
+        android:columnWidth="110dp"
+        android:numColumns="auto_fit"
+        android:stretchMode="spacingWidthUniform"
+        android:scrollbars="none"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" />
+
+
+</LinearLayout>

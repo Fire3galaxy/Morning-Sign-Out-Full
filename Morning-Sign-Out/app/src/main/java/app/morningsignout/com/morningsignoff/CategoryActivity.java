@@ -292,6 +292,8 @@ public class CategoryActivity extends ActionBarActivity {
             startActivity(AboutMSOActivity);
         } else if (position == categories_urls.length + 1) {
             // categories_urls.length + 1 -> Meet the Team
+            Intent intent = new Intent(this, MeetTheTeamActivity.class);
+            startActivity(intent);
         }
 
         // Highlight the selected item, update the title, and close the drawer
