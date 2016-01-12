@@ -389,8 +389,7 @@ class ArticleWebViewClient extends WebViewClient {
 
         /* Not from morningsignout, e.g. googleapis, gstatic, or gravatar
          * or an imageViewReference/theme/plugin from wordpress
-         * or a .* file, e.g. favicon.ico
-         */
+         * or a .* file, e.g. favicon.ico */
         if (!requestUrl.getHost().endsWith("morningsignout.com")
                 || requestUrl.getPathSegments().get(0).equals("wp-content")
                 || requestUrl.getPathSegments().get(0).matches(".*\\.[a-zA-Z]+"))

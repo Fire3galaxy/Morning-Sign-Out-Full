@@ -31,6 +31,7 @@ public class MeetTheTeamActivity extends ActionBarActivity {
     MeetTheTeamAdapter gridViewCustomAdapter;
     LinearLayout mttLayout;
     ProgressBar taskProgress;
+    Map<String, ArrayList<MTTListViewItem>> departments;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,11 +45,17 @@ public class MeetTheTeamActivity extends ActionBarActivity {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 boolean handled = false;
-                if (actionId == EditorInfo.IME_ACTION_SEND) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     String query = v.getText().toString();
+
                     if (!query.isEmpty()) {
-                        //Log.d("","");
+                        Intent intent = new Intent(MeetTheTeamActivity.this, MTTListViewActivity.class);
+                        intent.putParcelableArrayListExtra(FetchMeetTheTeamTask.TEAM_KEY, searchForPerson(query));
+                        intent.putExtra(FetchMeetTheTeamTask.NAME_KEY, "Search: " + query);
+                        startActivity(intent);
                     }
+
+                    handled = true;
                 }
                 return handled;
             }
@@ -77,7 +84,9 @@ public class MeetTheTeamActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void setTeamsMap(final Map<String, ArrayList<MTTListViewItem>> fromTask) {
+    public void setTeamsMap(Map<String, ArrayList<MTTListViewItem>> fromTask) {
+        departments = fromTask;
+
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -87,7 +96,7 @@ public class MeetTheTeamActivity extends ActionBarActivity {
                         (MeetTheTeamAdapter.TeamTitle) gridViewCustomAdapter.getItem(position);
 
                 Intent intent = new Intent(MeetTheTeamActivity.this, MTTListViewActivity.class);
-                intent.putParcelableArrayListExtra(FetchMeetTheTeamTask.TEAM_KEY, fromTask.get(team.realName));
+                intent.putParcelableArrayListExtra(FetchMeetTheTeamTask.TEAM_KEY, departments.get(team.realName));
                 intent.putExtra(FetchMeetTheTeamTask.NAME_KEY, team.caption);
                 startActivity(intent);
             }
@@ -102,6 +111,54 @@ public class MeetTheTeamActivity extends ActionBarActivity {
     public void cancel() {
         Toast.makeText(this, "Could not finish request, try again later?", Toast.LENGTH_SHORT).show();
         finish();
+    }
+
+    ArrayList<MTTListViewItem> searchForPerson(String query){
+        ArrayList<MTTListViewItem> results = new ArrayList<>();
+        final String regexWordSplit = "[\\p{javaWhitespace},-\\\\+_.]+";
+
+        // All words reduced to lowercase to simplify search
+        String[] parsedQuery = query.toLowerCase().split(regexWordSplit);
+
+        // iterate through departments to find query
+        for (String s : departments.keySet()) {
+            for (MTTListViewItem m : departments.get(s)) {
+                // Super simple "if name or position matches, add to list" search
+                // name - partial word matches ok
+                if (containsAny(m.name.toLowerCase(), parsedQuery)) {
+                    if (!results.contains(m)) results.add(m);
+                    break;
+                }
+
+                // position - do not want partial word matches here,
+                // but partial full title (e.g. "editor (in chief)") is acceptable
+                String[] positionWords = m.position.toLowerCase().split(regexWordSplit);
+                for (String p : positionWords) {
+                    if (equalsAny(p, parsedQuery)) {
+                        if (!results.contains(m)) results.add(m);
+                        break;
+                    }
+                }
+            }
+        }
+
+        return results;
+    }
+
+    private boolean containsAny(String s, String[] words) {
+        for (String w : words)
+            if (s.contains(w))
+                return true;
+
+        return false;
+    }
+
+    private boolean equalsAny(String s, String[] words) {
+        for (String w : words)
+            if (s.equals(w))
+                return true;
+
+        return false;
     }
 
     void setupActionBar() {

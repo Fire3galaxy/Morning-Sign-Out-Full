@@ -22,21 +22,22 @@
     <string name="disqus_dialog2">Reply to </string>
     <string name="comment_hint">Type comment here.</string>
     <string name="comment_label">Post</string>
+    <string name="title_commentXDescription">close comments</string>
 
     <string name="title_contentDescription">app home button</string>
-    <string name="title_commentXDescription">close comments</string>
     <string name="title_slide_menu">Categories menu</string>
     <string name="title_activity_category">CategoryActivity</string>
     <string name="article_image">Article Image</string>
     <string name="border_contentDescription">blue horizontal border</string>
     <string name="logo_contentDescription">Morning Sign Out logo</string>
+    <string name="category_icon">Category icon</string>
 
     <string name="search_hint">Search Morning Sign Out</string>
 
     <string name="meet_the_team">Meet the Team</string>
     <string name="mso_staff">MSO Staff</string>
     <string name="mtt_row_content_description">Morning Sign Out Staff Department</string>
-    <string name="mtt_search_hint">Search for names</string>
+    <string name="mtt_search_hint">Search for a person</string>
 
     <string name="category_refresh">If articles do not load, drag down to refresh</string>
     <string name="button_mttPrev">Prev</string>

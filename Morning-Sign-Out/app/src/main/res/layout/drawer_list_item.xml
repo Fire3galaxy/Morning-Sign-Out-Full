@@ -15,9 +15,8 @@
         android:layout_marginRight="12dp"
         android:layout_marginTop="12dp"
         android:layout_marginBottom="12dp"
-        android:contentDescription="hi"
-        android:src="@drawable/mso_square"
-        android:layout_centerVertical="true" />
+        android:contentDescription="@string/category_icon"
+        android:src="@drawable/mso_square" />
 
     <TextView
         android:id="@+id/title"
@@ -30,6 +29,6 @@
         android:textColor="@color/single_row_black"
         android:gravity="center_vertical"
         android:textStyle="bold"
-        android:textSize="20dp" />
+        android:textSize="20sp" />
 
 </LinearLayout>
