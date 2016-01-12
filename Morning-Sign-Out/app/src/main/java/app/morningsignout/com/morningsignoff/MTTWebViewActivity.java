@@ -91,6 +91,13 @@ public class MTTWebViewActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    // view parameter needed for title.xml onClick()
+    public void returnToParent(View view) {
+        Intent intent = new Intent(this, CategoryActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+    }
+
     private class MTTWebPagerAdapter extends FragmentStatePagerAdapter {
         public MTTWebPagerAdapter(FragmentManager fm) {
             super(fm);
