@@ -360,8 +360,6 @@ class ArticleWebViewClient extends WebViewClient {
         // Reset tumblr scroll button (If new page is loaded)
         ((ArticleActivity) c).resetLastSavedY();
 
-        Log.d(LOG_NAME, "onPageFinished");
-
         super.onPageFinished(webView, url);
     }
 
