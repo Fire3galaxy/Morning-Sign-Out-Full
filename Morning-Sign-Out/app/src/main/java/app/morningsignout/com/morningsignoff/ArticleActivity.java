@@ -32,6 +32,9 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+
 // Activity class created in FetchListArticleTask when user clicks on an article from the ListView
 public class ArticleActivity extends ActionBarActivity {
     private String category;
@@ -178,6 +181,11 @@ public class ArticleActivity extends ActionBarActivity {
                     }
                 }
             });
+
+            // For Ads by Admobs!
+            AdView mAdView = (AdView) findViewById(R.id.adView_article);
+            AdRequest adRequest = new AdRequest.Builder().build();
+            mAdView.loadAd(adRequest);
         }
     }
 
