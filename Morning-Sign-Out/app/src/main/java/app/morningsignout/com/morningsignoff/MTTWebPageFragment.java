@@ -45,6 +45,8 @@ public class MTTWebPageFragment extends Fragment {
 
         // Need to load webviewclient with correct url here
         WebView webView = (WebView) rootView.findViewById(R.id.webView_mtt);
+        webView.getSettings().setLoadWithOverviewMode(true); // zoom out page to fit width of phone
+        webView.getSettings().setUseWideViewPort(true); // use viewport tag to let website determine width
         MttWebViewClient client = new MttWebViewClient(baseUrl);
         webView.setWebViewClient(client);
         webView.setWebChromeClient(new WebChromeClient() {
@@ -126,7 +128,10 @@ class MttWebViewClient extends WebViewClient {
         try {
             html = URLToMobileArticle.getAuthorMTT(requestUrl.toString());
         } catch (IOException e) {
-            Log.e("MTTWebViewActivity", e.getMessage());
+            if (e.getMessage() != null)
+                Log.e("MTTWebViewActivity", e.getMessage());
+            else
+                Log.e("MTTWebViewActivity", "IOException in Meet the team");
         }
 
         // Let webView load default action (either webpage w/o mobile view, or webpage not found)

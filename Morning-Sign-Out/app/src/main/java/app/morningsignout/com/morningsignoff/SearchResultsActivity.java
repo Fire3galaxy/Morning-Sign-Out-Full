@@ -134,7 +134,7 @@ public class SearchResultsActivity extends ActionBarActivity {
 
     static String getURI(String query) {
         if (query != null) {
-            String searchURI = null;
+            String searchURI;
             try {
                 searchURI = "http://morningsignout.com/?s=" + URLEncoder.encode(query, "UTF-8");
                 return searchURI;
@@ -199,7 +199,11 @@ class SearchWebViewClient extends WebViewClient {
         try {
             html = URLToMobileArticle.getOther(requestUrl.toString());
         } catch (IOException e) {
-            Log.e("SearchResultsActivity", e.getMessage());
+            if (e.getMessage() != null)
+                Log.e("SearchResultsActivity", e.getMessage());
+            else
+                Log.e("SearchResultsActivity", "IOException in getOther()");
+            e.printStackTrace();
         }
 
         // Let webView load default action (either webpage w/o mobile view, or webpage not found)

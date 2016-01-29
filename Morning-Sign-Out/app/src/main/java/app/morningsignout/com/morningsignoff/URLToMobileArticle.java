@@ -8,10 +8,7 @@ import android.webkit.WebView;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Node;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
-import org.jsoup.select.NodeVisitor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,13 +16,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class URLToMobileArticle extends AsyncTask<String, Void, String> {
     static final String LOG_NAME = "URLToMobileArticle";
@@ -117,7 +108,7 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
     protected void onPostExecute(final String html) {
 //        wb.loadData(html, "text/html; charset=UTF-8", null);
         if (html != null)
-            wb.loadDataWithBaseURL(link, html, "text/html; charset=UTF-8", null, link);
+            wb.loadDataWithBaseURL(link, html, "text/html", "UTF-8", link);
         else
             wb.loadUrl(link);
     }
@@ -331,7 +322,8 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
     }
 
     static String getOther(final String urlname) throws IOException {
-        Document doc = Jsoup.connect(urlname).get();
+        // Increased timeout because it could be search page request
+        Document doc = Jsoup.connect(urlname).timeout(6 * 1000).get();
         doc.select("header").remove();
         doc.select("footer").remove();
         doc.select(".page-title--tag > span").remove();
