@@ -12,6 +12,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import java.io.ByteArrayInputStream;
@@ -33,20 +34,19 @@ public class MTTWebPageFragment extends Fragment {
 
         String baseUrl = null;
 
-        // FIXME: need to get arraylist from intent in activity, pass it in to bundle for fragment
-        // If this is a fragment, and each fragment is only a single page, then we can send single
-        // thing instead of whole array, not worry about index this way.
-
         // Need to initialize list and index variables here
         if (getArguments() != null)
             baseUrl = getArguments().getString(MEMBER_URL);
 
         loading = (ProgressBar) rootView.findViewById(R.id.progressBar_mttwebview);
-
-        // Need to load webviewclient with correct url here
         WebView webView = (WebView) rootView.findViewById(R.id.webView_mtt);
+
+        // Settings for webview
+        webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
         webView.getSettings().setLoadWithOverviewMode(true); // zoom out page to fit width of phone
         webView.getSettings().setUseWideViewPort(true); // use viewport tag to let website determine width
+
+        // Need to load webviewclient with correct url here
         MttWebViewClient client = new MttWebViewClient(baseUrl);
         webView.setWebViewClient(client);
         webView.setWebChromeClient(new WebChromeClient() {
@@ -56,12 +56,11 @@ public class MTTWebPageFragment extends Fragment {
                         loading.setVisibility(View.VISIBLE);
 
                     loading.setProgress(progress);
-                }
-                else if (progress == 100)
+                } else if (progress == 100)
                     loading.setVisibility(View.GONE);
             }
         });
-        new URLToMobileArticle(webView, true).execute(baseUrl);
+        webView.loadUrl(baseUrl);
 
         return rootView;
     }
@@ -71,8 +70,7 @@ class MttWebViewClient extends WebViewClient {
     static final String mimeType = "text/html";
     static final String encoding = "gzip"; // Find encoding https://en.wikipedia.org/wiki/HTTP_compression
 
-    // Useful for if team member has articles and pages
-    String baseUrl = null;
+    String baseUrl = null; // Useful for if team member has articles and pages
 
     public MttWebViewClient(String url) {
         baseUrl = url;
@@ -82,6 +80,15 @@ class MttWebViewClient extends WebViewClient {
     public void changeBaseUrl(String newBaseUrl) {
         baseUrl = newBaseUrl;
     }
+
+//    // Show logo once page completes loading
+//    @Override
+//    public void onPageFinished(WebView view, String url) {
+//        super.onPageFinished(view, url);
+//
+//        if (url.contains(baseUrl))
+//            logoView.setVisibility(View.VISIBLE);
+//    }
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -126,7 +133,7 @@ class MttWebViewClient extends WebViewClient {
         ByteArrayInputStream bais;
 
         try {
-            html = URLToMobileArticle.getAuthorMTT(requestUrl.toString());
+            html = URLToMobileArticle.getOther(requestUrl.toString());
         } catch (IOException e) {
             if (e.getMessage() != null)
                 Log.e("MTTWebViewActivity", e.getMessage());

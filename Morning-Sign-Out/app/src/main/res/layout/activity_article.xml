@@ -16,7 +16,7 @@
         android:layout_height="0dp"
         android:layout_weight="9">
 
-        <app.morningsignout.com.morningsignoff.CustomWebView
+        <WebView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/webView_article"

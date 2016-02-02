@@ -81,7 +81,7 @@ public class ArticleActivity extends ActionBarActivity {
             this.getSupportActionBar().setDisplayShowCustomEnabled(true);
 
             // WEBVIEW - Getting article from URL and stripping away extra parts of website for better reading
-            webView = (CustomWebView) findViewById(R.id.webView_article);
+            webView = (WebView) findViewById(R.id.webView_article);
             final ProgressBar loadPage = (ProgressBar) findViewById(R.id.progressBar_article);
             webView.setWebChromeClient(new WebChromeClient() { // Progress bar
                 @Override
