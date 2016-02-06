@@ -7,7 +7,9 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -20,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceResponse;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
@@ -99,7 +102,8 @@ public class ArticleActivity extends ActionBarActivity {
                     }
                 }
             });
-            blockZoom(); // True for images, false for articles.
+            webView.getSettings().setDisplayZoomControls(false);
+            webView.getSettings().setBuiltInZoomControls(false);
             webViewClient = new ArticleWebViewClient(this);
             webView.setWebViewClient(webViewClient);
 
@@ -301,16 +305,6 @@ public class ArticleActivity extends ActionBarActivity {
         }
     }
 
-    public void allowZoom() {
-        if (!webView.getSettings().getBuiltInZoomControls())
-            webView.getSettings().setBuiltInZoomControls(true);
-    }
-
-    public void blockZoom() {
-        if (webView.getSettings().getBuiltInZoomControls())
-            webView.getSettings().setBuiltInZoomControls(false);
-    }
-
     LayoutTransition getCustomLayoutTransition() {
         LayoutTransition customTransition = new LayoutTransition();
 //            customTransition.enableTransitionType(LayoutTransition.CHANGING);
@@ -352,18 +346,52 @@ class ArticleWebViewClient extends WebViewClient {
     }
 
     @Override
+    public void onPageStarted(WebView webView, String url, Bitmap favicon) {
+        WebSettings settings = webView.getSettings();
+
+        // Set image page to width of image
+        // Layout rendering in pre kitkat (API < 19) is pretty bad. SINGLE_COLUMN helps any isOther
+        // page and images.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if (isImage(url)) {
+                if (!settings.getLoadWithOverviewMode()) settings.setLoadWithOverviewMode(true);
+                if (!settings.getUseWideViewPort()) settings.setUseWideViewPort(true);
+            }
+        } else {
+            if (isImage(url) || isOther(url))
+                if (!settings.getLayoutAlgorithm().equals(WebSettings.LayoutAlgorithm.SINGLE_COLUMN))
+                    settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+        }
+    }
+
+    @Override
     public void onPageFinished(WebView webView, String url) {
+        WebSettings settings = webView.getSettings();
+
         // Removes bottom bar
         if (isArticle(url))
             ((ArticleActivity) c).showArticleBar();
         else
             ((ArticleActivity) c).hideArticleBar();
 
-        // Removes zoom controls
-        if (isImage(url))
-            ((ArticleActivity) c).allowZoom();
-        else
-            ((ArticleActivity) c).blockZoom();
+        // Changes zoom controls depending on image/nonimage page
+        if (isImage(url)) {
+            if (!settings.getBuiltInZoomControls()) settings.setBuiltInZoomControls(true);
+        } else {
+            if (settings.getBuiltInZoomControls()) settings.setBuiltInZoomControls(false);
+        }
+
+        // Reset width change from images or authors. Must be done differently for API < 19 (kitkat)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if (!isImage(url)) {
+                if (settings.getLoadWithOverviewMode()) settings.setLoadWithOverviewMode(false);
+                if (settings.getUseWideViewPort()) settings.setUseWideViewPort(false);
+            }
+        } else {
+            if (!isImage(url) && !isOther(url))
+                if (!settings.getLayoutAlgorithm().equals(WebSettings.LayoutAlgorithm.NORMAL))
+                    settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
+        }
 
         // Reset tumblr scroll button (If new page is loaded)
         ((ArticleActivity) c).resetLastSavedY();
@@ -375,9 +403,8 @@ class ArticleWebViewClient extends WebViewClient {
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
         Log.d("ArticleActivity", "In webviewclient, loading " + url);
 
-        if (Uri.parse(url).getHost().endsWith("morningsignout.com")) {
+        if (Uri.parse(url).getHost().endsWith("morningsignout.com"))
             return false;
-        }
 
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         view.getContext().startActivity(intent);
@@ -468,14 +495,17 @@ class ArticleWebViewClient extends WebViewClient {
 
     boolean isImage(String url) {
         Uri requestUrl = Uri.parse(url);
-
         List<String> segments = requestUrl.getPathSegments();
 
-        if (segments.size() >= 2 &&
+        return segments.size() >= 2 &&
                 segments.get(0).equals("wp-content") &&
-                segments.get(1).equals("uploads"))
-            return true;
+                segments.get(1).equals("uploads");
+    }
 
-        return false;
+    boolean isOther(String url) {
+        if (url == null) return false;
+
+        Uri requestUrl = Uri.parse(url);
+        return requestUrl.getPathSegments().size() == 2 || requestUrl.getPathSegments().size() == 4;
     }
 }

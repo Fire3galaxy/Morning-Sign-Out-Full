@@ -13,19 +13,5 @@
         <item name="android:actionBarSize">45dp</item>
     </style>
 
-    <style name="Theme.AppCompat.Translucent">
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:colorBackgroundCacheHint">@null</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowAnimationStyle">@android:style/Animation</item>
-    </style>
-
-    <style name="DisqusThemeTransparent" parent="Theme.AppCompat.Translucent">
-        <item name="android:homeAsUpIndicator">@drawable/ic_action_cancel</item>
-        <item name="colorPrimary">@color/mso_blue</item>
-        <item name="android:actionBarSize">45dp</item>
-    </style>
-
 </resources>
 

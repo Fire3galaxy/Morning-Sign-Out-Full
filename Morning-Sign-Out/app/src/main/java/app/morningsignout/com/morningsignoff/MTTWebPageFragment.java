@@ -2,6 +2,8 @@ package app.morningsignout.com.morningsignoff;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -10,13 +12,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceResponse;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Created by Daniel on 11/21/2015.
@@ -42,9 +47,13 @@ public class MTTWebPageFragment extends Fragment {
         WebView webView = (WebView) rootView.findViewById(R.id.webView_mtt);
 
         // Settings for webview
-        webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        webView.getSettings().setLoadWithOverviewMode(true); // zoom out page to fit width of phone
-        webView.getSettings().setUseWideViewPort(true); // use viewport tag to let website determine width
+        WebSettings settings = webView.getSettings();
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+        } else {
+            settings.setLoadWithOverviewMode(true);
+            settings.setUseWideViewPort(true);
+        }
 
         // Need to load webviewclient with correct url here
         MttWebViewClient client = new MttWebViewClient(baseUrl);
@@ -62,7 +71,55 @@ public class MTTWebPageFragment extends Fragment {
         });
         webView.loadUrl(baseUrl);
 
+
+//        try {
+//            new Test(webView)
+//                    .execute(new BufferedInputStream(getActivity().getAssets().open("mso_angela_mar.htm")));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
         return rootView;
+    }
+}
+
+class Test extends AsyncTask<BufferedInputStream, Void, String> {
+    WebView view;
+
+    public Test(WebView view) {
+        this.view = view;
+    }
+
+    @Override
+    protected String doInBackground(BufferedInputStream... params) {
+        String html = "";
+        BufferedInputStream is = null;
+        try {
+            is = params[0];
+            char c;
+
+            while (is.available() > 0) {
+                c = (char) is.read();
+                html += String.valueOf(c);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (is != null)
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+        }
+
+        Log.d("MTTWebPageFragment", "Html is empty: " + html);
+        return html;
+    }
+
+    @Override
+    protected void onPostExecute(String html) {
+        view.loadData(html, "text/html", "gzip");
     }
 }
 
