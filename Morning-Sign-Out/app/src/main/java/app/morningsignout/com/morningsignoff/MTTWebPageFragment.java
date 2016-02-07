@@ -71,55 +71,7 @@ public class MTTWebPageFragment extends Fragment {
         });
         webView.loadUrl(baseUrl);
 
-
-//        try {
-//            new Test(webView)
-//                    .execute(new BufferedInputStream(getActivity().getAssets().open("mso_angela_mar.htm")));
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
         return rootView;
-    }
-}
-
-class Test extends AsyncTask<BufferedInputStream, Void, String> {
-    WebView view;
-
-    public Test(WebView view) {
-        this.view = view;
-    }
-
-    @Override
-    protected String doInBackground(BufferedInputStream... params) {
-        String html = "";
-        BufferedInputStream is = null;
-        try {
-            is = params[0];
-            char c;
-
-            while (is.available() > 0) {
-                c = (char) is.read();
-                html += String.valueOf(c);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (is != null)
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-        }
-
-        Log.d("MTTWebPageFragment", "Html is empty: " + html);
-        return html;
-    }
-
-    @Override
-    protected void onPostExecute(String html) {
-        view.loadData(html, "text/html", "gzip");
     }
 }
 

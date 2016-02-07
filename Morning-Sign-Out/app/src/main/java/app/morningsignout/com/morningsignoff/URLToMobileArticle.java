@@ -2,6 +2,7 @@ package app.morningsignout.com.morningsignoff;
 
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Log;
 import android.webkit.WebView;
 
@@ -336,6 +337,11 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
         for (Element img : imgElems) {
             img.wrap(String.format("<a href=%s></a>", img.parent().select("a").attr("href")));
         }
+
+        // For author pages-align text center manually. Particularly issue with Aanchal Mehndiratta
+        // (2 lines) and api < 19.
+        doc.head().prependElement("style").appendText(".author-information h1, .author-information h2 {text-align: center;} ");
+
         return doc.toString();
     }
 
