@@ -338,9 +338,13 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
             img.wrap(String.format("<a href=%s></a>", img.parent().select("a").attr("href")));
         }
 
-        // For author pages-align text center manually. Particularly issue with Aanchal Mehndiratta
-        // (2 lines) and api < 19.
-        doc.head().prependElement("style").appendText(".author-information h1, .author-information h2 {text-align: center;} ");
+        /* 1. For author pages, align text center manually. Particularly bad with Aanchal Mehndiratta
+         *    (name w/ 2 lines) and androids w/ api < 19.
+         * 2. Remove margins of page-title
+         */
+        doc.head().prependElement("style")
+                .appendText(".author-information h1, .author-information h2 {text-align: center;} ")
+                .appendText(".page-title {margin: 0px 0 0px;} ");
 
         return doc.toString();
     }
