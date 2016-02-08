@@ -329,7 +329,8 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
         doc.select("footer").remove();
         doc.select(".page-title--tag > span").remove();
         doc.select("h4:containsOwn(Category)").remove();
-        doc.select(".page-title").attr("style", "margin-bottom: 25px");
+        doc.select(".page-title").attr("style", "margin: 0px 0 1px");
+        doc.select(".author-information h1, .author-information h2").attr("style", "text-align: center");
         doc.select(".author-bio").attr("style", "margin-top: 5px");
         doc.select(".content__post").attr("style", "margin: 0px 5px 15px");
         doc.select(".author-posts > h1").attr("style", "margin: 15px 0px");
@@ -337,14 +338,6 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
         for (Element img : imgElems) {
             img.wrap(String.format("<a href=%s></a>", img.parent().select("a").attr("href")));
         }
-
-        /* 1. For author pages, align text center manually. Particularly bad with Aanchal Mehndiratta
-         *    (name w/ 2 lines) and androids w/ api < 19.
-         * 2. Remove margins of page-title
-         */
-        doc.head().prependElement("style")
-                .appendText(".author-information h1, .author-information h2 {text-align: center;} ")
-                .appendText(".page-title {margin: 0px 0 0px;} ");
 
         return doc.toString();
     }
