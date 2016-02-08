@@ -434,7 +434,7 @@ class ArticleWebViewClient extends WebViewClient {
         // Article Page
         if (requestUrl.getPathSegments().size() == 1) {
             Log.d(LOG_NAME, "changing webresponse to article page");
-            html = URLToMobileArticle.getArticle(requestUrl.toString());
+            html = URLToMobileArticle.getArticleRevised(requestUrl.toString());
 
             // Prep slug string
             lastArticleSlug = requestUrl.getLastPathSegment();

@@ -57,7 +57,7 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
         // Article Page
         if (requestUrl.getPathSegments().size() == 1) {
             Log.d(LOG_NAME, "changing webresponse to article page");
-            return getArticle(requestUrl.toString());
+            return getArticleRevised(requestUrl.toString());
         }
         // Author, Tag, Date pages
         else if (requestUrl.getPathSegments().size() == 2) {
@@ -363,6 +363,28 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
         for (Element img : imgElems) {
             img.wrap(String.format("<a href=%s></a>", img.parent().select("a").attr("href")));
         }
+        return doc.toString();
+    }
+
+    public static String getArticleRevised(final String urlname) {
+        // Increased timeout because it could be search page request
+        Document doc = null;
+        try {
+            doc = Jsoup.connect(urlname).timeout(6 * 1000).get();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        doc.select("header").remove();
+        doc.select("footer").remove();
+        doc.select("div.ssba-wrap").remove();
+        doc.select(".content__related").remove();
+        doc.select("#disqus_thread").remove();
+        doc.select(".nocomments").remove();
+        doc.select(".post-nav").remove();
+        Element post = doc.select(".content__post").first();
+        post.attr("style", "margin-top: 0px; padding-top: 20px");
+
         return doc.toString();
     }
 }
