@@ -166,6 +166,8 @@ public class CategoryActivity extends ActionBarActivity {
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
 
+	// Messing with layout or gravity of searchview here if needed
+
         ComponentName componentName = new ComponentName(this, SearchResultsActivity.class);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
 //        return super.onCreateOptionsMenu(menu);
