@@ -131,8 +131,7 @@ public class CategoryActivity extends ActionBarActivity {
 //                    .commit();
 //        }
 
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
+        this.getSupportActionBar().setDisplayShowTitleEnabled(false);
         ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null);
         ib.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,7 +141,6 @@ public class CategoryActivity extends ActionBarActivity {
         });
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);
         this.getSupportActionBar().setCustomView(ib, params);
-
         this.getSupportActionBar().setDisplayShowCustomEnabled(true);
     }
 

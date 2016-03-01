@@ -5,12 +5,14 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/mso_blue</item>
         <item name="android:actionBarSize">45dp</item>
+        <item name="actionBarSize">45dp</item>
     </style>
 
     <style name="DisqusTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:homeAsUpIndicator">@drawable/ic_action_cancel</item>
         <item name="colorPrimary">@color/mso_blue</item>
         <item name="android:actionBarSize">45dp</item>
+        <item name="actionBarSize">45dp</item>
     </style>
 
 </resources>
