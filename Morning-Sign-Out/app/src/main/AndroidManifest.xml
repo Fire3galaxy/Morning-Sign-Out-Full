@@ -28,7 +28,8 @@
 
         <activity
             android:launchMode = "singleTop"
-            android:name=".CategoryActivity" >
+            android:name=".CategoryActivity" 
+            android:configChanges="orientation|keyboardHidden|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="app.morningsignout.com.morningsignoff.CategoryActivity" />

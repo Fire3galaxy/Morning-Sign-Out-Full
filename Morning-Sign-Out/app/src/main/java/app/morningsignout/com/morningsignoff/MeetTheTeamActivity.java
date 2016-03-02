@@ -45,7 +45,8 @@ public class MeetTheTeamActivity extends ActionBarActivity {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 boolean handled = false;
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH
+                        || actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
                     String query = v.getText().toString();
 
                     if (!query.isEmpty()) {
@@ -57,6 +58,7 @@ public class MeetTheTeamActivity extends ActionBarActivity {
 
                     handled = true;
                 }
+
                 return handled;
             }
         });
