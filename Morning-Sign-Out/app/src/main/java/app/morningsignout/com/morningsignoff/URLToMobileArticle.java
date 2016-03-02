@@ -387,9 +387,14 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
         Element post = doc.select(".content__post").first();
         post.attr("style", "margin-top: 0px; padding-top: 20px");
 
-        doc.select("img").removeAttr("width").removeAttr("height")
-                .attr("style", "height: 10%");
-        Log.d("URLToMobileArticle", doc.select("img").outerHtml());
+//        doc.select("img.size-full").removeAttr("width").removeAttr("height")
+//                .attr("style", "margin: 0");
+//                .attr("height", "10%");
+                //.attr("width", "auto")
+                //.attr("max-width", "inherit");
+//                .attr("max-height", "100%");
+//        Log.d("URLToMobileArticle", doc.select("img.size-full").outerHtml());
+        doc.select("figure").attr("style", "display: block");
         //Log.d("", "");
 
         return doc.toString();
