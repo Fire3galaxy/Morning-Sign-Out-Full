@@ -12,6 +12,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -384,6 +386,11 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
         doc.select(".post-nav").remove();
         Element post = doc.select(".content__post").first();
         post.attr("style", "margin-top: 0px; padding-top: 20px");
+
+        doc.select("img").removeAttr("width").removeAttr("height")
+                .attr("style", "height: 10%");
+        Log.d("URLToMobileArticle", doc.select("img").outerHtml());
+        //Log.d("", "");
 
         return doc.toString();
     }
