@@ -94,7 +94,6 @@ public class MeetTheTeamActivity extends ActionBarActivity {
                 // to correctly correspond to team
                 MeetTheTeamAdapter.TeamTitle team =
                         (MeetTheTeamAdapter.TeamTitle) gridViewCustomAdapter.getItem(position);
-
                 Intent intent = new Intent(MeetTheTeamActivity.this, MTTListViewActivity.class);
                 intent.putParcelableArrayListExtra(FetchMeetTheTeamTask.TEAM_KEY, departments.get(team.realName));
                 intent.putExtra(FetchMeetTheTeamTask.NAME_KEY, team.caption);
