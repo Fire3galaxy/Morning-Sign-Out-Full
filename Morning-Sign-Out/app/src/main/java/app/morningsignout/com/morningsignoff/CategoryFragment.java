@@ -80,7 +80,7 @@ public class CategoryFragment extends Fragment {
         // memory for images ~4.5 MB = 7-8 images
         final int cacheSize = maxMemory / 7;
 
-        Log.d("CategoryFragment", Integer.toString(cacheSize));
+        //Log.d("CategoryFragment", Integer.toString(cacheSize)); // cache size output
 
         memoryCache = new LruCache<String, Bitmap>(cacheSize) {
             @Override
@@ -397,7 +397,9 @@ class CategoryAdapter extends BaseAdapter {
             for (int i = 0; i < moreArticles.size(); ++i) {
                 String article = moreArticles.get(i).getTitle();
 
-                if (!uniqueArticleNames.contains(article))
+                // Hack-ish way of preventing the list from being populated with doubles
+                // which happens if request occurs multiple times...
+                if (!uniqueArticleNames.contains(article) && moreArticles.get(i).getImageURL() != null)
                     articles.add(SingleRow.newInstance(moreArticles.get(i)));
                 uniqueArticleNames.add(article);
 //                notifyDataSetChanged();

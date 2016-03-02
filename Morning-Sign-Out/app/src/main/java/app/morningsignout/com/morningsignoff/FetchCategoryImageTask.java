@@ -46,7 +46,7 @@ public class FetchCategoryImageTask extends AsyncTask<Void, Void, Bitmap> {
 
             if (this == task) {
                 // cache image
-                categoryFragment.addBitmapToMemoryCache(sr.title, b);
+                categoryFragment.addBitmapToMemoryCache(sr.title, b); Log.d("","");
 
                 // Preserve aspect ratio of image
                 imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -73,7 +73,7 @@ public class FetchCategoryImageTask extends AsyncTask<Void, Void, Bitmap> {
             if (inputStream != null) {
                 // Lowers resolution of images by subsampling imageViewReference, saves memory & time
                 BitmapFactory.Options a = new BitmapFactory.Options();
-                a.inSampleSize = 2;
+                a.inSampleSize = 1;
 
                 // Create bitmap from stream
                 return BitmapFactory.decodeStream(inputStream, null, a);
