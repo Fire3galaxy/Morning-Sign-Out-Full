@@ -6,7 +6,10 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.WrapperListAdapter;
+
+import org.apache.http.HttpStatus;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,6 +19,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.net.ssl.HttpsURLConnection;
 
 // This class is called in Category Activity to fetch articles online and feed it to CategoryAdapter
 // do in background gets the article objects from morningsignout, and converts imageURL to bitmap
@@ -28,7 +33,6 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
     private WeakReference<CategoryFragment> fragmentRef;
     private WeakReference<ListView> listViewWeakRef;
     private CategoryFragment.CategoryViews loadingViews;
-    private ProgressBar footerProgressBar;
     private int pageNum;
 
     private int adapterPageNum;
@@ -42,7 +46,6 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         this.listViewWeakRef = new WeakReference<ListView>(listView);       // ensure listview still exists
         this.loadingViews = loadingViews;       // refresh layout, task, loading message (first time views)
         this.pageNum = pageNum;         // page of mso page called for task
-        this.footerProgressBar = null; // not used on first call to task
     }
 
     @Override
@@ -123,11 +126,17 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         }
 
         // If result and adapter are not null and fragment still exists, load items
-        if (articles != null && adapter != null && fragmentRef.get() != null) {
+        if (adapter != null && fragmentRef.get() != null) {
             fragmentRef.get().isLoadingArticles.set(false);
-            adapter.loadMoreItems(articles, pageNum);
 
-            Log.d("FetchListArticlesTask", "Calling loadMoreItems " + Integer.toString(pageNum));
+            if (articles != null) {
+                adapter.loadMoreItems(articles, pageNum);
+                Log.d("FetchListArticlesTask", "Calling loadMoreItems " + Integer.toString(pageNum));
+            } else if (adapter.isEmpty()){
+                Toast.makeText(fragmentRef.get().getContext(),
+                        "We had trouble trying to connect", Toast.LENGTH_SHORT).show();
+                Log.d("FetchListArticlesTask", "Calling loadMoreItems " + Integer.toString(pageNum));
+            }
         }
     }
 
@@ -143,16 +152,23 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         Log.d("FetchListArticlesTask", "loading " + urlPath);
 
         BufferedReader in = null;
-        HttpURLConnection c = null; // Done because of tutorial
+        HttpsURLConnection c = null; // Done because of tutorial
 
         try {
-            // Open connection to
+            // Open connection to list article url
             URL url = new URL(urlPath);
-            c = (HttpURLConnection) url.openConnection();
+            c = (HttpsURLConnection) url.openConnection();
             c.setRequestMethod("GET");
             c.connect();
 
-            if (c.getInputStream() == null) return null; // Stream was null, why?
+            // Return if failed
+            int statusCode = c.getResponseCode();
+            if (statusCode != HttpStatus.SC_OK) {
+                return null;
+            }
+
+            // Stream was null, Possibly a timeout issue or something wrong.
+            if (c.getInputStream() == null) return null;
 
             in = new BufferedReader(new InputStreamReader(c.getInputStream()) );
             String inputLine;

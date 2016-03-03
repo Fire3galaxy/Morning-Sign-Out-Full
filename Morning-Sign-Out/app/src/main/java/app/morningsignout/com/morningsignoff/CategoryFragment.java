@@ -337,6 +337,12 @@ class CategoryAdapter extends BaseAdapter {
         return i;
     }
 
+    // Return based on if list has items
+    @Override
+    public boolean isEmpty() {
+        return articles.isEmpty();
+    }
+
     // Get the View route of a single row by id
     @Override
     public View getView(int i, View view, final ViewGroup viewGroup){

@@ -6,6 +6,7 @@ import android.os.Build;
 import android.util.Log;
 import android.webkit.WebView;
 
+import org.apache.http.HttpStatus;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,6 +21,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Calendar;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class URLToMobileArticle extends AsyncTask<String, Void, String> {
     static final String LOG_NAME = "URLToMobileArticle";
@@ -139,7 +142,14 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
         String html_new;
         try {
             url = new URL(link);
-            URLConnection c = url.openConnection();
+            HttpsURLConnection c = (HttpsURLConnection) url.openConnection();
+
+            // Return if failed
+            int statusCode = c.getResponseCode();
+            if (statusCode != HttpStatus.SC_OK) {
+                return null;
+            }
+
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(c.getInputStream(), "utf-8"));
             String input;

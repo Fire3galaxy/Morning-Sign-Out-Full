@@ -14,6 +14,8 @@ import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import javax.net.ssl.HttpsURLConnection;
+
 /**
  * Created by Daniel on 6/24/2015.
  */
@@ -60,10 +62,10 @@ public class FetchCategoryImageTask extends AsyncTask<Void, Void, Bitmap> {
     static public Bitmap downloadBitmap(String url) {
         if (url == null) return null;
 
-        HttpURLConnection urlConnection = null;
+        HttpsURLConnection urlConnection = null;
         try {
             URL uri = new URL(url);
-            urlConnection = (HttpURLConnection) uri.openConnection();
+            urlConnection = (HttpsURLConnection) uri.openConnection();
             int statusCode = urlConnection.getResponseCode();
             if (statusCode != HttpStatus.SC_OK) {
                 return null;
