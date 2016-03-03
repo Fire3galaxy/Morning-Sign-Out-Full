@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -142,7 +143,7 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
         String html_new;
         try {
             url = new URL(link);
-            HttpsURLConnection c = (HttpsURLConnection) url.openConnection();
+            HttpURLConnection c = (HttpURLConnection) url.openConnection();
 
             // Return if failed
             int statusCode = c.getResponseCode();

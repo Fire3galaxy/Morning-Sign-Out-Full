@@ -152,12 +152,12 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         Log.d("FetchListArticlesTask", "loading " + urlPath);
 
         BufferedReader in = null;
-        HttpsURLConnection c = null; // Done because of tutorial
+        HttpURLConnection c = null; // Done because of tutorial
 
         try {
             // Open connection to list article url
             URL url = new URL(urlPath);
-            c = (HttpsURLConnection) url.openConnection();
+            c = (HttpURLConnection) url.openConnection();
             c.setRequestMethod("GET");
             c.connect();
 

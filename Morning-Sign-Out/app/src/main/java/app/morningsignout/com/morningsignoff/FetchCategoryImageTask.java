@@ -62,10 +62,10 @@ public class FetchCategoryImageTask extends AsyncTask<Void, Void, Bitmap> {
     static public Bitmap downloadBitmap(String url) {
         if (url == null) return null;
 
-        HttpsURLConnection urlConnection = null;
+        HttpURLConnection urlConnection = null;
         try {
             URL uri = new URL(url);
-            urlConnection = (HttpsURLConnection) uri.openConnection();
+            urlConnection = (HttpURLConnection) uri.openConnection();
             int statusCode = urlConnection.getResponseCode();
             if (statusCode != HttpStatus.SC_OK) {
                 return null;
