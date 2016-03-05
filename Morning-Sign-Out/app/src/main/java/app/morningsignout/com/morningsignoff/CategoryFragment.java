@@ -78,9 +78,9 @@ public class CategoryFragment extends Fragment {
         // max memory of hdpi ~32 MB
         final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
         // memory for images ~4.5 MB = 7-8 images
-        final int cacheSize = maxMemory / 7;
+        final int cacheSize = maxMemory / 8;
 
-        //Log.d("CategoryFragment", Integer.toString(cacheSize)); // cache size output
+        Log.d("CategoryFragment", Integer.toString(cacheSize)); // cache size output
 
         memoryCache = new LruCache<String, Bitmap>(cacheSize) {
             @Override

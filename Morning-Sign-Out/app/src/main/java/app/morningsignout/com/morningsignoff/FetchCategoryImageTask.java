@@ -48,10 +48,10 @@ public class FetchCategoryImageTask extends AsyncTask<Void, Void, Bitmap> {
 
             if (this == task) {
                 // cache image
-                categoryFragment.addBitmapToMemoryCache(sr.title, b); Log.d("","");
+                categoryFragment.addBitmapToMemoryCache(sr.title, b); //Log.d("","");
 
                 // Preserve aspect ratio of image
-                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP); // FIT_CENTER to just fit x or y
                 imageView.setCropToPadding(true);
                 imageView.setImageBitmap(b);
             }

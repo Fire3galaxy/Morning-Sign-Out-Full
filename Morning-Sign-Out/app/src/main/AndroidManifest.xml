@@ -50,6 +50,7 @@
             android:name=".ArticleActivity"
             android:parentActivityName=".CategoryActivity"
             android:configChanges="orientation|keyboardHidden|screenSize">
+            <!--android:configChanges="orientation|keyboardHidden|screenSize"-->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="app.morningsignout.com.morningsignoff.CategoryActivity" />
