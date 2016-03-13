@@ -171,6 +171,7 @@ class SearchWebViewClient extends WebViewClient {
             if (url.contains("?s=" + query))
                 return false;
 
+            // Return to or Start articleActivity with article
             Intent intent = new Intent(view.getContext(), ArticleActivity.class);
             intent.putExtra(Intent.EXTRA_RETURN_RESULT, url); // Put url in intent
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP); // Open w/ old articleActivity if exists

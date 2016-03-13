@@ -12,7 +12,8 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="9">
+        android:layout_weight="9"
+        android:id="@+id/container_webview">
 
         <WebView
             android:layout_width="match_parent"
@@ -32,6 +33,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/container_articleTwoBars"
         android:background="@color/mso_blue"
         android:orientation="horizontal">
 
@@ -52,17 +54,17 @@
             android:layout_gravity="center_horizontal"
             android:background="@color/mso_blue"
             android:visibility="visible">
-            
+
             <ImageButton
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_toLeftOf="@+id/button_scroll"
                 android:layout_toStartOf="@+id/button_scroll"
                 android:layout_centerVertical="true"
-                android:id="@+id/button_share"
-                android:src="@drawable/ic_action_share"
+                android:id="@+id/button_comment"
+                android:contentDescription="@string/action_comment"
                 android:background="@drawable/button_scroll"
-                android:contentDescription="@string/action_share"/>
+                android:src="@drawable/comment_icon" />
 
             <ImageButton
                 android:layout_width="wrap_content"
@@ -84,20 +86,20 @@
 
             <ImageButton
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_toRightOf="@+id/space_center"
                 android:layout_toEndOf="@+id/space_center"
                 android:layout_centerVertical="true"
-                android:id="@+id/button_comment"
-                android:contentDescription="@string/action_comment"
+                android:id="@+id/button_share"
+                android:src="@drawable/ic_action_share"
                 android:background="@drawable/button_scroll"
-                android:src="@drawable/comment_icon" />
+                android:contentDescription="@string/action_share"/>
 
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/button_comment"
-                android:layout_toEndOf="@+id/button_comment"
+                android:layout_toRightOf="@+id/button_share"
+                android:layout_toEndOf="@+id/button_share"
                 android:layout_centerVertical="true"
                 android:id="@+id/button_swap_bar"
                 android:src="@drawable/ic_swap_bar"
@@ -105,5 +107,4 @@
                 android:background="@drawable/button_scroll" />
         </RelativeLayout>
     </LinearLayout>
-
 </LinearLayout>

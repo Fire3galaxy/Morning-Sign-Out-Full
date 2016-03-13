@@ -43,18 +43,16 @@ import com.google.android.gms.ads.AdView;
 
 // Activity class created in FetchListArticleTask when user clicks on an article from the ListView
 public class ArticleActivity extends ActionBarActivity {
-    private String category;
     private Integer lastSavedY;
     ObjectAnimator showArticleBar;
     ObjectAnimator hideArticleBar;
 
     private RelativeLayout relativeLayout;
-
     private WebView webView;
     private ProgressBar loading;
     private ArticleWebViewClient webViewClient;
-
     private SearchView searchView;
+
     private Intent shareIntent;
 
     public ArticleActivity() {
@@ -63,15 +61,16 @@ public class ArticleActivity extends ActionBarActivity {
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        webView.saveState(outState);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article);
         super.getSupportActionBar().setDisplayHomeAsUpEnabled(true); //made back arrow in top left corner
-
-        // Set the title for this myActivity to the article title
-        // VARIABLES/TITLE - Setting variable category (healthcare, wellness, etc.) and title of myActivity (article name)
-        category = getIntent().getStringExtra(Intent.EXTRA_TITLE);
-        setTitle(getIntent().getStringExtra(Intent.EXTRA_SHORTCUT_NAME));
 
         // ACTION BAR
         //      ImageButton is Morning Sign Out logo, which sends user back to home screen (see XML)
@@ -107,6 +106,14 @@ public class ArticleActivity extends ActionBarActivity {
         webView.getSettings().setBuiltInZoomControls(false);
         webViewClient = new ArticleWebViewClient(this);
         webView.setWebViewClient(webViewClient);
+
+        // Load first website or restore webview if destroyed and recreated
+        if (savedInstanceState == null) {
+            if (getIntent() != null)
+                webView.loadUrl(getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT));
+        } else {
+            webView.restoreState(savedInstanceState);
+        }
 
         // Setting relativeLayout
         relativeLayout = (RelativeLayout) findViewById(R.id.container_articleBar);
@@ -183,37 +190,6 @@ public class ArticleActivity extends ActionBarActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-
-        String searchReturnUrl = getIntent().getStringExtra(Intent.EXTRA_RETURN_RESULT);
-        String webviewUrl = webView.getUrl();
-        String intentUrl = getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT);
-
-        // 1. App has returned from search w/ result
-        if (searchReturnUrl != null) {
-            searchReturnUrl = getIntent().getStringExtra(Intent.EXTRA_RETURN_RESULT);   // copy string
-            getIntent().removeExtra(Intent.EXTRA_RETURN_RESULT);        // Return url only valid once, remove it after use
-            webView.loadUrl(searchReturnUrl);
-            Log.d("ArticleActivity", "Loading: " + intentUrl);
-        }
-        // 2. App was stopped/return to this myActivity from search w/o a result (do nothing)
-        else if (webviewUrl != null && !webviewUrl.isEmpty());
-        // 3. App has not loaded its first article yet
-        else if (intentUrl != null)
-            webView.loadUrl(intentUrl);
-//            new URLToMobileArticle(webView).execute(intentUrl);
-
-        if (getSupportActionBar() != null)
-            getSupportActionBar().collapseActionView(); // collapse search bar on return from search
-    }
-
-//    @Override
-//    public void onSaveInstanceState(Bundle outState) {
-//        webView.saveState(outState);
-//    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_article, menu);
@@ -241,8 +217,6 @@ public class ArticleActivity extends ActionBarActivity {
                     webView.goBack();
                 else                     // Return to front page (without recreating parent)
                     finish();
-                    //super.onBackPressed(); // Changed to support travel from meet the team, FIXME: Test this with normal behavior
-//                    returnToParent(null);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -266,22 +240,24 @@ public class ArticleActivity extends ActionBarActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-    /* Note: The myActivity cycle says that onNewIntent and onResume will occur even in normal app
-     * function. Hence, these two functions should NOT change the normal function of the myActivity
-     * and only load a new url if given through SearchResultsActivity's new intent
-     */
     @Override
     protected void onNewIntent(Intent intent) {
         // change myActivity intent to the one from SearchResultsActivity
-        setIntent(intent);
+        if (intent != null) {
+            setIntent(intent);
+            String searchUrl = intent.getStringExtra(Intent.EXTRA_RETURN_RESULT);
+            getSupportActionBar().collapseActionView();
+            webView.loadUrl(searchUrl);
+        }
     }
 
-    // view parameter needed for title.xml onClick()
+    // view parameter needed for imageview of logo at top: title.xml onClick()
     public void returnToParent(View view) {
         Intent intent = new Intent(this, CategoryActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
     }
+
     synchronized public void resetLastSavedY() {
         lastSavedY = 0;
     }
