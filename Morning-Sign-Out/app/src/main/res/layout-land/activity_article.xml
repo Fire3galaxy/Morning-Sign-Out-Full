@@ -6,8 +6,6 @@
     android:id="@+id/container_article"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="app.morningsignout.com.morningsignoff.ArticleActivity"
-    tools:ignore="MergeRootFrame"
     android:background="@android:color/transparent"
     android:animateLayoutChanges="true">
 
@@ -54,43 +52,57 @@
             android:layout_gravity="center_horizontal"
             android:background="@color/mso_blue"
             android:visibility="visible">
-
+            
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:layout_toLeftOf="@+id/button_scroll"
+                android:layout_toStartOf="@+id/button_scroll"
+                android:layout_centerVertical="true"
                 android:id="@+id/button_share"
                 android:src="@drawable/ic_action_share"
                 android:background="@drawable/button_scroll"
-                android:contentDescription="@string/action_share"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:layout_marginRight="50dp"
-                android:layout_marginEnd="50dp" />
+                android:contentDescription="@string/action_share"/>
 
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:layout_toLeftOf="@+id/space_center"
+                android:layout_toStartOf="@+id/space_center"
+                android:layout_centerVertical="true"
                 android:id="@+id/button_scroll"
                 android:background="@drawable/button_scroll"
                 android:src="@drawable/scroll_icon"
-                android:contentDescription="@string/action_scroll"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true" />
+                android:contentDescription="@string/action_scroll" />
+
+            <android.support.v4.widget.Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:id="@+id/space_center"
+                android:visibility="invisible"
+                android:layout_centerInParent="true"/>
 
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/space_center"
+                android:layout_toEndOf="@+id/space_center"
+                android:layout_centerVertical="true"
                 android:id="@+id/button_comment"
                 android:contentDescription="@string/action_comment"
                 android:background="@drawable/button_scroll"
-                android:src="@drawable/comment_icon"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginLeft="50dp"
-                android:layout_marginStart="50dp"/>
+                android:src="@drawable/comment_icon" />
 
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/button_comment"
+                android:layout_toEndOf="@+id/button_comment"
+                android:layout_centerVertical="true"
+                android:id="@+id/button_swap_bar"
+                android:src="@drawable/ic_swap_bar"
+                android:contentDescription="@string/action_swap"
+                android:background="@drawable/button_scroll" />
         </RelativeLayout>
     </LinearLayout>
 

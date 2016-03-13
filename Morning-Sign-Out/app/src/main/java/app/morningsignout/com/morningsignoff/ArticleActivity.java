@@ -69,132 +69,149 @@ public class ArticleActivity extends ActionBarActivity {
         super.getSupportActionBar().setDisplayHomeAsUpEnabled(true); //made back arrow in top left corner
 
         // Set the title for this myActivity to the article title
-        Intent intent = getIntent();
-        if (intent != null) {
-            // VARIABLES/TITLE - Setting variable category (healthcare, wellness, etc.) and title of myActivity (article name)
-            category = getIntent().getStringExtra(Intent.EXTRA_TITLE);
-            setTitle(getIntent().getStringExtra(Intent.EXTRA_SHORTCUT_NAME));
+        // VARIABLES/TITLE - Setting variable category (healthcare, wellness, etc.) and title of myActivity (article name)
+        category = getIntent().getStringExtra(Intent.EXTRA_TITLE);
+        setTitle(getIntent().getStringExtra(Intent.EXTRA_SHORTCUT_NAME));
 
-            // ACTION BAR
-            //      ImageButton is Morning Sign Out logo, which sends user back to home screen (see XML)
-            //      Setting imageButton to center of actionbar
-            ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null); // could replace null with new LinearLayout. properties not needed though.
-            ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);
-            this.getSupportActionBar().setCustomView(ib, params);
+        // ACTION BAR
+        //      ImageButton is Morning Sign Out logo, which sends user back to home screen (see XML)
+        //      Setting imageButton to center of actionbar
+        ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null); // could replace null with new LinearLayout. properties not needed though.
+        ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);
+        this.getSupportActionBar().setCustomView(ib, params);
 
-            //      Disabling title text of actionbar, enabling imagebutton
-            this.getSupportActionBar().setDisplayShowTitleEnabled(false);
-            this.getSupportActionBar().setDisplayShowCustomEnabled(true);
+        //      Disabling title text of actionbar, enabling imagebutton
+        this.getSupportActionBar().setDisplayShowTitleEnabled(false);
+        this.getSupportActionBar().setDisplayShowCustomEnabled(true);
 
-            // WEBVIEW - Getting article from URL and stripping away extra parts of website for better reading
-            webView = (WebView) findViewById(R.id.webView_article);
-            final ProgressBar loadPage = (ProgressBar) findViewById(R.id.progressBar_article);
-            webView.setWebChromeClient(new WebChromeClient() { // Progress bar
-                @Override
-                public void onProgressChanged(WebView v, int newProgress) {
-                    if (newProgress < 100) {
-                        if (loadPage.getVisibility() == View.GONE)
-                            loadPage.setVisibility(View.VISIBLE);
+        // WEBVIEW - Getting article from URL and stripping away extra parts of website for better reading
+        webView = (WebView) findViewById(R.id.webView_article);
+        final ProgressBar loadPage = (ProgressBar) findViewById(R.id.progressBar_article);
+        webView.setWebChromeClient(new WebChromeClient() { // Progress bar
+            @Override
+            public void onProgressChanged(WebView v, int newProgress) {
+                if (newProgress < 100) {
+                    if (loadPage.getVisibility() == View.GONE)
+                        loadPage.setVisibility(View.VISIBLE);
 
-                        loadPage.setProgress(newProgress);
-                    } else if (newProgress == 100) {
-                        loadPage.setProgress(newProgress);
+                    loadPage.setProgress(newProgress);
+                } else if (newProgress == 100) {
+                    loadPage.setProgress(newProgress);
 
-                        if (loadPage.getVisibility() == View.VISIBLE)
-                            loadPage.setVisibility(View.GONE);
-                    }
+                    if (loadPage.getVisibility() == View.VISIBLE)
+                        loadPage.setVisibility(View.GONE);
                 }
-            });
-            webView.getSettings().setDisplayZoomControls(false);
-            webView.getSettings().setBuiltInZoomControls(false);
-            webViewClient = new ArticleWebViewClient(this);
-            webView.setWebViewClient(webViewClient);
+            }
+        });
+        webView.getSettings().setDisplayZoomControls(false);
+        webView.getSettings().setBuiltInZoomControls(false);
+        webViewClient = new ArticleWebViewClient(this);
+        webView.setWebViewClient(webViewClient);
 
-            // Loading progressBar whenever a page is loading
-            loading = (ProgressBar) findViewById(R.id.progressBar_article);
-            webView.setWebChromeClient(new WebChromeClient() {
-                @Override
-                public void onProgressChanged(WebView view, int newProgress) {
-                    if (newProgress < 100) {
-                        if (loading.getVisibility() != View.VISIBLE)
-                            loading.setVisibility(View.VISIBLE);
+        // Setting relativeLayout
+        relativeLayout = (RelativeLayout) findViewById(R.id.container_articleBar);
 
-                        loading.setProgress(newProgress);
-                    } else
-                        loading.setVisibility(View.GONE);
-                }
-            });
+        // FIXME: Only for portrait orientation!
+        //      Setting up objectAnimators for articleBar's show/hide animation
+        showArticleBar = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.show_article_bar);
+        showArticleBar.setTarget(relativeLayout);
+        hideArticleBar = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.hide_article_bar);
+        hideArticleBar.setTarget(relativeLayout);
 
-            // Setting relativeLayout
-            relativeLayout = (RelativeLayout) findViewById(R.id.container_articleBar);
+        //      How the animation of the articleBar is programmed
+        LinearLayout container = (LinearLayout) findViewById(R.id.container_article);
+        container.setLayoutTransition(getCustomLayoutTransition());
 
-            //      Setting up objectAnimators for articleBar's show/hide animation
-            showArticleBar = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.show_article_bar);
-            showArticleBar.setTarget(relativeLayout);
-            hideArticleBar = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.hide_article_bar);
-            hideArticleBar.setTarget(relativeLayout);
+        // SHARE BUTTON
+        //      Setting up share intent for first web page
+        shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT));
 
-            //      How the animation of the articleBar is programmed
-            LinearLayout container = (LinearLayout) findViewById(R.id.container_article);
-            container.setLayoutTransition(getCustomLayoutTransition());
+        //      Setting up share button
+        ImageButton shareButton = (ImageButton) findViewById(R.id.button_share);
+        shareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                shareIntent.setType("text/plain");
+                startActivity(Intent.createChooser(shareIntent, "Share using"));
+            }
+        });
 
-            // SHARE BUTTON
-            //      Setting up share intent for first web page
-            shareIntent = new Intent(Intent.ACTION_SEND);
-            shareIntent.putExtra(Intent.EXTRA_TEXT, getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT));
-
-            //      Setting up share button
-            ImageButton shareButton = (ImageButton) findViewById(R.id.button_share);
-            shareButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    shareIntent.setType("text/plain");
-                    startActivity(Intent.createChooser(shareIntent, "Share using"));
-                }
-            });
-
-            // SCROLL BUTTON
-            //      Setting up "tumblr" scroll button
-            ImageButton scrollButton = (ImageButton) findViewById(R.id.button_scroll);
-            scrollButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (webView.getScrollY() != 0) {
-                        lastSavedY = webView.getScrollY();
+        // SCROLL BUTTON
+        //      Setting up "tumblr" scroll button
+        ImageButton scrollButton = (ImageButton) findViewById(R.id.button_scroll);
+        scrollButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (webView.getScrollY() != 0) {
+                    lastSavedY = webView.getScrollY();
 //                        webView.setScrollY(0);
-                        ObjectAnimator scrollUp = ObjectAnimator.ofInt(webView, "scrollY", webView.getScrollY(), 0);
-                        scrollUp.setDuration(400);
-                        scrollUp.start();
-                    } else {
-                        if (lastSavedY != 0) {
+                    ObjectAnimator scrollUp =
+                            ObjectAnimator.ofInt(webView, "scrollY", webView.getScrollY(), 0);
+                    scrollUp.setDuration(400);
+                    scrollUp.start();
+                } else {
+                    if (lastSavedY != 0) {
 //                            webView.setScrollY(lastSavedY);
-                            ObjectAnimator scrollDown = ObjectAnimator.ofInt(webView, "scrollY", webView.getScrollY(), lastSavedY);
-                            scrollDown.setDuration(400);
-                            scrollDown.start();
-                        }
+                        ObjectAnimator scrollDown =
+                                ObjectAnimator.ofInt(webView, "scrollY", webView.getScrollY(),
+                                                    lastSavedY);
+                        scrollDown.setDuration(400);
+                        scrollDown.start();
                     }
                 }
-            });
+            }
+        });
 
-            // COMMENT BUTTON
-            ImageButton commentButton = (ImageButton) findViewById(R.id.button_comment);
-            commentButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (webViewClient.lastArticleSlug != null) {
-                        Intent intent = new Intent(ArticleActivity.this, DisqusMainActivity.class);
-                        intent.putExtra(DisqusMainActivity.SLUG, webViewClient.lastArticleSlug);
-                        startActivity(intent);
-                    }
+        // COMMENT BUTTON
+        ImageButton commentButton = (ImageButton) findViewById(R.id.button_comment);
+        commentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (webViewClient.lastArticleSlug != null) {
+                    Intent intent = new Intent(ArticleActivity.this, DisqusMainActivity.class);
+                    intent.putExtra(DisqusMainActivity.SLUG, webViewClient.lastArticleSlug);
+                    startActivity(intent);
                 }
-            });
+            }
+        });
 
-            // For Ads by Admobs!
-            AdView mAdView = (AdView) findViewById(R.id.adView_article);
-            AdRequest adRequest = new AdRequest.Builder().build();
-            mAdView.loadAd(adRequest);
-        }
+        // For Ads by Admobs!
+        AdView mAdView = (AdView) findViewById(R.id.adView_article);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        String searchReturnUrl = getIntent().getStringExtra(Intent.EXTRA_RETURN_RESULT);
+        String webviewUrl = webView.getUrl();
+        String intentUrl = getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT);
+
+        // 1. App has returned from search w/ result
+        if (searchReturnUrl != null) {
+            searchReturnUrl = getIntent().getStringExtra(Intent.EXTRA_RETURN_RESULT);   // copy string
+            getIntent().removeExtra(Intent.EXTRA_RETURN_RESULT);        // Return url only valid once, remove it after use
+            webView.loadUrl(searchReturnUrl);
+            Log.d("ArticleActivity", "Loading: " + intentUrl);
+        }
+        // 2. App was stopped/return to this myActivity from search w/o a result (do nothing)
+        else if (webviewUrl != null && !webviewUrl.isEmpty());
+        // 3. App has not loaded its first article yet
+        else if (intentUrl != null)
+            webView.loadUrl(intentUrl);
+//            new URLToMobileArticle(webView).execute(intentUrl);
+
+        if (getSupportActionBar() != null)
+            getSupportActionBar().collapseActionView(); // collapse search bar on return from search
+    }
+
+//    @Override
+//    public void onSaveInstanceState(Bundle outState) {
+//        webView.saveState(outState);
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -257,32 +274,6 @@ public class ArticleActivity extends ActionBarActivity {
     protected void onNewIntent(Intent intent) {
         // change myActivity intent to the one from SearchResultsActivity
         setIntent(intent);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        String searchReturnUrl = getIntent().getStringExtra(Intent.EXTRA_RETURN_RESULT);
-        String webviewUrl = webView.getUrl();
-        String intentUrl = getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT);
-
-        // 1. App has returned from search w/ result
-        if (searchReturnUrl != null) {
-            searchReturnUrl = getIntent().getStringExtra(Intent.EXTRA_RETURN_RESULT);   // copy string
-            getIntent().removeExtra(Intent.EXTRA_RETURN_RESULT);        // Return url only valid once, remove it after use
-            webView.loadUrl(searchReturnUrl);
-            Log.d("ArticleActivity", "Loading: " + intentUrl);
-        }
-        // 2. App was stopped/return to this myActivity from search w/o a result (do nothing)
-        else if (webviewUrl != null && !webviewUrl.isEmpty());
-            // 3. App has not loaded its first article yet
-        else if (intentUrl != null)
-            webView.loadUrl(intentUrl);
-//            new URLToMobileArticle(webView).execute(intentUrl);
-
-        if (getSupportActionBar() != null)
-            getSupportActionBar().collapseActionView(); // collapse search bar on return from search
     }
 
     // view parameter needed for title.xml onClick()
