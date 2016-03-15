@@ -1,5 +1,6 @@
 package app.morningsignout.com.morningsignoff;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -10,12 +11,16 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.util.LruCache;
 import android.util.Xml;
+import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -32,6 +37,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import in.srain.cube.views.GridViewWithHeaderAndFooter;
 
 public class CategoryFragment extends Fragment {
     static public class CategoryViews {
@@ -92,12 +99,26 @@ public class CategoryFragment extends Fragment {
         };
     }
 
+    private void setUpGridView(GridViewWithHeaderAndFooter grid){
+        Context con = getActivity();
+        Display display = ((WindowManager) con.getSystemService(con.WINDOW_SERVICE))
+                .getDefaultDisplay();
+
+        int orientation = display.getRotation();
+
+        if (orientation == Surface.ROTATION_90
+                || orientation == Surface.ROTATION_270) {
+            grid.setNumColumns(2);
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_category_main, container, false);
         final SwipeRefreshLayout refreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefresh_category);
-        final ListView listView = (ListView) rootView.findViewById(R.id.listView);
+        final GridViewWithHeaderAndFooter gridViewWithHeaderAndFooter = (GridViewWithHeaderAndFooter) rootView.findViewById(R.id.gridView);
+        //update variable name to gridview from listview
         TextView headerTitle = getHeaderTextView();
 
         // Views for first FetchListArticlesTask to affect
@@ -111,21 +132,24 @@ public class CategoryFragment extends Fragment {
         loadingViews.refresh = getArguments().containsKey(EXTRA_REFRESH);
 
         // Header TextView
-        listView.addHeaderView(headerTitle);
+        gridViewWithHeaderAndFooter.addHeaderView(headerTitle);
 
         // Footer progressbar view
         footerProgressBar = getFooterProgressBar();
-        listView.addFooterView(footerProgressBar);
+        gridViewWithHeaderAndFooter.addFooterView(footerProgressBar);
+
+        //set up gridview
+        setUpGridView(gridViewWithHeaderAndFooter);
 
         // Adapter
-        listView.setAdapter(new CategoryAdapter(this, inflater));
+        gridViewWithHeaderAndFooter.setAdapter(new CategoryAdapter(this, inflater));
 
         // Use Asynctask to fetch article from the given category
         isLoadingArticles.set(true);
-        new FetchListArticlesTask(this, listView, loadingViews, 1).execute(category);
+        new FetchListArticlesTask(this, gridViewWithHeaderAndFooter, loadingViews, 1).execute(category);
 
         // Setup the click listener for the listView
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        gridViewWithHeaderAndFooter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 WrapperListAdapter wrappedAdapter = (WrapperListAdapter) parent.getAdapter();
@@ -144,7 +168,7 @@ public class CategoryFragment extends Fragment {
                 // Create new activity for the article here
                 // feed the new activity with the URL of the page
                 String articleLink = rowTemp.link;
-                Intent articleActivity = new Intent(listView.getContext(), ArticleActivity.class);
+                Intent articleActivity = new Intent(gridViewWithHeaderAndFooter.getContext(), ArticleActivity.class);
 
                 // EXTRA_HTML_TEXT holds the html link for the article
                 articleActivity.putExtra(Intent.EXTRA_HTML_TEXT, articleLink);
@@ -155,11 +179,11 @@ public class CategoryFragment extends Fragment {
                 // EXTRA_TITLE holds the category name, e.g. "wellness/"
                 articleActivity.putExtra(Intent.EXTRA_TITLE, category);
 
-                listView.getContext().startActivity(articleActivity);
+                gridViewWithHeaderAndFooter.getContext().startActivity(articleActivity);
             }
         });
 
-        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+        gridViewWithHeaderAndFooter.setOnScrollListener(new AbsListView.OnScrollListener() {
             int lastPageNum = 0;
 
             @Override
@@ -168,7 +192,7 @@ public class CategoryFragment extends Fragment {
 
                 // At last item
                 if (lastVisibleItem >= totalItemCount) {
-                    WrapperListAdapter wrappedAdapter = (WrapperListAdapter) listView.getAdapter();
+                    WrapperListAdapter wrappedAdapter = (WrapperListAdapter) gridViewWithHeaderAndFooter.getAdapter();
                     CategoryAdapter adapter = (CategoryAdapter) wrappedAdapter.getWrappedAdapter();
 
                     int pageNum = adapter.getPageNum();
@@ -179,7 +203,7 @@ public class CategoryFragment extends Fragment {
                         views.footerProgress = new WeakReference<ProgressBar>(footerProgressBar);
 
                         lastPageNum = pageNum;
-                        new FetchListArticlesTask(CategoryFragment.this, listView, views, pageNum + 1).execute(category);
+                        new FetchListArticlesTask(CategoryFragment.this, gridViewWithHeaderAndFooter, views, pageNum + 1).execute(category);
                     }
                 }
             }
@@ -192,7 +216,7 @@ public class CategoryFragment extends Fragment {
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (!listView.getAdapter().isEmpty() || !isLoadingArticles.get()) {
+                if (!gridViewWithHeaderAndFooter.getAdapter().isEmpty() || !isLoadingArticles.get()) {
                     // Reload categoryFragment
                     CategoryFragment fragment =
                             CategoryFragment.findOrCreateRetainFragment(getActivity().getSupportFragmentManager());

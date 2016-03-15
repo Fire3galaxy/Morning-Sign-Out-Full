@@ -13,17 +13,22 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/swipeRefresh_category">
-        <ListView
+        <in.srain.cube.views.GridViewWithHeaderAndFooter
             android:text="@string/app_name"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/listView"
+            android:id="@+id/gridView"
             android:clipToPadding="false"
             android:scrollbars="none"
+            android:numColumns="1"
             android:divider="#00ffffff"
             android:dividerHeight="10dp"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
+            android:horizontalSpacing="5dp"
+            android:verticalSpacing="5dp"
+            android:paddingRight="2dp"
+            android:paddingLeft="2dp"
             android:listSelector="@android:color/transparent"
             android:footerDividersEnabled="true"/>
     </android.support.v4.widget.SwipeRefreshLayout>

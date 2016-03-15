@@ -3,6 +3,7 @@ package app.morningsignout.com.morningsignoff;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
+import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -17,6 +18,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import in.srain.cube.views.GridViewWithHeaderAndFooter;
+
 // This class is called in Category Activity to fetch articles online and feed it to CategoryAdapter
 // do in background gets the article objects from morningsignout, and converts imageURL to bitmap
 // getArticles() is the method that connects to the website and html
@@ -26,7 +29,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
     private final String logString = FetchListArticlesTask.class.getSimpleName();
 
     private WeakReference<CategoryFragment> fragmentRef;
-    private WeakReference<ListView> listViewWeakRef;
+    private WeakReference<GridViewWithHeaderAndFooter> listViewWeakRef;
     private CategoryFragment.CategoryViews loadingViews;
     private ProgressBar footerProgressBar;
     private int pageNum;
@@ -35,11 +38,11 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
     // Called by onCreateView on first call
     public FetchListArticlesTask(CategoryFragment fragment,
-                                 ListView listView,
+                                 GridViewWithHeaderAndFooter gridViewWithHeaderAndFooter,
                                  CategoryFragment.CategoryViews loadingViews,
                                  int pageNum) {
         this.fragmentRef = new WeakReference<CategoryFragment>(fragment);   // ensure fragment still exists
-        this.listViewWeakRef = new WeakReference<ListView>(listView);       // ensure listview still exists
+        this.listViewWeakRef = new WeakReference<GridViewWithHeaderAndFooter>(gridViewWithHeaderAndFooter);       // ensure listview still exists
         this.loadingViews = loadingViews;       // refresh layout, task, loading message (first time views)
         this.pageNum = pageNum;         // page of mso page called for task
         this.footerProgressBar = null; // not used on first call to task
