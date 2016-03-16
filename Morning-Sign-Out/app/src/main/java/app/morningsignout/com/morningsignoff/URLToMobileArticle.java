@@ -388,25 +388,17 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
             e.printStackTrace();
             return null;
         }
-        doc.select("header").remove();
-        doc.select("footer").remove();
-        doc.select("div.ssba-wrap").remove();
-        doc.select(".content__related").remove();
-        doc.select("#disqus_thread").remove();
-        doc.select(".nocomments").remove();
-        doc.select(".post-nav").remove();
+        doc.select("header").remove();              // Top of page
+        doc.select("footer").remove();              // Bottom of page
+        doc.select("div.ssba-wrap").remove();       // Social media addon
+        doc.select(".content__related").remove();   // Related articles
+        doc.select("#disqus_thread").remove();      // Comments section
+        doc.select(".nocomments").remove();         // No comments section
+        doc.select(".post-nav").remove();           // Previous/Next article
+        doc.select("h4").first().remove();          // Category
         Element post = doc.select(".content__post").first();
-        post.attr("style", "margin-top: 0px; padding-top: 20px");
-
-//        doc.select("img.size-full").removeAttr("width").removeAttr("height")
-//                .attr("style", "margin: 0");
-//                .attr("height", "10%");
-                //.attr("width", "auto")
-                //.attr("max-width", "inherit");
-//                .attr("max-height", "100%");
-//        Log.d("URLToMobileArticle", doc.select("img.size-full").outerHtml());
-        doc.select("figure").attr("style", "display: block");
-        //Log.d("", "");
+        post.attr("style", "margin-top: 0px; padding-top: 20px");   // Padding of page
+        doc.select("figure").attr("style", "display: block");       // Fix stretched images
 
         return doc.toString();
     }
