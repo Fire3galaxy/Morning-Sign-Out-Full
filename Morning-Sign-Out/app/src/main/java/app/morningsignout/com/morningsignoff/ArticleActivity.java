@@ -86,42 +86,6 @@ public class ArticleActivity extends ActionBarActivity {
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setDisplayShowCustomEnabled(true);
 
-        // WEBVIEW - Getting article from URL and stripping away extra parts of website for better reading
-        webView = (WebView) findViewById(R.id.webView_article);
-        final ProgressBar loadPage = (ProgressBar) findViewById(R.id.progressBar_article);
-        webView.setWebChromeClient(new WebChromeClient() { // Progress bar
-            @Override
-            public void onProgressChanged(WebView v, int newProgress) {
-                if (newProgress < 100) {
-                    if (loadPage.getVisibility() == View.GONE)
-                        loadPage.setVisibility(View.VISIBLE);
-
-                    loadPage.setProgress(newProgress);
-                } else if (newProgress == 100) {
-                    loadPage.setProgress(newProgress);
-
-                    if (loadPage.getVisibility() == View.VISIBLE)
-                        loadPage.setVisibility(View.GONE);
-                }
-            }
-        });
-        webView.getSettings().setDisplayZoomControls(false);
-        webView.getSettings().setBuiltInZoomControls(false);
-        webViewClient = new ArticleWebViewClient(this);
-        webView.setWebViewClient(webViewClient);
-
-        // Load first website or restore webview if destroyed and recreated
-        if (savedInstanceState == null) {
-            if (getIntent() != null) {
-                String article = getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT);
-                webView.loadUrl(article);
-                shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.putExtra(Intent.EXTRA_TEXT, article);
-            }
-        } else {
-            webView.restoreState(savedInstanceState);
-        }
-
         // Setting global var for bar at the bottom for disappearance/reappearance
         bottomBar = (RelativeLayout) findViewById(R.id.container_articleBar);
 
@@ -222,6 +186,46 @@ public class ArticleActivity extends ActionBarActivity {
                 }
             });
         }
+
+        // WEBVIEW - Getting article from URL and stripping away extra parts of website for better reading
+        webView = (WebView) findViewById(R.id.webView_article);
+        final ProgressBar loadPage = (ProgressBar) findViewById(R.id.progressBar_article);
+        webView.setWebChromeClient(new WebChromeClient() { // Progress bar
+            @Override
+            public void onProgressChanged(WebView v, int newProgress) {
+                if (newProgress < 100) {
+                    if (loadPage.getVisibility() == View.GONE)
+                        loadPage.setVisibility(View.VISIBLE);
+
+                    loadPage.setProgress(newProgress);
+                } else if (newProgress == 100) {
+                    loadPage.setProgress(newProgress);
+
+                    if (loadPage.getVisibility() == View.VISIBLE)
+                        loadPage.setVisibility(View.GONE);
+                }
+            }
+        });
+        webView.getSettings().setDisplayZoomControls(false);
+        webView.getSettings().setBuiltInZoomControls(false);
+        webViewClient = new ArticleWebViewClient(this);
+        webView.setWebViewClient(webViewClient);
+
+        // Load first website or restore webview if destroyed and recreated
+        if (savedInstanceState == null) {
+            if (getIntent() != null) {
+                String article = getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT);
+                webView.loadUrl(article);
+                shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.putExtra(Intent.EXTRA_TEXT, article);
+            }
+        } else {
+            webView.restoreState(savedInstanceState);
+        }
+
+        // Hiding bar before onResume() if activity was recreated by orientation change
+        if (!ArticleWebViewClient.isArticle(webView.getUrl()))
+            hideArticleBar();
     }
 
     @Override
@@ -304,7 +308,9 @@ public class ArticleActivity extends ActionBarActivity {
             bottomBar.setVisibility(RelativeLayout.VISIBLE);
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (mAdView.getLayoutParams().width != LinearLayout.LayoutParams.WRAP_CONTENT) {
+            ViewGroup.LayoutParams orig = mAdView.getLayoutParams();
+
+            if (orig.width != LinearLayout.LayoutParams.WRAP_CONTENT) {
                 LinearLayout.LayoutParams normal =
                         new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 mAdView.setLayoutParams(normal);
@@ -316,7 +322,9 @@ public class ArticleActivity extends ActionBarActivity {
             bottomBar.setVisibility(RelativeLayout.GONE);
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (mAdView.getLayoutParams().width != LinearLayout.LayoutParams.MATCH_PARENT) {
+            ViewGroup.LayoutParams orig = mAdView.getLayoutParams();
+
+            if (orig.width != LinearLayout.LayoutParams.MATCH_PARENT) {
                 LinearLayout.LayoutParams centerAd =
                         new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 mAdView.setLayoutParams(centerAd);
@@ -499,7 +507,10 @@ class ArticleWebViewClient extends WebViewClient {
         return wbresponse;
     }
 
-    boolean isArticle(String url) {
+    public static boolean isArticle(String url) {
+        if (url == null || url.isEmpty())
+            return false;
+
         Uri requestUrl = Uri.parse(url);
 
         // imageViewReference/etc.
