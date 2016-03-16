@@ -1,5 +1,6 @@
 package app.morningsignout.com.morningsignoff;
 
+import android.animation.AnimatorInflater;
 import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.app.SearchManager;
@@ -86,21 +87,55 @@ public class ArticleActivity extends ActionBarActivity {
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setDisplayShowCustomEnabled(true);
 
-        // Setting global var for bar at the bottom for disappearance/reappearance
+        // BOTTOM BAR
+        //      Setting global var for bar at the bottom for disappearance/reappearance
         bottomBar = (RelativeLayout) findViewById(R.id.container_articleBar);
 
-//        // FIXME: Only for portrait orientation!
-//        //      Setting up objectAnimators for articleBar's show/hide animation
-//        showArticleBar = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.show_article_bar);
-//        showArticleBar.setTarget(bottomBar);
-//        hideArticleBar = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.hide_article_bar);
-//        hideArticleBar.setTarget(bottomBar);
-//
-//        //      How the animation of the articleBar is programmed
-//        LinearLayout container = (LinearLayout) findViewById(R.id.container_article);
-//        container.setLayoutTransition(getCustomLayoutTransition());
+        // For Ads by Admobs!
+        mAdView = (AdView) findViewById(R.id.adView_article);
+        mAdView.loadAd(new AdRequest.Builder().build());
 
-        //      Setting up share button
+        // WEBVIEW - Getting article from URL and stripping away extra parts of website for better reading
+        webView = (WebView) findViewById(R.id.webView_article);
+        final ProgressBar loadPage = (ProgressBar) findViewById(R.id.progressBar_article);
+        webView.setWebChromeClient(new WebChromeClient() { // Progress bar
+            @Override
+            public void onProgressChanged(WebView v, int newProgress) {
+                if (newProgress < 100) {
+                    if (loadPage.getVisibility() == View.GONE)
+                        loadPage.setVisibility(View.VISIBLE);
+
+                    loadPage.setProgress(newProgress);
+                } else if (newProgress == 100) {
+                    loadPage.setProgress(newProgress);
+
+                    if (loadPage.getVisibility() == View.VISIBLE)
+                        loadPage.setVisibility(View.GONE);
+                }
+            }
+        });
+        webView.getSettings().setDisplayZoomControls(false);
+        webView.getSettings().setBuiltInZoomControls(false);
+        webViewClient = new ArticleWebViewClient(this);
+        webView.setWebViewClient(webViewClient);
+
+        // Load first website or restore webview if destroyed and recreated
+        if (savedInstanceState == null) {
+            if (getIntent() != null) {
+                String article = getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT);
+                webView.loadUrl(article);
+                shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.putExtra(Intent.EXTRA_TEXT, article);
+            }
+        } else {
+            webView.restoreState(savedInstanceState);
+        }
+
+        // Hiding bar before onResume() if activity was recreated by orientation change
+        if (!ArticleWebViewClient.isArticle(webView.getUrl()))
+            hideArticleBar();
+
+        // SHARE BUTTON
         ImageButton shareButton = (ImageButton) findViewById(R.id.button_share);
         shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,12 +177,19 @@ public class ArticleActivity extends ActionBarActivity {
             }
         });
 
-        // For Ads by Admobs!
-        mAdView = (AdView) findViewById(R.id.adView_article);
-        mAdView.loadAd(new AdRequest.Builder().build());
+        // Setting up objectAnimators for articleBar's show/hide animation (Portrait only)
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            showArticleBar = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.show_article_bar);
+            showArticleBar.setTarget(bottomBar);
+            hideArticleBar = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.hide_article_bar);
+            hideArticleBar.setTarget(bottomBar);
 
+            //      How the animation of the articleBar is programmed
+            LinearLayout container = (LinearLayout) findViewById(R.id.container_article);
+            container.setLayoutTransition(getCustomLayoutTransition());
+        }
         // SWAP BUTTON (Landscape only)
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        else {
             // If user is left handed, put adview on the right before user can see it
             SharedPreferences preferences = getPreferences(MODE_PRIVATE);
             final boolean adWasLeft = preferences.getBoolean(AD_WAS_LEFT, true);
@@ -186,46 +228,6 @@ public class ArticleActivity extends ActionBarActivity {
                 }
             });
         }
-
-        // WEBVIEW - Getting article from URL and stripping away extra parts of website for better reading
-        webView = (WebView) findViewById(R.id.webView_article);
-        final ProgressBar loadPage = (ProgressBar) findViewById(R.id.progressBar_article);
-        webView.setWebChromeClient(new WebChromeClient() { // Progress bar
-            @Override
-            public void onProgressChanged(WebView v, int newProgress) {
-                if (newProgress < 100) {
-                    if (loadPage.getVisibility() == View.GONE)
-                        loadPage.setVisibility(View.VISIBLE);
-
-                    loadPage.setProgress(newProgress);
-                } else if (newProgress == 100) {
-                    loadPage.setProgress(newProgress);
-
-                    if (loadPage.getVisibility() == View.VISIBLE)
-                        loadPage.setVisibility(View.GONE);
-                }
-            }
-        });
-        webView.getSettings().setDisplayZoomControls(false);
-        webView.getSettings().setBuiltInZoomControls(false);
-        webViewClient = new ArticleWebViewClient(this);
-        webView.setWebViewClient(webViewClient);
-
-        // Load first website or restore webview if destroyed and recreated
-        if (savedInstanceState == null) {
-            if (getIntent() != null) {
-                String article = getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT);
-                webView.loadUrl(article);
-                shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.putExtra(Intent.EXTRA_TEXT, article);
-            }
-        } else {
-            webView.restoreState(savedInstanceState);
-        }
-
-        // Hiding bar before onResume() if activity was recreated by orientation change
-        if (!ArticleWebViewClient.isArticle(webView.getUrl()))
-            hideArticleBar();
     }
 
     @Override
