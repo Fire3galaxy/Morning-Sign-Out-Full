@@ -6,6 +6,7 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -19,6 +20,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.TranslateAnimation;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
@@ -48,6 +50,7 @@ public class ArticleActivity extends ActionBarActivity {
     private WebView webView;
     private ArticleWebViewClient webViewClient;
     private SearchView searchView;
+    AdView mAdView;
 
     private Intent shareIntent;
 
@@ -172,9 +175,42 @@ public class ArticleActivity extends ActionBarActivity {
         });
 
         // For Ads by Admobs!
-        AdView mAdView = (AdView) findViewById(R.id.adView_article);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
+        mAdView = (AdView) findViewById(R.id.adView_article);
+        mAdView.loadAd(new AdRequest.Builder().build());
+
+        // SWAP BUTTON (Landscape only)
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            ImageButton swapButton = (ImageButton) findViewById(R.id.button_swap_bar);
+
+            swapButton.setOnClickListener(new View.OnClickListener() {
+                boolean adIsLeft = true;
+                int centerPx = Math.max(bottomBar.getLeft(), mAdView.getLeft());
+
+                @Override
+                public void onClick(View v) {
+                    TranslateAnimation swapRight =
+                            new TranslateAnimation(0, centerPx, 0, 0);
+                    TranslateAnimation swapLeft =
+                            new TranslateAnimation(0, -1 * centerPx, 0, 0);
+                    swapLeft.setDuration(400);
+                    swapRight.setDuration(400);
+
+                    if (adIsLeft) {
+                        mAdView.startAnimation(swapRight);
+                        bottomBar.startAnimation(swapLeft);
+                        mAdView.setLeft(centerPx);
+                        bottomBar.setLeft(0);
+                        adIsLeft = false;
+                    } else {
+                        mAdView.startAnimation(swapLeft);
+                        bottomBar.startAnimation(swapRight);
+                        mAdView.setLeft(0);
+                        bottomBar.setLeft(centerPx);
+                        adIsLeft = true;
+                    }
+                }
+            });
+        }
     }
 
     @Override
