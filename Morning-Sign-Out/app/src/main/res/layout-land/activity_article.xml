@@ -35,19 +35,20 @@
         android:layout_height="wrap_content"
         android:id="@+id/container_articleTwoBars"
         android:background="@color/mso_blue"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:animateLayoutChanges="true">
 
         <com.google.android.gms.ads.AdView
             android:id="@+id/adView_article"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="320dp"
+            android:layout_height="50dp"
             ads:adUnitId="@string/banner_ad_unit_id"
             ads:adSize="BANNER"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center_horizontal"/>
 
         <RelativeLayout
             android:layout_width="0dp"
-            android:layout_height="?android:attr/actionBarSize"
+            android:layout_height="50dp"
             android:layout_weight="1"
             android:id="@+id/container_articleBar"
             android:layout_gravity="center_horizontal"

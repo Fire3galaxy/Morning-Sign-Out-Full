@@ -27,6 +27,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
@@ -181,31 +182,21 @@ public class ArticleActivity extends ActionBarActivity {
         // SWAP BUTTON (Landscape only)
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             ImageButton swapButton = (ImageButton) findViewById(R.id.button_swap_bar);
+            final LinearLayout containerTwoBars = (LinearLayout) findViewById(R.id.container_articleTwoBars);
 
             swapButton.setOnClickListener(new View.OnClickListener() {
                 boolean adIsLeft = true;
-                int centerPx = Math.max(bottomBar.getLeft(), mAdView.getLeft());
 
                 @Override
                 public void onClick(View v) {
-                    TranslateAnimation swapRight =
-                            new TranslateAnimation(0, centerPx, 0, 0);
-                    TranslateAnimation swapLeft =
-                            new TranslateAnimation(0, -1 * centerPx, 0, 0);
-                    swapLeft.setDuration(400);
-                    swapRight.setDuration(400);
-
+//                    Log.d("ArticleActivity", String.valueOf(centerBarPx));
                     if (adIsLeft) {
-                        mAdView.startAnimation(swapRight);
-                        bottomBar.startAnimation(swapLeft);
-                        mAdView.setLeft(centerPx);
-                        bottomBar.setLeft(0);
+                        mAdView.animate().x(bottomBar.getWidth());
+                        bottomBar.animate().x(0);
                         adIsLeft = false;
                     } else {
-                        mAdView.startAnimation(swapLeft);
-                        bottomBar.startAnimation(swapRight);
-                        mAdView.setLeft(0);
-                        bottomBar.setLeft(centerPx);
+                        mAdView.animate().x(0);
+                        bottomBar.animate().x(mAdView.getWidth());
                         adIsLeft = true;
                     }
                 }
