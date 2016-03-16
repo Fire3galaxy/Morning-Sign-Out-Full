@@ -6,6 +6,7 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -20,7 +21,6 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.TranslateAnimation;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
@@ -41,7 +41,9 @@ import com.google.android.gms.ads.AdView;
 
 // Activity class created in FetchListArticleTask when user clicks on an article from the ListView
 public class ArticleActivity extends ActionBarActivity {
-    private Integer lastSavedY;
+    final static String AD_WAS_LEFT = "AdView is left";
+
+    Integer lastSavedY;
     ObjectAnimator showArticleBar;
     ObjectAnimator hideArticleBar;
 
@@ -181,24 +183,41 @@ public class ArticleActivity extends ActionBarActivity {
 
         // SWAP BUTTON (Landscape only)
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            ImageButton swapButton = (ImageButton) findViewById(R.id.button_swap_bar);
-            final LinearLayout containerTwoBars = (LinearLayout) findViewById(R.id.container_articleTwoBars);
+            // If user is left handed, put adview on the right before user can see it
+            SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+            final boolean adWasLeft = preferences.getBoolean(AD_WAS_LEFT, true);
 
+            if (!adWasLeft) {
+                LinearLayout containerTwoBars =
+                        (LinearLayout) findViewById(R.id.container_articleTwoBars);
+                containerTwoBars.removeView(mAdView);
+                containerTwoBars.addView(mAdView, 1);
+            }
+
+            // Set up swap button (Left/Right handed people)
+            ImageButton swapButton = (ImageButton) findViewById(R.id.button_swap_bar);
             swapButton.setOnClickListener(new View.OnClickListener() {
-                boolean adIsLeft = true;
+                SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
+                boolean adIsLeft = adWasLeft;
 
                 @Override
                 public void onClick(View v) {
-//                    Log.d("ArticleActivity", String.valueOf(centerBarPx));
+                    // Swap the ad to the right
                     if (adIsLeft) {
                         mAdView.animate().x(bottomBar.getWidth());
                         bottomBar.animate().x(0);
                         adIsLeft = false;
-                    } else {
+                    }
+                    // Swap the ad to the left
+                    else {
                         mAdView.animate().x(0);
                         bottomBar.animate().x(mAdView.getWidth());
                         adIsLeft = true;
                     }
+
+                    // Save user's setting
+                    editor.putBoolean(AD_WAS_LEFT, adIsLeft);
+                    editor.apply();
                 }
             });
         }
