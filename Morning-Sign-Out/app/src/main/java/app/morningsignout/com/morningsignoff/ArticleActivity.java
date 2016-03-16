@@ -21,6 +21,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
@@ -79,9 +80,9 @@ public class ArticleActivity extends ActionBarActivity {
         // ACTION BAR
         //      ImageButton is Morning Sign Out logo, which sends user back to home screen (see XML)
         //      Setting imageButton to center of actionbar
-        ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null); // could replace null with new LinearLayout. properties not needed though.
+        ImageButton home = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null); // could replace null with new LinearLayout. properties not needed though.
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);
-        actionBar.setCustomView(ib, params);
+        actionBar.setCustomView(home, params);
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setDisplayShowCustomEnabled(true);
 
@@ -121,9 +122,9 @@ public class ArticleActivity extends ActionBarActivity {
             webView.restoreState(savedInstanceState);
         }
 
-        // Setting bar at the bottom for disappearance/reappearance
+        // Setting global var for bar at the bottom for disappearance/reappearance
         bottomBar = (RelativeLayout) findViewById(R.id.container_articleBar);
-//
+
 //        // FIXME: Only for portrait orientation!
 //        //      Setting up objectAnimators for articleBar's show/hide animation
 //        showArticleBar = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.show_article_bar);
@@ -299,13 +300,27 @@ public class ArticleActivity extends ActionBarActivity {
         this.shareIntent = shareIntent;
     }
     public void showArticleBar() {
-        if (bottomBar.getVisibility() != RelativeLayout.VISIBLE) {
+        if (bottomBar.getVisibility() != RelativeLayout.VISIBLE)
             bottomBar.setVisibility(RelativeLayout.VISIBLE);
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if (mAdView.getLayoutParams().width != LinearLayout.LayoutParams.WRAP_CONTENT) {
+                LinearLayout.LayoutParams normal =
+                        new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                mAdView.setLayoutParams(normal);
+            }
         }
     }
     public void hideArticleBar() {
-        if (bottomBar.getVisibility() != RelativeLayout.GONE) {
+        if (bottomBar.getVisibility() != RelativeLayout.GONE)
             bottomBar.setVisibility(RelativeLayout.GONE);
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if (mAdView.getLayoutParams().width != LinearLayout.LayoutParams.MATCH_PARENT) {
+                LinearLayout.LayoutParams centerAd =
+                        new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                mAdView.setLayoutParams(centerAd);
+            }
         }
     }
 

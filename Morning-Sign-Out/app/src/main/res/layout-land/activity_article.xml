@@ -32,11 +32,10 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:id="@+id/container_articleTwoBars"
         android:background="@color/mso_blue"
-        android:orientation="horizontal"
-        android:animateLayoutChanges="true">
+        android:orientation="horizontal">
 
         <com.google.android.gms.ads.AdView
             android:id="@+id/adView_article"
