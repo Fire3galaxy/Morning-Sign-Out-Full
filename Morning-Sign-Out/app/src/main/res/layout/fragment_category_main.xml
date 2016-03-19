@@ -26,9 +26,7 @@
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             android:horizontalSpacing="5dp"
-            android:verticalSpacing="5dp"
-            android:paddingRight="2dp"
-            android:paddingLeft="2dp"
+            android:verticalSpacing="15dp"
             android:listSelector="@android:color/transparent"
             android:footerDividersEnabled="true"/>
     </android.support.v4.widget.SwipeRefreshLayout>

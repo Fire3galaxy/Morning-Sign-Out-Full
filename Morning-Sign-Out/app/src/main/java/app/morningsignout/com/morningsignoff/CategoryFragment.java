@@ -109,6 +109,7 @@ public class CategoryFragment extends Fragment {
         if (orientation == Surface.ROTATION_90
                 || orientation == Surface.ROTATION_270) {
             grid.setNumColumns(2);
+            grid.setPadding(5,10,5,10);
         }
     }
 
