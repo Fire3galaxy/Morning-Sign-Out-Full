@@ -95,7 +95,7 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
             try {
                 return getOther(requestUrl.toString());
             } catch (IOException e) {
-                Log.e(LOG_NAME, e.getMessage());
+                Log.e(LOG_NAME, "IOException in Fetching Search page");
             }
         }
 
@@ -329,10 +329,8 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
             return false;
         }
 
-        if (html.charAt(lastTag + 1) == 'a') // <a href="....">
-            return true;
-        else                                // <figure
-            return false;
+        // <a href="...."> or <figure
+        return html.charAt(lastTag + 1) == 'a';
     }
 
     static String getOther(final String urlname) throws IOException {

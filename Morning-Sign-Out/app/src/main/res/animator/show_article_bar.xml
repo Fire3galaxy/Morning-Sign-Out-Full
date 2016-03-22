@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <objectAnimator xmlns:android="http://schemas.android.com/apk/res/android"
-    android:propertyName="translationY"
-    android:duration="300"
-    android:valueFrom="?android:attr/actionBarSize"
-    android:valueTo="0"/>
+    android:duration="300">
+    <propertyValuesHolder
+        android:propertyName="translationY"
+        android:valueFrom="?android:attr/actionBarSize"
+        android:valueTo="0"/>
+    <propertyValuesHolder
+        android:propertyName="alpha"
+        android:valueFrom="0f"
+        android:valueTo="1f"/>
+</objectAnimator>
