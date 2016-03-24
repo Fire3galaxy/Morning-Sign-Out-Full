@@ -246,7 +246,7 @@ public class DisqusDetails {
 
                 return response.toString();
             } catch (IOException e) {
-                Log.e("DisqusDetails", "getHttp: " + e.getMessage());
+                Log.e("DisqusDetails", "getHttp connection problem");
             }
 
             return null;
@@ -297,7 +297,7 @@ public class DisqusDetails {
                 // Print result
                 return response.toString();
             } catch (IOException e) {
-                Log.e("DisqusDetails", "postHttp: " + e.getMessage());
+                Log.e("DisqusDetails", "postHttp connection problem");
             } finally {
                 if (urlConnection != null) urlConnection.disconnect();
             }

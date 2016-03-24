@@ -69,11 +69,7 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ListAdapter listAdapter = commentsView.getAdapter();
                 if (listAdapter != null) {
-                    DisqusAdapter adapter;
-                    if (listAdapter instanceof HeaderViewListAdapter)
-                        adapter = (DisqusAdapter) ((HeaderViewListAdapter) listAdapter).getWrappedAdapter();
-                    else
-                        adapter = (DisqusAdapter) listAdapter;
+                    DisqusAdapter adapter = (DisqusAdapter) listAdapter;
 
                     Comments comment = (Comments) adapter.getItem(position);
 
@@ -164,7 +160,6 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
             new DisqusGetAccessToken(dsqTextPb, this).execute(code, dsq_thread_id);
         } else if (resultCode == Activity.RESULT_CANCELED)
             Log.d("DisqusActivity", "Cancelled");
-        //Log.d("",""); // can delete this. just htc m8 testing bugs.
     }
 
     public void refreshComments(boolean pause) {

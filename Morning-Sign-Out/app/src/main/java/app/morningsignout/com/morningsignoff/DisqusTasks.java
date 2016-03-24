@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListAdapter;
@@ -24,8 +25,7 @@ import java.util.ArrayList;
 class DisqusGetComments extends AsyncTask<String, Void, TempCommentsAndThreadId> {
     WeakReference<ListView> commentsView;
     WeakReference<ProgressBar> pb;
-    WeakReference<DisqusMainActivity> act; // FIXME: we need to pass in dsq_thread_id, for now we get it here and set it for act.
-    TextView noComments = null;
+    WeakReference<DisqusMainActivity> act;
     boolean hasToken = false, justRefresh = false;
 
     DisqusGetComments(ListView commentsView, ProgressBar pb, DisqusMainActivity act, boolean hasToken, boolean justRefresh) {
@@ -49,8 +49,20 @@ class DisqusGetComments extends AsyncTask<String, Void, TempCommentsAndThreadId>
     // returns list of comments (thread id stored in reference)
     @Override
     protected TempCommentsAndThreadId doInBackground(String... args) {
-        // Returns null only on request to get comments JSON failed
-        return new DisqusDetails().getComments(args[0], justRefresh);
+        TempCommentsAndThreadId catiPair = new DisqusDetails().getComments(args[0], justRefresh);
+
+        // Try again once if network issue
+        if (catiPair.code == 2) {
+            try {
+                Thread.sleep(1000); // 1 second
+            } catch (InterruptedException e) {
+                Log.e("DisqusGetComments", "Error in thread sleep");
+            }
+
+            catiPair = new DisqusDetails().getComments(args[0], justRefresh);
+        }
+
+        return catiPair;
     }
 
     @Override
@@ -68,34 +80,31 @@ class DisqusGetComments extends AsyncTask<String, Void, TempCommentsAndThreadId>
             return;
         }
 
-        else if (catiPair.code == 2) {
-            return; // FIXME
-        }
-
         // If first time, give activity the thread id
         if (!justRefresh && act.get() != null)
             if (catiPair.code == 0 || catiPair.code == 3)
                 act.get().setDsq_thread_id(catiPair.dsq_thread_id);
 
-        if (catiPair.code == 3)
+        // I guess user will just have to try again later?
+        if (catiPair.code == 2 || catiPair.code == 3) {
+            if (act.get() != null)
+                Toast.makeText(act.get(), "Internet issue. Try refreshing!", Toast.LENGTH_SHORT).show();
             return;
+        }
 
         // Set up list of comments (code == 0)
         if (commentsView.get() != null && act.get() != null) {
             ListAdapter adapter = commentsView.get().getAdapter();
 
-            if (adapter == null)         // Set new list of comments
+            // Set new list of comments
+            if (adapter == null)
                 commentsView.get().setAdapter(new DisqusAdapter(act.get(), catiPair.comments));
-            else //if (adapter instanceof DisqusAdapter)          // Change data list of old adapter
+
+            // Change data list of old adapter
+            else
                 ((DisqusAdapter) adapter).switchList(catiPair.comments);
-//            else if (adapter instanceof WrapperListAdapter) {   // Adapter was once empty, unwrap first.
-//                DisqusAdapter oldAdapter =
-//                        (DisqusAdapter) ((WrapperListAdapter) adapter).getWrappedAdapter();
-//                oldAdapter.switchList(catiPair.comments);
-//            }
         }
 
-        // FIXME Remove this?
         // Set up action button (if relevant - first time getting)
         if (!justRefresh && act.get() != null) {
             if (!hasToken)
@@ -104,39 +113,6 @@ class DisqusGetComments extends AsyncTask<String, Void, TempCommentsAndThreadId>
                 act.get().setupEditText();
                 act.get().setActionButtonToPost();
             }
-        }
-//        else
-//            act.get().setRefreshOff(); // Turn off refreshing animation (if relevant - refresh w/ layout)
-    }
-
-    private void addNoCommentsHeaderIfNeeded() {
-        // If listview is null, user probably exited activity early. Don't bother with task.
-        boolean isNotNull = commentsView.get() != null;
-        // Don't add header if it already exists
-        boolean noHeader = isNotNull && (commentsView.get().getHeaderViewsCount() == 0);
-        // Don't add header if this is refresh and comments already exist in listview
-        boolean isEmpty;
-
-        // Can only add header views before adapter is in place until API 19, KITKAT
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
-            isEmpty = isNotNull && commentsView.get().getAdapter() == null;
-        else
-            isEmpty = isNotNull &&
-                    (commentsView.get().getAdapter() == null || commentsView.get().getCount() == 0);
-
-
-        // No comments here yet. Be the first!
-        if (noHeader && isEmpty) {
-            if (noComments == null) {
-                noComments = new TextView(commentsView.get().getContext());
-                noComments.setText("No comments here yet. Be the first!\n\n" +
-                        "Swipe down here or hit refresh in the menu to check for more comments.");
-                noComments.setPadding(12, 8, 12, 0);
-                noComments.setTypeface(Typeface.DEFAULT);
-                noComments.setTextColor(Color.BLACK);
-            }
-
-            commentsView.get().addHeaderView(noComments, null, false);
         }
     }
 }
