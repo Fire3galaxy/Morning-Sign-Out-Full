@@ -21,7 +21,7 @@ import java.util.ArrayList;
  * Created by Daniel on 11/26/2015.
  */
 // Argument: Slug of mso post (ArticleWebViewClient)
-class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
+class DisqusGetComments extends AsyncTask<String, Void, TempCommentsAndThreadId> {
     WeakReference<ListView> commentsView;
     WeakReference<ProgressBar> pb;
     WeakReference<DisqusMainActivity> act; // FIXME: we need to pass in dsq_thread_id, for now we get it here and set it for act.
@@ -42,56 +42,60 @@ class DisqusGetComments extends AsyncTask<String, Void, ArrayList<Comments>> {
         if (pb.get() != null)
             pb.get().setVisibility(View.VISIBLE);
 
-        addNoCommentsHeaderIfNeeded();
+//        addNoCommentsHeaderIfNeeded();
     }
 
-    // args[0] = slug for article
+    // args[0] = slug for article in !justRefresh, dsq thread id in justRefresh
     // returns list of comments (thread id stored in reference)
     @Override
-    protected ArrayList<Comments> doInBackground(String... args) {
-        DisqusDetails disqus = new DisqusDetails();
-
-        TempCommentsAndThreadId ret = disqus.getComments(args[0]);
-        if (ret != null) {
-            // If first time, give activity the thread id
-            if (!justRefresh && act.get() != null)
-                act.get().setDsq_thread_id(ret.dsq_thread_id);
-
-            return ret.comments;
-        }
-
-        return null;
+    protected TempCommentsAndThreadId doInBackground(String... args) {
+        // Returns null only on request to get comments JSON failed
+        return new DisqusDetails().getComments(args[0], justRefresh);
     }
 
     @Override
-    protected void onPostExecute(ArrayList<Comments> comments) {
+    protected void onPostExecute(TempCommentsAndThreadId catiPair) { // cati - Comments And Thread Id
         // Remove progress bar for comments
         if (pb.get() != null)
             pb.get().setVisibility(View.GONE);
 
-        // Set up list of comments
-        if (commentsView.get() != null && act.get() != null && comments != null) {
-            // remove header if comments exist
-            if (!comments.isEmpty()) commentsView.get().removeHeaderView(noComments);
-
-            ListAdapter adapter = commentsView.get().getAdapter();
-            if (adapter == null)         // Set new list of comments
-                commentsView.get().setAdapter(new DisqusAdapter(act.get(), comments));
-            else if (adapter instanceof DisqusAdapter)          // Change data list of old adapter
-                ((DisqusAdapter) adapter).switchList(comments);
-            else if (adapter instanceof WrapperListAdapter) {   // Adapter was once empty, unwrap first.
-                DisqusAdapter oldAdapter =
-                        (DisqusAdapter) ((WrapperListAdapter) adapter).getWrappedAdapter();
-                oldAdapter.switchList(comments);
+        // Cannot comment on page b/c not allowed/no thread id? Close activity and toast
+        if (catiPair.code == 1) {
+            if (act.get() != null) {
+                act.get().closeActivity();
             }
 
-//            for (Comments c : comments)
-//                Log.d("DisqusGetComments", c.id + ": " + c.message);
-
-            // If no comments exist anymore (meaning it had comments but now doesn't), add textview
-            addNoCommentsHeaderIfNeeded();
+            return;
         }
 
+        else if (catiPair.code == 2) {
+            return; // FIXME
+        }
+
+        // If first time, give activity the thread id
+        if (!justRefresh && act.get() != null)
+            if (catiPair.code == 0 || catiPair.code == 3)
+                act.get().setDsq_thread_id(catiPair.dsq_thread_id);
+
+        if (catiPair.code == 3)
+            return;
+
+        // Set up list of comments (code == 0)
+        if (commentsView.get() != null && act.get() != null) {
+            ListAdapter adapter = commentsView.get().getAdapter();
+
+            if (adapter == null)         // Set new list of comments
+                commentsView.get().setAdapter(new DisqusAdapter(act.get(), catiPair.comments));
+            else //if (adapter instanceof DisqusAdapter)          // Change data list of old adapter
+                ((DisqusAdapter) adapter).switchList(catiPair.comments);
+//            else if (adapter instanceof WrapperListAdapter) {   // Adapter was once empty, unwrap first.
+//                DisqusAdapter oldAdapter =
+//                        (DisqusAdapter) ((WrapperListAdapter) adapter).getWrappedAdapter();
+//                oldAdapter.switchList(catiPair.comments);
+//            }
+        }
+
+        // FIXME Remove this?
         // Set up action button (if relevant - first time getting)
         if (!justRefresh && act.get() != null) {
             if (!hasToken)

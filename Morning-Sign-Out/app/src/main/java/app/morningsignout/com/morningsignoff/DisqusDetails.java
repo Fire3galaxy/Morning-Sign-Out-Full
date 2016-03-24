@@ -74,14 +74,27 @@ public class DisqusDetails {
     // LIST_POSTS Disqus: two internet requests to load comments
     // TEMP: Until we don't need a separate call to get thread id (b/c we already have it from using
     // primarily JSON for articles, return both comments and thread id.
-    TempCommentsAndThreadId getComments(String slug) {
-        String threadId = httpMethods.getMsoThreadId(slug);             // Request 1
-        String commentsJson = disqusMethods.getCommentsJson(threadId);  // Request 2
+    // Used only by DisqusGetComments in background
+    TempCommentsAndThreadId getComments(String s, boolean justRefresh) {
+        String threadId = s;
+
+        // Request 1
+        if (!justRefresh) {
+            HttpDetails.ThreadIdPair threadIdPair = httpMethods.getMsoThreadId(s);
+
+            // If Request 1 fails, either error 1 or 2
+            if (threadIdPair.code != 0) return new TempCommentsAndThreadId(null, null, threadIdPair.code);
+
+            threadId = threadIdPair.threadId;
+        }
+
+        // Request 2 (Pure http request)
+        String commentsJson = disqusMethods.getCommentsJson(threadId);
 
         if (commentsJson != null)
-            return new TempCommentsAndThreadId(Comments.parseCommentsArray(commentsJson), threadId);
-
-        return null;
+            return new TempCommentsAndThreadId(Comments.parseCommentsArray(commentsJson), threadId, 0);
+        else
+            return new TempCommentsAndThreadId(null, threadId, 3);
     }
 
     AccessToken getAccessToken(String code) {
@@ -181,17 +194,36 @@ public class DisqusDetails {
         static final int dsqVarLength = 18;
         static final String msoPost = "http://morningsignout.com/?json=get_post&slug="; // slug from ArticleWebViewClient
 
-        String getMsoThreadId(String slug) {
-            String threadMSO = getHttp(msoPost + slug);
+        /* Pair codes to indicate different situations with getMsoThreadId()
+         * 0 - ID exists
+         * 1 - Request returned successfully, but ID does not exist
+         * 2 - Network issue
+         */
+        class ThreadIdPair {
+            String threadId;
+            int code;
 
-            // Checks for null
-            if (threadMSO == null) return null;
+            public ThreadIdPair(String t, int c) {
+                threadId = t;
+                code = c;
+            }
+        }
+
+        ThreadIdPair getMsoThreadId(String slug) {
+            String threadMSO = getHttp(msoPost + slug);
+            if (threadMSO == null) return new ThreadIdPair(null, 2);    // Network issue
+
             int findDsqVar = threadMSO.indexOf(dsqVar);
-            if (findDsqVar == -1) return null;
+            if (findDsqVar == -1) return new ThreadIdPair(null, 1);     // Can't find dsq var (Maybe comments not allowed?)
 
             int dsq_thread_id = findDsqVar + dsqVarLength;
             int end = threadMSO.indexOf("\"", dsq_thread_id);
-            return threadMSO.substring(dsq_thread_id, end);
+            String threadId = threadMSO.substring(dsq_thread_id, end);
+
+            // see article: http://morningsignout.com/anti-vaccination-approaching-a-solution/
+            if (threadId.isEmpty()) return new ThreadIdPair(null, 1);   // No ID exists (No forum for that article...)
+
+            return new ThreadIdPair(threadId, 0);                       // Success
         }
 
         String getHttp(String _url)  {
@@ -406,9 +438,6 @@ class Comments {
     }
 
     static ArrayList<Comments> parseCommentsArray(String jsonString) {
-        if (jsonString == null)
-            return null;
-
         JsonParser parser = new JsonParser();
         JsonObject disqusJson = parser.parse(jsonString).getAsJsonObject();
 
@@ -492,12 +521,20 @@ class Comments {
     }
 }
 
+/* Pair codes to indicate different situations with getComments()
+ * 0 - Comments and ID return successfully
+ * 1 - ID does not exist through getMsoThreadId()
+ * 2 - Network issue with getMsoThreadId()
+ * 3 - ID succeeded but network issue with getCommentsJson()
+ */
 class TempCommentsAndThreadId {
     ArrayList<Comments> comments;
     String dsq_thread_id;
+    int code;
 
-    public TempCommentsAndThreadId(ArrayList<Comments> comments, String dsq_thread_id) {
+    public TempCommentsAndThreadId(ArrayList<Comments> comments, String dsq_thread_id, int code) {
         this.comments = comments;
         this.dsq_thread_id = dsq_thread_id;
+        this.code = code;
     }
 }
