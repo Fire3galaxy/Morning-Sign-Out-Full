@@ -349,6 +349,7 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
         for (Element img : imgElems) {
             img.wrap(String.format("<a href=%s></a>", img.parent().select("a").attr("href")));
         }
+        doc.select(".content--multiple img").attr("style", "object-fit: cover");       // Fix stretched images
 
         return doc.toString();
     }

@@ -1,6 +1,7 @@
 package app.morningsignout.com.morningsignoff;
 
 import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
 import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.app.SearchManager;
@@ -24,7 +25,6 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
@@ -50,8 +50,8 @@ public class ArticleActivity extends ActionBarActivity {
     Integer lastSavedY;
     boolean isPortrait;
     float xOfAdView = 0;
-    ObjectAnimator showArticleBar;
-    ObjectAnimator hideArticleBar;
+    AnimatorSet showArticleBar;
+    AnimatorSet hideArticleBar;
     ObjectAnimator scrollWebviewAnimator;
 
     private RelativeLayout bottomBar;
@@ -102,9 +102,11 @@ public class ArticleActivity extends ActionBarActivity {
 
         // Setting up objectAnimators for articleBar's show/hide animation (Portrait only)
         if (isPortrait) {
-            showArticleBar = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.show_article_bar);
+            showArticleBar = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.show_article_bar);
+            showArticleBar.setDuration(300);
             showArticleBar.setTarget(bottomBar);
-            hideArticleBar = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.hide_article_bar);
+            hideArticleBar = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.hide_article_bar);
+            hideArticleBar.setDuration(300);
             hideArticleBar.setTarget(bottomBar);
 
             //      How the animation of the articleBar is programmed
