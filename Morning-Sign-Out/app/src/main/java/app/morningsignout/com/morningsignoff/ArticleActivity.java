@@ -46,9 +46,10 @@ public class ArticleActivity extends ActionBarActivity {
     final static String AD_WAS_LEFT = "AdView is left";
 
     Integer lastSavedY;
+    boolean isPortrait;
+    float xOfAdView = 0;
     ObjectAnimator showArticleBar;
     ObjectAnimator hideArticleBar;
-
     ObjectAnimator scrollWebviewAnimator;
 
     private RelativeLayout bottomBar;
@@ -76,7 +77,8 @@ public class ArticleActivity extends ActionBarActivity {
         setContentView(R.layout.activity_article);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true); //made back arrow in top left corner
+        isPortrait =
+                getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
 
         // ACTION BAR
         //      ImageButton is Morning Sign Out logo, which sends user back to home screen (see XML)
@@ -84,10 +86,11 @@ public class ArticleActivity extends ActionBarActivity {
         ImageButton home = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null); // could replace null with new LinearLayout. properties not needed though.
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);
         actionBar.setCustomView(home, params);
+        actionBar.setDisplayHomeAsUpEnabled(true); //made back arrow in top left corner
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setDisplayShowCustomEnabled(true);
 
-        // BOTTOM BAR
+        // BOTTOM BAR(s)
         //      Setting global var for bar at the bottom for disappearance/reappearance
         bottomBar = (RelativeLayout) findViewById(R.id.container_articleBar);
 
@@ -95,18 +98,72 @@ public class ArticleActivity extends ActionBarActivity {
         mAdView = (AdView) findViewById(R.id.adView_article);
         mAdView.loadAd(new AdRequest.Builder().build());
 
+        // Setting up objectAnimators for articleBar's show/hide animation (Portrait only)
+        if (isPortrait) {
+            showArticleBar = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.show_article_bar);
+            showArticleBar.setTarget(bottomBar);
+            hideArticleBar = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.hide_article_bar);
+            hideArticleBar.setTarget(bottomBar);
+
+            //      How the animation of the articleBar is programmed
+            LinearLayout container = (LinearLayout) findViewById(R.id.container_article);
+            container.setLayoutTransition(getCustomLayoutTransition());
+        }
+        // SWAP BUTTON (Landscape only)
+        else {
+            // If user is left handed, put adview on the right before user can see it
+            SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+            final boolean adWasLeft = preferences.getBoolean(AD_WAS_LEFT, true);
+
+            if (!adWasLeft) {
+                LinearLayout containerTwoBars =
+                        (LinearLayout) findViewById(R.id.container_articleTwoBars);
+                containerTwoBars.removeView(mAdView);
+                containerTwoBars.addView(mAdView, 1);
+            }
+
+            // Set up swap button (Left/Right handed people)
+            ImageButton swapButton = (ImageButton) findViewById(R.id.button_swap_bar);
+            swapButton.setOnClickListener(new View.OnClickListener() {
+                SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
+                boolean adIsLeft = adWasLeft;
+
+                @Override
+                public void onClick(View v) {
+                    // Swap the ad to the right
+                    if (adIsLeft) {
+                        mAdView.animate().x(bottomBar.getWidth());
+                        bottomBar.animate().x(0);
+                        adIsLeft = false;
+                        bottomBar.setTag(0);
+                    }
+                    // Swap the ad to the left
+                    else {
+                        mAdView.animate().x(0);
+                        bottomBar.animate().x(mAdView.getWidth());
+                        adIsLeft = true;
+                        bottomBar.setTag(1);
+                    }
+
+                    // Save user's setting
+                    editor.putBoolean(AD_WAS_LEFT, adIsLeft);
+                    editor.apply();
+                }
+            });
+        }
+
         // WEBVIEW - Getting article from URL and stripping away extra parts of website for better reading
         webView = (WebView) findViewById(R.id.webView_article);
         final ProgressBar loadPage = (ProgressBar) findViewById(R.id.progressBar_article);
         webView.setWebChromeClient(new WebChromeClient() { // Progress bar
             @Override
             public void onProgressChanged(WebView v, int newProgress) {
-                if (newProgress < 100) {
+                if (newProgress < 90) {
                     if (loadPage.getVisibility() == View.GONE)
                         loadPage.setVisibility(View.VISIBLE);
 
                     loadPage.setProgress(newProgress);
-                } else if (newProgress == 100) {
+                } else if (newProgress >= 90) {
                     loadPage.setProgress(newProgress);
 
                     if (loadPage.getVisibility() == View.VISIBLE)
@@ -176,58 +233,6 @@ public class ArticleActivity extends ActionBarActivity {
                 }
             }
         });
-
-        // Setting up objectAnimators for articleBar's show/hide animation (Portrait only)
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            showArticleBar = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.show_article_bar);
-            showArticleBar.setTarget(bottomBar);
-            hideArticleBar = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.hide_article_bar);
-            hideArticleBar.setTarget(bottomBar);
-
-            //      How the animation of the articleBar is programmed
-            LinearLayout container = (LinearLayout) findViewById(R.id.container_article);
-            container.setLayoutTransition(getCustomLayoutTransition());
-        }
-        // SWAP BUTTON (Landscape only)
-        else {
-            // If user is left handed, put adview on the right before user can see it
-            SharedPreferences preferences = getPreferences(MODE_PRIVATE);
-            final boolean adWasLeft = preferences.getBoolean(AD_WAS_LEFT, true);
-
-            if (!adWasLeft) {
-                LinearLayout containerTwoBars =
-                        (LinearLayout) findViewById(R.id.container_articleTwoBars);
-                containerTwoBars.removeView(mAdView);
-                containerTwoBars.addView(mAdView, 1);
-            }
-
-            // Set up swap button (Left/Right handed people)
-            ImageButton swapButton = (ImageButton) findViewById(R.id.button_swap_bar);
-            swapButton.setOnClickListener(new View.OnClickListener() {
-                SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
-                boolean adIsLeft = adWasLeft;
-
-                @Override
-                public void onClick(View v) {
-                    // Swap the ad to the right
-                    if (adIsLeft) {
-                        mAdView.animate().x(bottomBar.getWidth());
-                        bottomBar.animate().x(0);
-                        adIsLeft = false;
-                    }
-                    // Swap the ad to the left
-                    else {
-                        mAdView.animate().x(0);
-                        bottomBar.animate().x(mAdView.getWidth());
-                        adIsLeft = true;
-                    }
-
-                    // Save user's setting
-                    editor.putBoolean(AD_WAS_LEFT, adIsLeft);
-                    editor.apply();
-                }
-            });
-        }
     }
 
     @Override
@@ -306,31 +311,27 @@ public class ArticleActivity extends ActionBarActivity {
         this.shareIntent = shareIntent;
     }
     public void showArticleBar() {
-        if (bottomBar.getVisibility() != RelativeLayout.VISIBLE)
-            bottomBar.setVisibility(RelativeLayout.VISIBLE);
+        if (bottomBar.getVisibility() != RelativeLayout.VISIBLE) {
+            bottomBar.setVisibility(View.VISIBLE);
 
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            ViewGroup.LayoutParams orig = mAdView.getLayoutParams();
-
-            if (orig.width != LinearLayout.LayoutParams.WRAP_CONTENT) {
-                LinearLayout.LayoutParams normal =
-                        new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                mAdView.setLayoutParams(normal);
-            }
+            if (!isPortrait)
+                mAdView.animate().x(xOfAdView);
         }
     }
+
     public void hideArticleBar() {
-        if (bottomBar.getVisibility() != RelativeLayout.GONE)
-            bottomBar.setVisibility(RelativeLayout.GONE);
+        if (!isPortrait) {
+            if (bottomBar.getVisibility() != RelativeLayout.INVISIBLE) {
+                xOfAdView = mAdView.getX();
 
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            ViewGroup.LayoutParams orig = mAdView.getLayoutParams();
-
-            if (orig.width != LinearLayout.LayoutParams.MATCH_PARENT) {
-                LinearLayout.LayoutParams centerAd =
-                        new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                mAdView.setLayoutParams(centerAd);
+                bottomBar.setVisibility(View.INVISIBLE);
+                mAdView.animate().x((webView.getWidth() - mAdView.getWidth()) / 2f);
             }
+        }
+        // Portrait
+        else {
+            if (bottomBar.getVisibility() != RelativeLayout.GONE)
+                bottomBar.setVisibility(RelativeLayout.GONE);
         }
     }
 
@@ -378,6 +379,12 @@ class ArticleWebViewClient extends WebViewClient {
     public void onPageStarted(WebView webView, String url, Bitmap favicon) {
         WebSettings settings = webView.getSettings();
 
+        // Hide/show bottom bar
+        if (isArticle(url))
+            caller.showArticleBar();
+        else
+            caller.hideArticleBar();
+
         // Set image page to width of image
         // Layout rendering in pre kitkat (API < 19) is pretty bad. SINGLE_COLUMN helps any isOther
         // page and images.
@@ -396,12 +403,6 @@ class ArticleWebViewClient extends WebViewClient {
     @Override
     public void onPageFinished(WebView webView, String url) {
         WebSettings settings = webView.getSettings();
-
-        // Removes bottom bar
-        if (isArticle(url))
-            caller.showArticleBar();
-        else
-            caller.hideArticleBar();
 
         // Changes zoom controls depending on image/nonimage page
         if (isImage(url)) {
