@@ -2,6 +2,7 @@ package app.morningsignout.com.morningsignoff;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -99,6 +100,9 @@ public class CategoryFragment extends Fragment {
         final SwipeRefreshLayout refreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefresh_category);
         final ListView listView = (ListView) rootView.findViewById(R.id.listView);
         TextView headerTitle = getHeaderTextView();
+
+        // Colors for refresh layout
+        refreshLayout.setColorSchemeColors(Color.argb(255, 0x81, 0xbf, 0xff), Color.WHITE);
 
         // Views for first FetchListArticlesTask to affect
         final CategoryViews loadingViews = new CategoryViews();

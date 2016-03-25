@@ -15,11 +15,16 @@
         android:layout_weight="9"
         android:id="@+id/container_webview">
 
-        <WebView
+        <android.support.v4.widget.SwipeRefreshLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/webView_article"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:id="@+id/swipeRefresh_article">
+            <WebView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/webView_article" />
+        </android.support.v4.widget.SwipeRefreshLayout>
 
         <ProgressBar
             style="?android:attr/progressBarStyleHorizontal"

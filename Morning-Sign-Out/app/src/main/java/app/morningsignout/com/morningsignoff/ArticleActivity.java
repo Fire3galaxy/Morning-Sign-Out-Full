@@ -10,8 +10,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -177,20 +179,33 @@ public class ArticleActivity extends ActionBarActivity {
         webView.setWebViewClient(webViewClient);
 
         // Load first website or restore webview if destroyed and recreated
-        if (savedInstanceState == null) {
+        if (savedInstanceState != null)
+            webView.restoreState(savedInstanceState);
+
+        if (savedInstanceState == null || webView.getUrl() == null) {
             if (getIntent() != null) {
                 String article = getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT);
                 webView.loadUrl(article);
                 shareIntent = new Intent(Intent.ACTION_SEND);
                 shareIntent.putExtra(Intent.EXTRA_TEXT, article);
             }
-        } else {
-            webView.restoreState(savedInstanceState);
         }
 
         // Hiding bar before onResume() if activity was recreated by orientation change
         if (!ArticleWebViewClient.isArticle(webView.getUrl()))
             hideArticleBar();
+
+        // Refresh listener for webview
+        final SwipeRefreshLayout refreshLayout =
+                (SwipeRefreshLayout) findViewById(R.id.swipeRefresh_article);
+        refreshLayout.setColorSchemeColors(Color.argb(255, 0x81, 0xbf, 0xff), Color.WHITE);
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                webView.reload();
+                refreshLayout.setRefreshing(false);
+            }
+        });
 
         // SHARE BUTTON
         ImageButton shareButton = (ImageButton) findViewById(R.id.button_share);

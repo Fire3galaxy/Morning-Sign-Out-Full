@@ -74,7 +74,7 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
                     Comments comment = (Comments) adapter.getItem(position);
 
                     DisqusDialog dialog =
-                           DisqusDialog.createDisqusDialog(accessToken, comment, dsq_thread_id);
+                            DisqusDialog.createDisqusDialog(accessToken, comment, dsq_thread_id);
                     dialog.show(DisqusMainActivity.this.getFragmentManager(), "disqus");
                 }
             }
@@ -84,6 +84,7 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
         commentText = (EditText) findViewById(R.id.editText_commentMain);   // editText
         dsqTextPb = (ProgressBar) findViewById(R.id.progressBar_dsqText);   // pb for button/editText
         swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh_disqus); // Swipe to refresh
+        swipeRefresh.setColorSchemeColors(Color.argb(255, 0x81, 0xbf, 0xff), Color.WHITE);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
