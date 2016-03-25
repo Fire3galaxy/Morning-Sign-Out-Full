@@ -286,7 +286,7 @@ public class ArticleActivity extends ActionBarActivity {
         // change myActivity intent to the one from SearchResultsActivity
         if (intent != null) {
             setIntent(intent);
-            String searchUrl = intent.getStringExtra(Intent.EXTRA_RETURN_RESULT);
+            String searchUrl = intent.getStringExtra(Intent.EXTRA_HTML_TEXT);
             getSupportActionBar().collapseActionView();
             webView.loadUrl(searchUrl);
         }
