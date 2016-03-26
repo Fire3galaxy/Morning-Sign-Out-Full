@@ -362,6 +362,18 @@ class CategoryAdapter extends BaseAdapter {
         return i;
     }
 
+    public boolean isLandscape(Context con){
+        Display display = ((WindowManager) con.getSystemService(con.WINDOW_SERVICE))
+                .getDefaultDisplay();
+
+        int orientation = display.getRotation();
+
+        if (orientation == Surface.ROTATION_90
+                || orientation == Surface.ROTATION_270)
+            return true;
+        return false;
+    }
+
     // Get the View route of a single row by id
     @Override
     public View getView(int i, View view, final ViewGroup viewGroup){
@@ -387,6 +399,9 @@ class CategoryAdapter extends BaseAdapter {
 
         // Set the values of the rowItem
         SingleRow rowTemp = articles.get(i);
+        if(isLandscape(row.getContext())){
+            viewHolder.title.setLines(3);
+        }
         viewHolder.title.setText(rowTemp.title);
         viewHolder.description.setText(rowTemp.description);
 
