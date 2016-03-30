@@ -346,10 +346,16 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
         doc.select(".content__post").attr("style", "margin: 0px 5px 15px");
         doc.select(".author-posts > h1").attr("style", "margin: 15px 0px");
         Elements imgElems = doc.select(".attachment-post-thumbnail, .wp-post-imageViewReference");
+
+        // Hyperlink images to articles
         for (Element img : imgElems) {
-            img.wrap(String.format("<a href=%s></a>", img.parent().select("a").attr("href")));
+            img.wrap(String.format("<a href=%s> </a>", img.parent().select("a").attr("href")));
         }
-        doc.select(".content--multiple img").attr("style", "object-fit: cover");       // Fix stretched images
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            imgElems.attr("style", "object-fit: cover");            // Maintain aspect ratio and crop
+        else
+            imgElems.attr("style", "width: 100%; height: auto");    // Compromise, do not crop image
 
         return doc.toString();
     }
