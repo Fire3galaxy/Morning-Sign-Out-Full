@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--App stuff asa whole or outdated stuff-->
+    <!--App stuff as a whole or outdated stuff-->
     <string name="app_name">Morning Sign Out</string>
+    <string name="banner_ad_unit_id">ca-app-pub-5416353734203696/5885880964</string>
 
     <!--Menu, actionbar, or bottom bar of articles-->
     <string name="action_style">Style!</string>
@@ -9,6 +10,7 @@
     <string name="action_scroll">Scroll to top or to previous position</string>
     <string name="action_comment">Comment</string>
     <string name="action_share">Share article</string>
+    <string name="action_swap">Put the toolbar on the left or right</string>
     <string name="action_login">Log in </string>
     <string name="action_logout">Log out</string>
     <string name="action_refresh">Refresh</string>

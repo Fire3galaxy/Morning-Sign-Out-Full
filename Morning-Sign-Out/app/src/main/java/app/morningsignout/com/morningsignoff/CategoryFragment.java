@@ -3,6 +3,7 @@ package app.morningsignout.com.morningsignoff;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -85,9 +86,9 @@ public class CategoryFragment extends Fragment {
         // max memory of hdpi ~32 MB
         final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
         // memory for images ~4.5 MB = 7-8 images
-        final int cacheSize = maxMemory / 7;
+        final int cacheSize = maxMemory / 8;
 
-        Log.d("CategoryFragment", Integer.toString(cacheSize));
+        Log.d("CategoryFragment", Integer.toString(cacheSize)); // cache size output
 
         memoryCache = new LruCache<String, Bitmap>(cacheSize) {
             @Override
@@ -100,14 +101,7 @@ public class CategoryFragment extends Fragment {
     }
 
     private void setUpGridView(GridViewWithHeaderAndFooter grid){
-        Context con = getActivity();
-        Display display = ((WindowManager) con.getSystemService(con.WINDOW_SERVICE))
-                .getDefaultDisplay();
-
-        int orientation = display.getRotation();
-
-        if (orientation == Surface.ROTATION_90
-                || orientation == Surface.ROTATION_270) {
+        if (CategoryAdapter.isLandscape(getContext())) {
             grid.setNumColumns(2);
             grid.setPadding(5,10,5,10);
         }
@@ -121,6 +115,9 @@ public class CategoryFragment extends Fragment {
         final GridViewWithHeaderAndFooter gridViewWithHeaderAndFooter = (GridViewWithHeaderAndFooter) rootView.findViewById(R.id.gridView);
         //update variable name to gridview from listview
         TextView headerTitle = getHeaderTextView();
+
+        // Colors for refresh layout
+        refreshLayout.setColorSchemeColors(Color.argb(255, 0x81, 0xbf, 0xff), Color.WHITE);
 
         // Views for first FetchListArticlesTask to affect
         final CategoryViews loadingViews = new CategoryViews();
@@ -362,16 +359,19 @@ class CategoryAdapter extends BaseAdapter {
         return i;
     }
 
-    public boolean isLandscape(Context con){
-        Display display = ((WindowManager) con.getSystemService(con.WINDOW_SERVICE))
+    public static boolean isLandscape(Context con) {
+        Display display = ((WindowManager) con.getSystemService(Context.WINDOW_SERVICE))
                 .getDefaultDisplay();
 
         int orientation = display.getRotation();
 
-        if (orientation == Surface.ROTATION_90
-                || orientation == Surface.ROTATION_270)
-            return true;
-        return false;
+        return (orientation == Surface.ROTATION_90 || orientation == Surface.ROTATION_270);
+    }
+
+    // Return based on if list has items
+    @Override
+    public boolean isEmpty() {
+        return articles.isEmpty();
     }
 
     // Get the View route of a single row by id
@@ -437,7 +437,9 @@ class CategoryAdapter extends BaseAdapter {
             for (int i = 0; i < moreArticles.size(); ++i) {
                 String article = moreArticles.get(i).getTitle();
 
-                if (!uniqueArticleNames.contains(article))
+                // Hack-ish way of preventing the list from being populated with doubles
+                // which happens if request occurs multiple times...
+                if (!uniqueArticleNames.contains(article) && moreArticles.get(i).getImageURL() != null)
                     articles.add(SingleRow.newInstance(moreArticles.get(i)));
                 uniqueArticleNames.add(article);
 //                notifyDataSetChanged();

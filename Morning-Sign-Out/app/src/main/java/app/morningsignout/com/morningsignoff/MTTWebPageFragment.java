@@ -2,6 +2,8 @@ package app.morningsignout.com.morningsignoff;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -10,12 +12,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceResponse;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Created by Daniel on 11/21/2015.
@@ -33,33 +39,41 @@ public class MTTWebPageFragment extends Fragment {
 
         String baseUrl = null;
 
-        // FIXME: need to get arraylist from intent in activity, pass it in to bundle for fragment
-        // If this is a fragment, and each fragment is only a single page, then we can send single
-        // thing instead of whole array, not worry about index this way.
-
         // Need to initialize list and index variables here
         if (getArguments() != null)
             baseUrl = getArguments().getString(MEMBER_URL);
 
         loading = (ProgressBar) rootView.findViewById(R.id.progressBar_mttwebview);
+        WebView webView = (WebView) rootView.findViewById(R.id.webView_mtt);
+
+        // Settings for webview
+        WebSettings settings = webView.getSettings();
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+        } else {
+            settings.setLoadWithOverviewMode(true);
+            settings.setUseWideViewPort(true);
+        }
 
         // Need to load webviewclient with correct url here
-        WebView webView = (WebView) rootView.findViewById(R.id.webView_mtt);
         MttWebViewClient client = new MttWebViewClient(baseUrl);
         webView.setWebViewClient(client);
         webView.setWebChromeClient(new WebChromeClient() {
             public void onProgressChanged(WebView view, int progress) {
                 if (progress < 100) {
-                    if (loading.getVisibility() != View.VISIBLE)
+                    if (loading.getVisibility() == View.GONE)
                         loading.setVisibility(View.VISIBLE);
 
                     loading.setProgress(progress);
+                } else if (progress == 100) {
+                    loading.setProgress(progress);
+
+                    if (loading.getVisibility() == View.VISIBLE)
+                        loading.setVisibility(View.GONE);
                 }
-                else if (progress == 100)
-                    loading.setVisibility(View.GONE);
             }
         });
-        new URLToMobileArticle(webView, true).execute(baseUrl);
+        webView.loadUrl(baseUrl);
 
         return rootView;
     }
@@ -69,8 +83,7 @@ class MttWebViewClient extends WebViewClient {
     static final String mimeType = "text/html";
     static final String encoding = "gzip"; // Find encoding https://en.wikipedia.org/wiki/HTTP_compression
 
-    // Useful for if team member has articles and pages
-    String baseUrl = null;
+    String baseUrl = null; // Useful for if team member has articles and pages
 
     public MttWebViewClient(String url) {
         baseUrl = url;
@@ -80,6 +93,15 @@ class MttWebViewClient extends WebViewClient {
     public void changeBaseUrl(String newBaseUrl) {
         baseUrl = newBaseUrl;
     }
+
+//    // Show logo once page completes loading
+//    @Override
+//    public void onPageFinished(WebView view, String url) {
+//        super.onPageFinished(view, url);
+//
+//        if (url.contains(baseUrl))
+//            logoView.setVisibility(View.VISIBLE);
+//    }
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -124,9 +146,12 @@ class MttWebViewClient extends WebViewClient {
         ByteArrayInputStream bais;
 
         try {
-            html = URLToMobileArticle.getAuthorMTT(requestUrl.toString());
+            html = URLToMobileArticle.getOther(requestUrl.toString());
         } catch (IOException e) {
-            Log.e("MTTWebViewActivity", e.getMessage());
+            if (e.getMessage() != null)
+                Log.e("MTTWebViewActivity", e.getMessage());
+            else
+                Log.e("MTTWebViewActivity", "IOException in Meet the team");
         }
 
         // Let webView load default action (either webpage w/o mobile view, or webpage not found)

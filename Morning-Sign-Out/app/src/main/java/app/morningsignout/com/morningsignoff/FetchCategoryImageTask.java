@@ -14,6 +14,8 @@ import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import javax.net.ssl.HttpsURLConnection;
+
 /**
  * Created by Daniel on 6/24/2015.
  */
@@ -46,10 +48,10 @@ public class FetchCategoryImageTask extends AsyncTask<Void, Void, Bitmap> {
 
             if (this == task) {
                 // cache image
-                categoryFragment.addBitmapToMemoryCache(sr.title, b);
+                categoryFragment.addBitmapToMemoryCache(sr.title, b); //Log.d("","");
 
                 // Preserve aspect ratio of image
-                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP); // FIT_CENTER to just fit x or y
                 imageView.setCropToPadding(true);
                 imageView.setImageBitmap(b);
             }
@@ -73,7 +75,7 @@ public class FetchCategoryImageTask extends AsyncTask<Void, Void, Bitmap> {
             if (inputStream != null) {
                 // Lowers resolution of images by subsampling imageViewReference, saves memory & time
                 BitmapFactory.Options a = new BitmapFactory.Options();
-                a.inSampleSize = 2;
+                a.inSampleSize = 1;
 
                 // Create bitmap from stream
                 return BitmapFactory.decodeStream(inputStream, null, a);

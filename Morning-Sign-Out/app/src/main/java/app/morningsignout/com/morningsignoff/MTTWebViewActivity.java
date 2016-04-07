@@ -29,7 +29,6 @@ public class MTTWebViewActivity extends ActionBarActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_mttwebview);
 
         // Setting up action bar with logo and up button
@@ -40,12 +39,16 @@ public class MTTWebViewActivity extends ActionBarActivity {
         actionbar.setCustomView(title);
         actionbar.setDisplayShowCustomEnabled(true);
 
+        int arraySize = -1;
+
         // Initialize Team Array and Index selected in previous list
         if (getIntent() != null) {
             Intent ref = getIntent();
 
             teamArray = ref.getParcelableArrayListExtra(MTTListViewActivity.EXTRA_LIST);
             index = ref.getIntExtra(MTTListViewActivity.EXTRA_INDEX, 0);
+
+            arraySize = teamArray.size();
         }
 
         // Set up ViewPager for swiping left/right to other people
@@ -56,21 +59,19 @@ public class MTTWebViewActivity extends ActionBarActivity {
         viewPager.setCurrentItem(index, false); // Setting pager to selected person
 
         // Showing message for swiping left/right for 10 seconds
-        final RelativeLayout swipeMessage = (RelativeLayout) findViewById(R.id.relativeLayout_mtt_swipe);
-        swipeMessage.setVisibility(View.VISIBLE);
+        if (arraySize > 1) {
+            final RelativeLayout swipeMessage = (RelativeLayout) findViewById(R.id.relativeLayout_mtt_swipe);
+            swipeMessage.setVisibility(View.VISIBLE);
 
-        Log.d("", "");  // just because studio didn't properly install debug apk
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                swipeMessage.setVisibility(View.GONE);
-            }
-        };
-        Handler handler = new Handler();
-        handler.postDelayed(runnable, 7 * 1000);
-
-        // FIXME: Test, Transition to a ViewPager and make the prev/next buttons scroll the page (not swipe). Think of way to hide buttons when not in use.
-        // Semi-visible arrows could be good way of filling white space and indicating you can scroll sideways
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    swipeMessage.setVisibility(View.GONE);
+                }
+            };
+            Handler handler = new Handler();
+            handler.postDelayed(runnable, 7 * 1000);
+        }
     }
 
     @Override

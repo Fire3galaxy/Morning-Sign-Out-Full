@@ -45,7 +45,8 @@ public class MeetTheTeamActivity extends ActionBarActivity {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 boolean handled = false;
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH
+                        || actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
                     String query = v.getText().toString();
 
                     if (!query.isEmpty()) {
@@ -57,6 +58,7 @@ public class MeetTheTeamActivity extends ActionBarActivity {
 
                     handled = true;
                 }
+
                 return handled;
             }
         });
@@ -94,7 +96,6 @@ public class MeetTheTeamActivity extends ActionBarActivity {
                 // to correctly correspond to team
                 MeetTheTeamAdapter.TeamTitle team =
                         (MeetTheTeamAdapter.TeamTitle) gridViewCustomAdapter.getItem(position);
-
                 Intent intent = new Intent(MeetTheTeamActivity.this, MTTListViewActivity.class);
                 intent.putParcelableArrayListExtra(FetchMeetTheTeamTask.TEAM_KEY, departments.get(team.realName));
                 intent.putExtra(FetchMeetTheTeamTask.NAME_KEY, team.caption);

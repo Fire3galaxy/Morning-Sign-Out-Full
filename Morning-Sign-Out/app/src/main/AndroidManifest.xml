@@ -5,6 +5,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:hardwareAccelerated="true"
@@ -28,7 +29,8 @@
 
         <activity
             android:launchMode = "singleTop"
-            android:name=".CategoryActivity" >
+            android:name=".CategoryActivity" 
+            android:configChanges="orientation|keyboardHidden|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="app.morningsignout.com.morningsignoff.CategoryActivity" />
@@ -48,7 +50,8 @@
         <activity
             android:name=".ArticleActivity"
             android:parentActivityName=".CategoryActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize">
+            android:configChanges="keyboardHidden|screenSize">
+            <!--android:configChanges="orientation|keyboardHidden|screenSize"-->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="app.morningsignout.com.morningsignoff.CategoryActivity" />

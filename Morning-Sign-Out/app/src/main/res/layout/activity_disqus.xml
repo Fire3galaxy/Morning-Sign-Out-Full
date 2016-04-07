@@ -38,8 +38,7 @@
                 <ListView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/listView_disqus"
-                    android:headerDividersEnabled="false"/>
+                    android:id="@+id/listView_disqus" />
             </android.support.v4.widget.SwipeRefreshLayout>
 
             <ProgressBar

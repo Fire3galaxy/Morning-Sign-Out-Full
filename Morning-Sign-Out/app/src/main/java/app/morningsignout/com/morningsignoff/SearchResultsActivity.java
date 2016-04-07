@@ -112,7 +112,7 @@ public class SearchResultsActivity extends ActionBarActivity {
             // Open webView with search results of query
             if (searchURI != null) {
                 searchWebViewClient.setQuery(query);
-                new URLToMobileArticle(webView, true).execute(searchURI);
+                webView.loadUrl(searchURI);
             } else {
                 Log.e("Search", "Error: Failed Search (null string)");
             }
@@ -134,7 +134,7 @@ public class SearchResultsActivity extends ActionBarActivity {
 
     static String getURI(String query) {
         if (query != null) {
-            String searchURI = null;
+            String searchURI;
             try {
                 searchURI = "http://morningsignout.com/?s=" + URLEncoder.encode(query, "UTF-8");
                 return searchURI;
@@ -171,8 +171,9 @@ class SearchWebViewClient extends WebViewClient {
             if (url.contains("?s=" + query))
                 return false;
 
+            // Return to or Start articleActivity with article
             Intent intent = new Intent(view.getContext(), ArticleActivity.class);
-            intent.putExtra(Intent.EXTRA_RETURN_RESULT, url); // Put url in intent
+            intent.putExtra(Intent.EXTRA_HTML_TEXT, url); // Put url in intent
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP); // Open w/ old articleActivity if exists
             view.getContext().startActivity(intent);
             return true;
@@ -199,7 +200,11 @@ class SearchWebViewClient extends WebViewClient {
         try {
             html = URLToMobileArticle.getOther(requestUrl.toString());
         } catch (IOException e) {
-            Log.e("SearchResultsActivity", e.getMessage());
+            if (e.getMessage() != null)
+                Log.e("SearchResultsActivity", e.getMessage());
+            else
+                Log.e("SearchResultsActivity", "IOException in getOther()");
+            e.printStackTrace();
         }
 
         // Let webView load default action (either webpage w/o mobile view, or webpage not found)

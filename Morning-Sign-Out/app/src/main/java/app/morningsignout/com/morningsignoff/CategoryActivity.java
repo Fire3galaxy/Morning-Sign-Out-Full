@@ -125,14 +125,9 @@ public class CategoryActivity extends ActionBarActivity {
                     .add(R.id.container_category, fragment)
                     .commit();
         }
-//        else {
-//            getSupportFragmentManager().beginTransaction()
-//                    .add(R.id.container_category, new ErrorFragment())
-//                    .commit();
-//        }
 
+        // Adding MSO Logo to center of action bar
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-
         ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null);
         ib.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,7 +137,6 @@ public class CategoryActivity extends ActionBarActivity {
         });
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);
         this.getSupportActionBar().setCustomView(ib, params);
-
         this.getSupportActionBar().setDisplayShowCustomEnabled(true);
     }
 
@@ -166,6 +160,8 @@ public class CategoryActivity extends ActionBarActivity {
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
 
+	    // Messing with layout or gravity of searchview here if needed
+
         ComponentName componentName = new ComponentName(this, SearchResultsActivity.class);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
 //        return super.onCreateOptionsMenu(menu);
@@ -176,8 +172,10 @@ public class CategoryActivity extends ActionBarActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         // Check if the key event was the Back button
         if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+            Log.d("CategoryActivity","iconified" + String.valueOf(searchView.isIconified()));
+            Log.d("","");
             if (!searchView.isIconified()) {    // Check if searchView is expanded
-                getSupportActionBar().collapseActionView();
+                searchView.setIconified(true);
                 return true;
             }
         }

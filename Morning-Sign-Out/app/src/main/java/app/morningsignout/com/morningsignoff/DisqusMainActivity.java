@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -22,10 +24,14 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.HeaderViewListAdapter;
 import android.widget.ImageButton;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import java.util.ArrayList;
 
 public class DisqusMainActivity extends ActionBarActivity implements DisqusDialog.OnChangeCommentsListener {
@@ -57,17 +63,20 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
 
         // Views that will change later
         commentsView = (ListView) findViewById(R.id.listView_disqus);   // list of comments
+        commentsView.setDividerHeight(0); // no divider
         commentsView.setOnItemClickListener(new AdapterView.OnItemClickListener() { // FIXME
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-               if (commentsView.getAdapter() != null) {
-                   final DisqusAdapter adapter = (DisqusAdapter) commentsView.getAdapter();
-                   Comments comment = (Comments) adapter.getItem(position);
+                ListAdapter listAdapter = commentsView.getAdapter();
+                if (listAdapter != null) {
+                    DisqusAdapter adapter = (DisqusAdapter) listAdapter;
 
-                   DisqusDialog dialog =
-                           DisqusDialog.createDisqusDialog(accessToken, comment, dsq_thread_id);
-                   dialog.show(DisqusMainActivity.this.getFragmentManager(), "disqus");
-               }
+                    Comments comment = (Comments) adapter.getItem(position);
+
+                    DisqusDialog dialog =
+                            DisqusDialog.createDisqusDialog(accessToken, comment, dsq_thread_id);
+                    dialog.show(DisqusMainActivity.this.getFragmentManager(), "disqus");
+                }
             }
         });
         actionButton = (Button) findViewById(R.id.button_disqus);       // login/post
@@ -75,6 +84,7 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
         commentText = (EditText) findViewById(R.id.editText_commentMain);   // editText
         dsqTextPb = (ProgressBar) findViewById(R.id.progressBar_dsqText);   // pb for button/editText
         swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh_disqus); // Swipe to refresh
+        swipeRefresh.setColorSchemeColors(Color.argb(255, 0x81, 0xbf, 0xff), Color.WHITE);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -151,7 +161,6 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
             new DisqusGetAccessToken(dsqTextPb, this).execute(code, dsq_thread_id);
         } else if (resultCode == Activity.RESULT_CANCELED)
             Log.d("DisqusActivity", "Cancelled");
-        //Log.d("",""); // can delete this. just htc m8 testing bugs.
     }
 
     public void refreshComments(boolean pause) {
@@ -164,7 +173,7 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                new DisqusGetComments(commentsView, dsqPb, ref, false, true).execute(slug);
+                new DisqusGetComments(commentsView, dsqPb, ref, false, true).execute(dsq_thread_id);
             }
         }, pauseTime);
     }
@@ -175,6 +184,11 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
 
     public void setDsq_thread_id(String id) {
         dsq_thread_id = id;
+    }
+
+    public void closeActivity() {
+        Toast.makeText(this, "Cannot comment on this article, sorry!", Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     // Save accesstoken, special "set" method
@@ -190,7 +204,7 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
         editor.putString(EXPIRES_IN, accessToken.expires_in);
         editor.putString(USERNAME, accessToken.username);
 
-        editor.commit(); // .commit() runs on main thread, .apply() does it in background
+        editor.apply();
 
         loggedIn = true;
         invalidateOptionsMenu();
@@ -220,7 +234,7 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
 
         SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
         editor.putBoolean(LOGIN, false);
-        editor.commit(); // chose main thread for logout. security?
+        editor.apply();
     }
 
     // Note: X button is in style.xml
@@ -305,6 +319,8 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
 
 class DisqusAdapter extends BaseAdapter {
     static final int INDENT = 20;
+    static final String EMPTY = "No comments here yet. Be the first!\n\n" +
+            "Swipe down here or hit refresh in the menu to check for more comments.";
 
     DisqusMainActivity act;
     ArrayList<Comments> commentsList;
@@ -325,7 +341,14 @@ class DisqusAdapter extends BaseAdapter {
     }
 
     @Override
+    public boolean isEnabled(int position) {
+        return !(commentsList.isEmpty());
+    }
+
+    @Override
     public int getCount() {
+        if (commentsList.isEmpty()) return 1;
+
         return commentsList.size();
     }
 
@@ -342,10 +365,25 @@ class DisqusAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        DsqViewHolder viewHolder;
+        // No comments
+        if (commentsList.isEmpty()) {
+            // Is already an empty comments view.
+            if (convertView != null && convertView instanceof TextView) return convertView;
+
+            // Create new textview
+            TextView noComments = new TextView(act);
+            noComments.setText(EMPTY);
+            noComments.setPadding(12, 8, 12, 0);
+            noComments.setTypeface(Typeface.DEFAULT);
+            noComments.setTextColor(Color.BLACK);
+            return noComments;
+        }
+
+        DsqViewHolder viewHolder;   // To hold two textviews
         LayoutInflater inflater = act.getLayoutInflater();
 
-        if (convertView == null) {// Comment row
+        // Comment row
+        if (convertView == null || convertView instanceof TextView) {
             convertView = inflater.inflate(R.layout.comment_row, parent, false);
             viewHolder = new DsqViewHolder();
             viewHolder.name = (TextView) convertView.findViewById(R.id.textView_userDsq);

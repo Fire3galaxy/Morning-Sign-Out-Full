@@ -2,30 +2,28 @@ package app.morningsignout.com.morningsignoff;
 
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Log;
 import android.webkit.WebView;
 
+import org.apache.http.HttpStatus;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Node;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
-import org.jsoup.select.NodeVisitor;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class URLToMobileArticle extends AsyncTask<String, Void, String> {
     static final String LOG_NAME = "URLToMobileArticle";
@@ -65,7 +63,7 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
         // Article Page
         if (requestUrl.getPathSegments().size() == 1) {
             Log.d(LOG_NAME, "changing webresponse to article page");
-            return getArticle(requestUrl.toString());
+            return getArticleRevised(requestUrl.toString());
         }
         // Author, Tag, Date pages
         else if (requestUrl.getPathSegments().size() == 2) {
@@ -97,7 +95,7 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
             try {
                 return getOther(requestUrl.toString());
             } catch (IOException e) {
-                Log.e(LOG_NAME, e.getMessage());
+                Log.e(LOG_NAME, "IOException in Fetching Search page");
             }
         }
 
@@ -117,7 +115,7 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
     protected void onPostExecute(final String html) {
 //        wb.loadData(html, "text/html; charset=UTF-8", null);
         if (html != null)
-            wb.loadDataWithBaseURL(link, html, "text/html; charset=UTF-8", null, link);
+            wb.loadDataWithBaseURL(link, html, "text/html", "UTF-8", link);
         else
             wb.loadUrl(link);
     }
@@ -145,7 +143,14 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
         String html_new;
         try {
             url = new URL(link);
-            URLConnection c = url.openConnection();
+            HttpURLConnection c = (HttpURLConnection) url.openConnection();
+
+            // Return if failed
+            int statusCode = c.getResponseCode();
+            if (statusCode != HttpStatus.SC_OK) {
+                return null;
+            }
+
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(c.getInputStream(), "utf-8"));
             String input;
@@ -324,26 +329,34 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
             return false;
         }
 
-        if (html.charAt(lastTag + 1) == 'a') // <a href="....">
-            return true;
-        else                                // <figure
-            return false;
+        // <a href="...."> or <figure
+        return html.charAt(lastTag + 1) == 'a';
     }
 
     static String getOther(final String urlname) throws IOException {
-        Document doc = Jsoup.connect(urlname).get();
+        // Increased timeout because it could be search page request
+        Document doc = Jsoup.connect(urlname).timeout(6 * 1000).get();
         doc.select("header").remove();
         doc.select("footer").remove();
         doc.select(".page-title--tag > span").remove();
         doc.select("h4:containsOwn(Category)").remove();
-        doc.select(".page-title").attr("style", "margin-bottom: 25px");
+        doc.select(".page-title").attr("style", "margin: 0px 0 1px");
+        doc.select(".author-information h1, .author-information h2").attr("style", "text-align: center");
         doc.select(".author-bio").attr("style", "margin-top: 5px");
         doc.select(".content__post").attr("style", "margin: 0px 5px 15px");
         doc.select(".author-posts > h1").attr("style", "margin: 15px 0px");
         Elements imgElems = doc.select(".attachment-post-thumbnail, .wp-post-imageViewReference");
+
+        // Hyperlink images to articles
         for (Element img : imgElems) {
-            img.wrap(String.format("<a href=%s></a>", img.parent().select("a").attr("href")));
+            img.wrap(String.format("<a href=%s> </a>", img.parent().select("a").attr("href")));
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            imgElems.attr("style", "object-fit: cover");            // Maintain aspect ratio and crop
+        else
+            imgElems.attr("style", "width: 100%; height: auto");    // Compromise, do not crop image
+
         return doc.toString();
     }
 
@@ -368,6 +381,30 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
         for (Element img : imgElems) {
             img.wrap(String.format("<a href=%s></a>", img.parent().select("a").attr("href")));
         }
+        return doc.toString();
+    }
+
+    public static String getArticleRevised(final String urlname) {
+        // Increased timeout because it could be search page request
+        Document doc = null;
+        try {
+            doc = Jsoup.connect(urlname).timeout(6 * 1000).get();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        doc.select("header").remove();              // Top of page
+        doc.select("footer").remove();              // Bottom of page
+        doc.select("div.ssba-wrap").remove();       // Social media addon
+        doc.select(".content__related").remove();   // Related articles
+        doc.select("#disqus_thread").remove();      // Comments section
+        doc.select(".nocomments").remove();         // No comments section
+        doc.select(".post-nav").remove();           // Previous/Next article
+        doc.select("h4").first().remove();          // Category
+        Element post = doc.select(".content__post").first();
+        post.attr("style", "margin-top: 0px; padding-top: 20px");   // Padding of page
+        doc.select("figure").attr("style", "display: block");       // Fix stretched images
+
         return doc.toString();
     }
 }
