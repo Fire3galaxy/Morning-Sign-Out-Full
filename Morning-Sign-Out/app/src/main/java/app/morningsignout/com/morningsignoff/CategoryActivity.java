@@ -43,10 +43,6 @@ public class CategoryActivity extends ActionBarActivity {
             categories_titles;          // ... for Title usage
     private int position;               // position in category array
 
-    private TypedArray navMenuIcons;
-    private ArrayList<NavDrawerItem> navDrawerItems;
-    private NavDrawerListAdapter adapter;
-
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView parent, View view, int position, long id) {
@@ -81,13 +77,13 @@ public class CategoryActivity extends ActionBarActivity {
 
 
         // nav drawer icons from resources
-        navMenuIcons = getResources()
+        TypedArray navMenuIcons = getResources()
                 .obtainTypedArray(R.array.categories_icons);
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.listView_slide);
 
-        navDrawerItems = new ArrayList<NavDrawerItem>();
+        ArrayList<NavDrawerItem> navDrawerItems = new ArrayList<NavDrawerItem>();
 
         // adding nav drawer items to array
         navDrawerItems.add(new NavDrawerItem(categories_titles[0], navMenuIcons.getResourceId(0, -1)));
@@ -101,7 +97,7 @@ public class CategoryActivity extends ActionBarActivity {
         navDrawerItems.add(new NavDrawerItem(categories_titles[8], navMenuIcons.getResourceId(8, -1)));
 
         navMenuIcons.recycle();
-        adapter = new NavDrawerListAdapter(getApplicationContext(),
+        NavDrawerListAdapter adapter = new NavDrawerListAdapter(getApplicationContext(),
                 navDrawerItems);
         mDrawerList.setAdapter(adapter);
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
