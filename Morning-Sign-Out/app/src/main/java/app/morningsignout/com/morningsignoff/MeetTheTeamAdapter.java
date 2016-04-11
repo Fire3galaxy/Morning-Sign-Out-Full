@@ -28,10 +28,6 @@ public class MeetTheTeamAdapter extends BaseAdapter {
     };
 
     private final Integer[] images = {
-//            R.drawable.category_featured, R.drawable.category_humanities, R.drawable.category_research,
-//            R.drawable.category_wellness, R.drawable.category_medicine, R.drawable.category_public_health,
-//            R.drawable.category_healthcare, R.drawable.category_web_team, R.drawable.category_visuals_team,
-//            R.drawable.category_marketing, R.drawable.category_finance, R.drawable.category_humanities
             R.drawable.executive_team, R.drawable.admin_team, R.drawable.research_team,
             R.drawable.wellness_team, R.drawable.medicine_team, R.drawable.public_health_team,
             R.drawable.healthcare_team, R.drawable.web_team, R.drawable.visuals_team,
