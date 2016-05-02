@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
- * Created by tanvikamath on 12/26/15.
+ * Created by tanvikamath on 12/26/15. Puts the categories and icons into the gridview.
  */
 public class MeetTheTeamAdapter extends BaseAdapter {
     Context context;
@@ -28,10 +28,10 @@ public class MeetTheTeamAdapter extends BaseAdapter {
     };
 
     private final Integer[] images = {
-            R.drawable.executive_team, R.drawable.admin_team, R.drawable.research_team,
+            R.drawable.executive_team, R.drawable.gen_admin_team, R.drawable.research_team,
             R.drawable.wellness_team, R.drawable.medicine_team, R.drawable.public_health_team,
             R.drawable.healthcare_team, R.drawable.web_team, R.drawable.visuals_team,
-            R.drawable.marketing_team, R.drawable.finance_team, R.drawable.admin_team
+            R.drawable.marketing_team, R.drawable.finance_team, R.drawable.op_admin_team
     };
 
     public MeetTheTeamAdapter(Context c) {
