@@ -129,7 +129,6 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         // If result and adapter are not null and fragment still exists, load items
         if (adapter != null && fragmentRef.get() != null) {
             fragmentRef.get().isLoadingArticles.set(false);
-
             if (articles != null) {
                 adapter.loadMoreItems(articles, pageNum);
                 Log.d("FetchListArticlesTask", "Calling loadMoreItems " + Integer.toString(pageNum));

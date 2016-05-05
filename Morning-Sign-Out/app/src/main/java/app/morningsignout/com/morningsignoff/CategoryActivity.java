@@ -225,6 +225,7 @@ public class CategoryActivity extends ActionBarActivity {
         mDrawerToggle.onConfigurationChanged(newConfig); // pass it on to toggle
     }
 
+
     void setupActivityTitle() {
         if (position == -1) { // Error
             mTitle = "";
@@ -295,6 +296,7 @@ public class CategoryActivity extends ActionBarActivity {
         setTitle(categories_titles[position]);
         mDrawerLayout.closeDrawer(mDrawerList);
     }
+
 
 //    // courtesy of http://developer.android.com/training/monitoring-device-state/connectivity-monitoring.html
 //    public boolean checkForInternet() {
