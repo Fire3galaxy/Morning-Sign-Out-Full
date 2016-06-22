@@ -6,15 +6,11 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageView;
 
-import org.apache.http.HttpStatus;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
-import javax.net.ssl.HttpsURLConnection;
 
 /**
  * Created by Daniel on 6/24/2015.
@@ -67,7 +63,7 @@ public class FetchCategoryImageTask extends AsyncTask<Void, Void, Bitmap> {
             URL uri = new URL(url);
             urlConnection = (HttpURLConnection) uri.openConnection();
             int statusCode = urlConnection.getResponseCode();
-            if (statusCode != HttpStatus.SC_OK) {
+            if (statusCode != HttpURLConnection.HTTP_OK) {
                 return null;
             }
 

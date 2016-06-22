@@ -3,14 +3,10 @@ package app.morningsignout.com.morningsignoff;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
-import android.widget.GridView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.WrapperListAdapter;
-
-import org.apache.http.HttpStatus;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -129,7 +125,6 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         // If result and adapter are not null and fragment still exists, load items
         if (adapter != null && fragmentRef.get() != null) {
             fragmentRef.get().isLoadingArticles.set(false);
-
             if (articles != null) {
                 adapter.loadMoreItems(articles, pageNum);
                 Log.d("FetchListArticlesTask", "Calling loadMoreItems " + Integer.toString(pageNum));
@@ -164,7 +159,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
             // Return if failed
             int statusCode = c.getResponseCode();
-            if (statusCode != HttpStatus.SC_OK) {
+            if (statusCode != HttpURLConnection.HTTP_OK) {
                 return null;
             }
 

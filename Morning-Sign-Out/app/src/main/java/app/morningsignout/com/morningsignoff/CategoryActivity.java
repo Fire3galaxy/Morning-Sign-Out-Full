@@ -77,8 +77,7 @@ public class CategoryActivity extends ActionBarActivity {
 
 
         // nav drawer icons from resources
-        TypedArray navMenuIcons = getResources()
-                .obtainTypedArray(R.array.categories_icons);
+        TypedArray navMenuIcons = getResources().obtainTypedArray(R.array.categories_icons);
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.listView_slide);
@@ -86,15 +85,8 @@ public class CategoryActivity extends ActionBarActivity {
         ArrayList<NavDrawerItem> navDrawerItems = new ArrayList<NavDrawerItem>();
 
         // adding nav drawer items to array
-        navDrawerItems.add(new NavDrawerItem(categories_titles[0], navMenuIcons.getResourceId(0, -1)));
-        navDrawerItems.add(new NavDrawerItem(categories_titles[1], navMenuIcons.getResourceId(1, -1)));
-        navDrawerItems.add(new NavDrawerItem(categories_titles[2], navMenuIcons.getResourceId(2, -1)));
-        navDrawerItems.add(new NavDrawerItem(categories_titles[3], navMenuIcons.getResourceId(3, -1)));
-        navDrawerItems.add(new NavDrawerItem(categories_titles[4], navMenuIcons.getResourceId(4, -1)));
-        navDrawerItems.add(new NavDrawerItem(categories_titles[5], navMenuIcons.getResourceId(5, -1)));
-        navDrawerItems.add(new NavDrawerItem(categories_titles[6], navMenuIcons.getResourceId(6, -1)));
-        navDrawerItems.add(new NavDrawerItem(categories_titles[7], navMenuIcons.getResourceId(7, -1)));
-        navDrawerItems.add(new NavDrawerItem(categories_titles[8], navMenuIcons.getResourceId(8, -1)));
+        for (int i = 0; i <= 8; i++)
+            navDrawerItems.add(new NavDrawerItem(categories_titles[i], navMenuIcons.getResourceId(i, -1)));
 
         navMenuIcons.recycle();
         NavDrawerListAdapter adapter = new NavDrawerListAdapter(getApplicationContext(),
@@ -225,6 +217,7 @@ public class CategoryActivity extends ActionBarActivity {
         mDrawerToggle.onConfigurationChanged(newConfig); // pass it on to toggle
     }
 
+
     void setupActivityTitle() {
         if (position == -1) { // Error
             mTitle = "";
@@ -295,6 +288,7 @@ public class CategoryActivity extends ActionBarActivity {
         setTitle(categories_titles[position]);
         mDrawerLayout.closeDrawer(mDrawerList);
     }
+
 
 //    // courtesy of http://developer.android.com/training/monitoring-device-state/connectivity-monitoring.html
 //    public boolean checkForInternet() {
