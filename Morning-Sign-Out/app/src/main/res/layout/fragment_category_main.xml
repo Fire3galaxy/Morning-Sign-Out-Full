@@ -50,9 +50,9 @@
         android:text="@string/category_refresh"
         android:id="@+id/textView_categoryRefresh"
         android:layout_below="@+id/textView_categoryHeader"
-        android:paddingTop="@dimen/abc_action_bar_default_padding_material"
+        android:paddingTop="8dp"
         android:layout_centerHorizontal="true"
-        android:maxWidth="@dimen/abc_action_bar_stacked_tab_max_width"
+        android:maxWidth="180dp"
         android:drawableTop="@drawable/ic_action_about"/>
 
     <TextView
@@ -62,7 +62,7 @@
         android:gravity="center_horizontal"
         android:textStyle="italic|bold"
         android:typeface="normal"
-        android:textSize="@dimen/abc_text_size_large_material"
+        android:textSize="22sp"
         android:textColor="@android:color/black"
         android:id="@+id/textView_categoryHeader"
         android:layout_alignParentTop="true"
