@@ -7,7 +7,7 @@
     android:paddingTop="0dp"
     android:paddingBottom="0dp"
     android:background="#e1eaee"
-    tools:context="app.morningsignout.com.morningsignoff.CategoryActivity">
+    tools:context=".category.CategoryActivity">
 
 
     <android.support.v4.widget.SwipeRefreshLayout

@@ -1,4 +1,4 @@
-package app.morningsignout.com.morningsignoff;
+package app.morningsignout.com.morningsignoff.category;
 
 import android.app.SearchManager;
 import android.content.ComponentName;
@@ -24,6 +24,8 @@ import android.content.res.TypedArray;
 
 import java.util.ArrayList;
 
+import app.morningsignout.com.morningsignoff.R;
+import app.morningsignout.com.morningsignoff.search_results.SearchResultsActivity;
 import app.morningsignout.com.morningsignoff.meet_the_team.MeetTheTeamActivity;
 
 // Category page activity
@@ -271,7 +273,7 @@ public class CategoryActivity extends ActionBarActivity {
                     .commit();
         } else if (position == categories_urls.length){
             // Enter code here! categories_urls.length -> About MSO
-            Intent AboutMSOActivity = new Intent(this, AboutMSOActivity.class);
+            Intent AboutMSOActivity = new Intent(this, app.morningsignout.com.morningsignoff.about_mso.AboutMSOActivity.class);
             startActivity(AboutMSOActivity);
         } else if (position == categories_urls.length + 1) {
             // categories_urls.length + 1 -> Meet the Team

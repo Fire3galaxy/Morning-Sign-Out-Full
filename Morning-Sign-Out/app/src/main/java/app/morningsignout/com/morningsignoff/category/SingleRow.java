@@ -1,4 +1,6 @@
-package app.morningsignout.com.morningsignoff;
+package app.morningsignout.com.morningsignoff.category;
+
+import app.morningsignout.com.morningsignoff.article.Article;
 
 // Defines the row item xml
 public class SingleRow{

@@ -1,14 +1,16 @@
-package app.morningsignout.com.morningsignoff;
+package app.morningsignout.com.morningsignoff.splash;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+
+import app.morningsignout.com.morningsignoff.R;
+import app.morningsignout.com.morningsignoff.category.CategoryActivity;
 
 /**
  * Created by liukwarm on 8/19/15.
  */
-public class StartupActivity extends Activity {
+public class SplashActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

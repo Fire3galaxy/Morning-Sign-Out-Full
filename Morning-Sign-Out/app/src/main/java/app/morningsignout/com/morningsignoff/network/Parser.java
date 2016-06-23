@@ -1,4 +1,4 @@
-package app.morningsignout.com.morningsignoff;
+package app.morningsignout.com.morningsignoff.network;
 
 // It is used by FetchListArticlesTask class and FetchHeadLineArticles class to parse HTML elements
 public class Parser {

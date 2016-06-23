@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import app.morningsignout.com.morningsignoff.CategoryActivity;
+import app.morningsignout.com.morningsignoff.category.CategoryActivity;
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.network.FetchMeetTheTeamTask;
 

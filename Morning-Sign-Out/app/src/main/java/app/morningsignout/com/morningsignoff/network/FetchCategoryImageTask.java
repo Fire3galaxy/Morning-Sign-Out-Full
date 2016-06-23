@@ -12,9 +12,9 @@ import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import app.morningsignout.com.morningsignoff.CategoryAdapter;
-import app.morningsignout.com.morningsignoff.CategoryFragment;
-import app.morningsignout.com.morningsignoff.SingleRow;
+import app.morningsignout.com.morningsignoff.category.CategoryAdapter;
+import app.morningsignout.com.morningsignoff.category.CategoryFragment;
+import app.morningsignout.com.morningsignoff.category.SingleRow;
 
 /**
  * Created by Daniel on 6/24/2015.

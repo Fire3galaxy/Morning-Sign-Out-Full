@@ -1,4 +1,4 @@
-package app.morningsignout.com.morningsignoff;
+package app.morningsignout.com.morningsignoff.disqus;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -18,9 +18,10 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.Arrays;
+
+import app.morningsignout.com.morningsignoff.R;
 
 /**
  * Created by Daniel on 1/4/2016.

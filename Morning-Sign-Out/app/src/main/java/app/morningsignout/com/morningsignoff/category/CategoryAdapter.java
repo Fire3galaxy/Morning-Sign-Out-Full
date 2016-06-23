@@ -1,4 +1,4 @@
-package app.morningsignout.com.morningsignoff;
+package app.morningsignout.com.morningsignoff.category;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -18,6 +18,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import app.morningsignout.com.morningsignoff.R;
+import app.morningsignout.com.morningsignoff.article.Article;
 import app.morningsignout.com.morningsignoff.network.FetchCategoryImageTask;
 import in.srain.cube.views.GridViewWithHeaderAndFooter;
 

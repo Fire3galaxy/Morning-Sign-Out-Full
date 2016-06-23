@@ -9,8 +9,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import app.morningsignout.com.morningsignoff.Article;
-import app.morningsignout.com.morningsignoff.Parser;
+import app.morningsignout.com.morningsignoff.article.Article;
 
 /* Majorly reformed for the sake of just getting specific articles and
  * NOT a list of articles for the category page. The original code with parsing intended

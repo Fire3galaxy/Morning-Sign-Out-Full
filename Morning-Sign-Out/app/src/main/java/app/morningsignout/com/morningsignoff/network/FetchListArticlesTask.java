@@ -17,10 +17,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import app.morningsignout.com.morningsignoff.Article;
-import app.morningsignout.com.morningsignoff.CategoryAdapter;
-import app.morningsignout.com.morningsignoff.CategoryFragment;
-import app.morningsignout.com.morningsignoff.Parser;
+import app.morningsignout.com.morningsignoff.article.Article;
+import app.morningsignout.com.morningsignoff.category.CategoryAdapter;
+import app.morningsignout.com.morningsignoff.category.CategoryFragment;
 import in.srain.cube.views.GridViewWithHeaderAndFooter;
 
 // This class is called in Category Activity to fetch articles online and feed it to CategoryAdapter

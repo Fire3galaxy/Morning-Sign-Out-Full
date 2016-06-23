@@ -16,7 +16,7 @@ import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
 
-import app.morningsignout.com.morningsignoff.CategoryActivity;
+import app.morningsignout.com.morningsignoff.category.CategoryActivity;
 import app.morningsignout.com.morningsignoff.R;
 
 /**

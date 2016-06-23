@@ -1,4 +1,4 @@
-package app.morningsignout.com.morningsignoff;
+package app.morningsignout.com.morningsignoff.category;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import app.morningsignout.com.morningsignoff.R;
+import app.morningsignout.com.morningsignoff.article.ArticleActivity;
 import app.morningsignout.com.morningsignoff.network.FetchListArticlesTask;
 import in.srain.cube.views.GridViewWithHeaderAndFooter;
 

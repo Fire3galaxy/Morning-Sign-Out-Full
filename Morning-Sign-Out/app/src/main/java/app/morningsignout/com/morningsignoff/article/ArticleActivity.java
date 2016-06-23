@@ -1,4 +1,4 @@
-package app.morningsignout.com.morningsignoff;
+package app.morningsignout.com.morningsignoff.article;
 
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
@@ -43,6 +43,10 @@ import java.util.List;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
+import app.morningsignout.com.morningsignoff.category.CategoryActivity;
+import app.morningsignout.com.morningsignoff.R;
+import app.morningsignout.com.morningsignoff.search_results.SearchResultsActivity;
+import app.morningsignout.com.morningsignoff.disqus.DisqusMainActivity;
 import app.morningsignout.com.morningsignoff.network.URLToMobileArticle;
 
 // Activity class created in FetchListArticleTask when user clicks on an article from the ListView
@@ -81,6 +85,7 @@ public class ArticleActivity extends ActionBarActivity {
         setContentView(R.layout.activity_article);
 
         ActionBar actionBar = getSupportActionBar();
+
         isPortrait =
                 getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
 

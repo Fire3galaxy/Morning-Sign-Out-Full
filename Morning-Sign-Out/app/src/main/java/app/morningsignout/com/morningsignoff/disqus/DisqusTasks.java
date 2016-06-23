@@ -1,22 +1,15 @@
-package app.morningsignout.com.morningsignoff;
+package app.morningsignout.com.morningsignoff.disqus;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.WrapperListAdapter;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 
 /**
  * Created by Daniel on 11/26/2015.

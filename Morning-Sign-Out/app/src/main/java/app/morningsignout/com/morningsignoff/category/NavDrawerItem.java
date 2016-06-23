@@ -1,4 +1,4 @@
-package app.morningsignout.com.morningsignoff;
+package app.morningsignout.com.morningsignoff.category;
 
 /**
  * Created by liukwarm on 9/20/15.

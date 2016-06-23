@@ -1,27 +1,17 @@
 package app.morningsignout.com.morningsignoff.meet_the_team;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-
-import app.morningsignout.com.morningsignoff.ArticleActivity;
 import app.morningsignout.com.morningsignoff.R;
-import app.morningsignout.com.morningsignoff.network.URLToMobileArticle;
 
 /**
  * Created by Daniel on 11/21/2015.

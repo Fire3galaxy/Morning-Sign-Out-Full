@@ -1,4 +1,4 @@
-package app.morningsignout.com.morningsignoff;
+package app.morningsignout.com.morningsignoff.category;
 
 /**
  * Created by liukwarm on 9/20/15.
@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import app.morningsignout.com.morningsignoff.R;
 
 public class NavDrawerListAdapter extends BaseAdapter {
 
