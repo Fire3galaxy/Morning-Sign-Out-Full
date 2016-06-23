@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import app.morningsignout.com.morningsignoff.network.URLToMobileArticle;
+
 public class SearchResultsActivity extends ActionBarActivity {
     SearchView searchView;
     WebView webView;

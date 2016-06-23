@@ -1,7 +1,5 @@
 package app.morningsignout.com.morningsignoff;
 
-import android.graphics.Bitmap;
-
 // Defines the row item xml
 public class SingleRow{
     public String title;

@@ -1,14 +1,10 @@
 package app.morningsignout.com.morningsignoff;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -22,13 +18,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.Toast;
 import android.content.res.TypedArray;
 
 import java.util.ArrayList;
+
+import app.morningsignout.com.morningsignoff.meet_the_team.MeetTheTeamActivity;
 
 // Category page activity
 public class CategoryActivity extends ActionBarActivity {

@@ -1,4 +1,4 @@
-package app.morningsignout.com.morningsignoff.util;
+package app.morningsignout.com.morningsignoff.network;
 
 import android.os.AsyncTask;
 
@@ -14,8 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import app.morningsignout.com.morningsignoff.MTTListViewItem;
-import app.morningsignout.com.morningsignoff.MeetTheTeamActivity;
+import app.morningsignout.com.morningsignoff.meet_the_team.MTTListViewItem;
+import app.morningsignout.com.morningsignoff.meet_the_team.MeetTheTeamActivity;
 
 /**
  * Created by Daniel on 10/30/2015.

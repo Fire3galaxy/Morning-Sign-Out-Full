@@ -1,6 +1,5 @@
 package app.morningsignout.com.morningsignoff;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -15,14 +14,10 @@ import android.util.LruCache;
 import android.util.Xml;
 import android.view.Display;
 import android.view.LayoutInflater;
-import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.WrapperListAdapter;
@@ -32,14 +27,9 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import app.morningsignout.com.morningsignoff.util.FetchCategoryImageTask;
-import app.morningsignout.com.morningsignoff.util.FetchListArticlesTask;
+import app.morningsignout.com.morningsignoff.network.FetchListArticlesTask;
 import in.srain.cube.views.GridViewWithHeaderAndFooter;
 
 public class CategoryFragment extends Fragment {

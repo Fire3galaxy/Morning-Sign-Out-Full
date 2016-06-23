@@ -1,4 +1,4 @@
-package app.morningsignout.com.morningsignoff;
+package app.morningsignout.com.morningsignoff.meet_the_team;
 
 import android.content.Context;
 import android.os.Bundle;

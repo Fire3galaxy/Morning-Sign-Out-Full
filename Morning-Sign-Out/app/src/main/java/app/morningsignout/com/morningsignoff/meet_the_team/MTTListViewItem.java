@@ -1,4 +1,4 @@
-package app.morningsignout.com.morningsignoff;
+package app.morningsignout.com.morningsignoff.meet_the_team;
 
 import android.os.Parcel;
 import android.os.Parcelable;

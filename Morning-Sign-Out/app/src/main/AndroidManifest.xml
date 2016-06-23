@@ -36,7 +36,7 @@
                 android:value="app.morningsignout.com.morningsignoff.CategoryActivity" />
         </activity>
         <activity
-            android:name=".MeetTheTeamActivity"
+            android:name=".meet_the_team.MeetTheTeamActivity"
             android:label="@string/meet_the_team"
             android:parentActivityName=".CategoryActivity"
             android:launchMode="singleTop"
@@ -88,10 +88,10 @@
             android:configChanges="orientation|screenSize|keyboardHidden" />
 
         <activity
-            android:name=".MTTListViewActivity"/>
+            android:name=".meet_the_team.MTTListViewActivity"/>
 
         <activity
-            android:name=".MTTWebViewActivity"
+            android:name=".meet_the_team.MTTWebViewActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
     </application>
 

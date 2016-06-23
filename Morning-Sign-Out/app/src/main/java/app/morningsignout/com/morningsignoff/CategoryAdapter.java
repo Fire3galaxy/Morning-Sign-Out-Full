@@ -18,7 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import app.morningsignout.com.morningsignoff.util.FetchCategoryImageTask;
+import app.morningsignout.com.morningsignoff.network.FetchCategoryImageTask;
 import in.srain.cube.views.GridViewWithHeaderAndFooter;
 
 // CategoryAdapter takes in a list of Articles and displays the titles, descriptions, images

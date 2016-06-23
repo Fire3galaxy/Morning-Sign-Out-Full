@@ -1,4 +1,4 @@
-package app.morningsignout.com.morningsignoff.util;
+package app.morningsignout.com.morningsignoff.network;
 
 import android.util.Log;
 

@@ -43,6 +43,8 @@ import java.util.List;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
+import app.morningsignout.com.morningsignoff.network.URLToMobileArticle;
+
 // Activity class created in FetchListArticleTask when user clicks on an article from the ListView
 public class ArticleActivity extends ActionBarActivity {
     final static String AD_WAS_LEFT = "AdView is left";

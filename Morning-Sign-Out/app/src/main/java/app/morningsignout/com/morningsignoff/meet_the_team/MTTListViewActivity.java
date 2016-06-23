@@ -1,4 +1,4 @@
-package app.morningsignout.com.morningsignoff;
+package app.morningsignout.com.morningsignoff.meet_the_team;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,7 +16,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import app.morningsignout.com.morningsignoff.util.FetchMeetTheTeamTask;
+import app.morningsignout.com.morningsignoff.CategoryActivity;
+import app.morningsignout.com.morningsignoff.R;
+import app.morningsignout.com.morningsignoff.network.FetchMeetTheTeamTask;
 
 /**
  * Created by liukwarm on 10/24/15.

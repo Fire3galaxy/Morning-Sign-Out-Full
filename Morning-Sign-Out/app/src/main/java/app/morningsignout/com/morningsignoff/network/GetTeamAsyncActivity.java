@@ -1,4 +1,4 @@
-package app.morningsignout.com.morningsignoff.util;
+package app.morningsignout.com.morningsignoff.network;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -7,7 +7,7 @@ import android.widget.Button;
 import java.util.ArrayList;
 import java.util.Map;
 
-import app.morningsignout.com.morningsignoff.MTTListViewItem;
+import app.morningsignout.com.morningsignoff.meet_the_team.MTTListViewItem;
 import app.morningsignout.com.morningsignoff.R;
 
 /**
