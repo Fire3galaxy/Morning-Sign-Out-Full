@@ -1,6 +1,8 @@
 package app.morningsignout.com.morningsignoff.disqus;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -260,7 +262,7 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), DisqusLogin.class);
-                ((DisqusMainActivity) v.getContext()).startActivityForResult(intent, 1);
+                DisqusMainActivity.this.startActivityForResult(intent, 1);
             }
         });
 
