@@ -58,7 +58,7 @@ public class MttWebViewClient extends WebViewClient {
                 return false;
 
             Intent intent = new Intent(view.getContext(), ArticleActivity.class);
-            intent.putExtra(Intent.EXTRA_RETURN_RESULT, url); // Put url in intent
+            intent.putExtra(Intent.EXTRA_HTML_TEXT, url); // Put url in intent
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP); // Open w/ old articleActivity if exists
             view.getContext().startActivity(intent);
             return true;
