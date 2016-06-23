@@ -104,7 +104,8 @@ public class CategoryActivity extends ActionBarActivity {
         // For CategoryFragment
         CategoryFragment fragment = CategoryFragment.findOrCreateRetainFragment(getSupportFragmentManager());
         Bundle args = new Bundle();
-        args.putString(CategoryFragment.EXTRA_TITLE, categories_urls[position]);
+        args.putString(CategoryFragment.EXTRA_TITLE, categories_titles[position]);
+        args.putString(CategoryFragment.EXTRA_URL, categories_urls[position]);
         fragment.setArguments(args);
 
         // Set fragment's listview
@@ -115,7 +116,8 @@ public class CategoryActivity extends ActionBarActivity {
         }
 
         // Adding MSO Logo to center of action bar
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
         ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null);
         ib.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -191,11 +193,8 @@ public class CategoryActivity extends ActionBarActivity {
 
         int id = item.getItemId();
 
-        if (id == R.id.title) {
-            return true;
-        }
+        return id == R.id.title || super.onOptionsItemSelected(item);
 
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -266,7 +265,8 @@ public class CategoryActivity extends ActionBarActivity {
 
             CategoryFragment fragment = new CategoryFragment();
             Bundle args = new Bundle();
-            args.putString(CategoryFragment.EXTRA_TITLE, categories_urls[position]);
+            args.putString(CategoryFragment.EXTRA_TITLE, categories_titles[position]);
+            args.putString(CategoryFragment.EXTRA_URL, categories_urls[position]);
             fragment.setArguments(args);
 
             // Insert the fragment by replacing any existing fragment

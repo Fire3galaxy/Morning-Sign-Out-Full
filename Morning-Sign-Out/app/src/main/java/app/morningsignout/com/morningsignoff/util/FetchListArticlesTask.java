@@ -1,4 +1,4 @@
-package app.morningsignout.com.morningsignoff;
+package app.morningsignout.com.morningsignoff.util;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -17,6 +17,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import app.morningsignout.com.morningsignoff.Article;
+import app.morningsignout.com.morningsignoff.CategoryAdapter;
+import app.morningsignout.com.morningsignoff.CategoryFragment;
+import app.morningsignout.com.morningsignoff.Parser;
 import in.srain.cube.views.GridViewWithHeaderAndFooter;
 
 // This class is called in Category Activity to fetch articles online and feed it to CategoryAdapter
@@ -124,7 +128,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
         // If result and adapter are not null and fragment still exists, load items
         if (adapter != null && fragmentRef.get() != null) {
-            fragmentRef.get().isLoadingArticles.set(false);
+            fragmentRef.get().getIsLoadingArticles().set(false);
             if (articles != null) {
                 adapter.loadMoreItems(articles, pageNum);
                 Log.d("FetchListArticlesTask", "Calling loadMoreItems " + Integer.toString(pageNum));

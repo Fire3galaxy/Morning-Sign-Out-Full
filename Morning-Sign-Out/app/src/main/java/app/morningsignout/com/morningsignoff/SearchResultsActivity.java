@@ -158,7 +158,11 @@ class SearchWebViewClient extends WebViewClient {
     }
 
     public void setQuery(String query) {
-        this.query = query;
+        try {
+            this.query = URLEncoder.encode(query, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

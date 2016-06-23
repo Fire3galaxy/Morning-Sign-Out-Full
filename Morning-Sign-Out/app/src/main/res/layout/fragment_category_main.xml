@@ -7,7 +7,7 @@
     android:paddingTop="0dp"
     android:paddingBottom="0dp"
     android:background="#e1eaee"
-    tools:context="app.morningsignout.com.morningsignoff.CategoryActivity$PlaceholderFragment">
+    tools:context="app.morningsignout.com.morningsignoff.CategoryActivity">
 
 
     <android.support.v4.widget.SwipeRefreshLayout
@@ -56,7 +56,6 @@
         android:drawableTop="@drawable/ic_action_about"/>
 
     <TextView
-        android:text="New Text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
@@ -66,6 +65,8 @@
         android:textColor="@android:color/black"
         android:id="@+id/textView_categoryHeader"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:paddingTop="10dp" />
+    <!--paddingTop matches gridview's paddingTop-->
 
 </RelativeLayout>

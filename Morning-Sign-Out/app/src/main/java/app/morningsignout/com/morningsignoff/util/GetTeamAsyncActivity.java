@@ -1,4 +1,4 @@
-package app.morningsignout.com.morningsignoff;
+package app.morningsignout.com.morningsignoff.util;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -6,6 +6,9 @@ import android.widget.Button;
 
 import java.util.ArrayList;
 import java.util.Map;
+
+import app.morningsignout.com.morningsignoff.MTTListViewItem;
+import app.morningsignout.com.morningsignoff.R;
 
 /**
  * Created by Daniel on 11/18/2015.

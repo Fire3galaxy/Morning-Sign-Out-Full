@@ -3,11 +3,11 @@ package app.morningsignout.com.morningsignoff;
 import android.graphics.Bitmap;
 
 // Defines the row item xml
-class SingleRow{
-    String title;
-    String description;
-    String link;
-    String imageURL;
+public class SingleRow{
+    public String title;
+    public String description;
+    public String link;
+    public String imageURL;
 
     SingleRow(String title, String description, String link) {
         this.title = title;

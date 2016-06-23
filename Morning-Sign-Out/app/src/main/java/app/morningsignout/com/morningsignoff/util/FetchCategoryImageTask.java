@@ -1,4 +1,4 @@
-package app.morningsignout.com.morningsignoff;
+package app.morningsignout.com.morningsignoff.util;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,6 +11,10 @@ import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import app.morningsignout.com.morningsignoff.CategoryAdapter;
+import app.morningsignout.com.morningsignoff.CategoryFragment;
+import app.morningsignout.com.morningsignoff.SingleRow;
 
 /**
  * Created by Daniel on 6/24/2015.

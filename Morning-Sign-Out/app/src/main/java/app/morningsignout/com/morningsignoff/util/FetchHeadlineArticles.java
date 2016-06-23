@@ -1,6 +1,5 @@
-package app.morningsignout.com.morningsignoff;
+package app.morningsignout.com.morningsignoff.util;
 
-import android.os.AsyncTask;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -9,9 +8,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+
+import app.morningsignout.com.morningsignoff.Article;
+import app.morningsignout.com.morningsignoff.Parser;
 
 /* Majorly reformed for the sake of just getting specific articles and
  * NOT a list of articles for the category page. The original code with parsing intended
