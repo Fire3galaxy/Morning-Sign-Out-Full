@@ -24,4 +24,12 @@
         android:dividerHeight="1dp"
         android:listSelector="@drawable/list_selector"
         android:background="@color/background_white"/>
+
+    <ImageView
+        android:id="@+id/imageView_splashScreen"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:src="@drawable/hi_res_splash"
+        android:clickable="true"
+        android:background="#73b3e2"/>
 </android.support.v4.widget.DrawerLayout>

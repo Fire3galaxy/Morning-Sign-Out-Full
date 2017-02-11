@@ -329,6 +329,7 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
         return html.charAt(lastTag + 1) == 'a';
     }
 
+    // Any page that is not an author page or list of articles
     public static String getOther(final String urlname) throws IOException {
         // Increased timeout because it could be search page request
         Document doc = Jsoup.connect(urlname).timeout(6 * 1000).get();

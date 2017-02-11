@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.WrapperListAdapter;
@@ -35,25 +36,6 @@ import app.morningsignout.com.morningsignoff.network.FetchListArticlesTask;
 import in.srain.cube.views.GridViewWithHeaderAndFooter;
 
 public class CategoryFragment extends Fragment {
-    static public class CategoryViews {
-        public WeakReference<SwipeRefreshLayout> swipeRefresh;
-        public WeakReference<ProgressBar> progressBar;
-        public WeakReference<TextView> refreshTextView;
-        public WeakReference<TextView> headerTextView;
-        public WeakReference<ProgressBar> footerProgress;
-
-        public boolean firstLoad;
-        public boolean refresh;
-
-        public CategoryViews() {
-            swipeRefresh = null;
-            progressBar = null;
-            refreshTextView = null;
-            headerTextView = null;
-            footerProgress = null;
-        }
-    }
-
     final static String EXTRA_TITLE = "EXTRA_TITLE";
     final static String EXTRA_REFRESH = "EXTRA_REFRESH";
     final static String EXTRA_URL = "EXTRA_URL";
@@ -62,16 +44,17 @@ public class CategoryFragment extends Fragment {
     String category = "";
     String category_url = "";
 
-    AtomicBoolean isLoadingArticles;
-    public LruCache<String, Bitmap> memoryCache;
-    ProgressBar footerProgressBar;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private ProgressBar progressBar;
+    private TextView refreshTextView;
+    private ImageView splashScreenView;
+    private ProgressBar footerProgressBar;
     private GridViewWithHeaderAndFooter gridViewWithHeaderAndFooter;
-    private TextView headerTitle;
-    protected static Integer index = null;
-    private CategoryAdapter categoryAdapter;
 
-    public CategoryFragment() {
-    }
+    private CategoryAdapter categoryAdapter;
+    public LruCache<String, Bitmap> memoryCache;
+    private AtomicBoolean isLoadingArticles;
+    protected static Integer index = null;
 
     public AtomicBoolean getIsLoadingArticles() {
         return isLoadingArticles;
@@ -80,7 +63,6 @@ public class CategoryFragment extends Fragment {
     @Override
     public void onDetach() {
         index = gridViewWithHeaderAndFooter.getFirstVisiblePosition();
-        Log.d("Avi","Index value stored is "+index);
         super.onDetach();
     }
 
@@ -88,12 +70,12 @@ public class CategoryFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        Log.d("Avi","Category fragment created");
 
         if (getArguments() != null) {
             category = getArguments().getString(EXTRA_TITLE);
             category_url = getArguments().getString(EXTRA_URL);
         }
+
         isLoadingArticles = new AtomicBoolean(false);
         setUpCache();
     }
@@ -111,15 +93,13 @@ public class CategoryFragment extends Fragment {
         display.getSize(size);
         int width = size.x;
         if (width <= 320) {
-            Log.d("Avi", "Old phone, change cache size");
             cacheSize = maxMemory / 3;
         } else
             cacheSize = maxMemory / 8;
         memoryCache = new LruCache<String, Bitmap>(cacheSize) {
             @Override
             protected int sizeOf(String key, Bitmap bitmap) {
-                // The cache size will be measured in kilobytes rather than
-                // number of items.
+                // The cache size will be measured in kilobytes rather than number of items.
                 return bitmap.getByteCount() / 1024;
             }
         };
@@ -134,51 +114,35 @@ public class CategoryFragment extends Fragment {
             grid.setNumColumns(1);
     }
 
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d("Avi","Category fragment view on create called");
-
-
         View rootView = inflater.inflate(R.layout.fragment_category_main, container, false);
-        final SwipeRefreshLayout refreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefresh_category);
+
+        TextView headerView = (TextView) rootView.findViewById(R.id.textView_categoryHeader);
+        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefresh_category);
+        progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
+        refreshTextView = (TextView) rootView.findViewById(R.id.textView_categoryRefresh);
+        splashScreenView = (ImageView) rootView.findViewById(R.id.imageView_splash);
+        footerProgressBar = getFooterProgressBarXml();
         gridViewWithHeaderAndFooter = (GridViewWithHeaderAndFooter) rootView.findViewById(R.id.gridView);
-        String text = category;
-        ((TextView)rootView.findViewById(R.id.textView_categoryHeader)).setText(text);
+        boolean isRefresh = getArguments().getBoolean(EXTRA_REFRESH, false);
 
-        // Colors for refresh layout
-        refreshLayout.setColorSchemeColors(Color.argb(255, 0x81, 0xbf, 0xff), Color.WHITE);
-
-        // Views for first FetchListArticlesTask to affect
-
-        final CategoryViews loadingViews = new CategoryViews();
-        loadingViews.swipeRefresh = new WeakReference<SwipeRefreshLayout>(refreshLayout);
-        loadingViews.progressBar = new WeakReference<ProgressBar>((ProgressBar) rootView.findViewById(R.id.progressBar));
-        loadingViews.refreshTextView = new WeakReference<TextView>((TextView) rootView.findViewById(R.id.textView_categoryRefresh));
-        loadingViews.headerTextView = new WeakReference<TextView>((TextView) headerTitle);
-        loadingViews.refresh = getArguments().containsKey(EXTRA_REFRESH);
-        loadingViews.firstLoad = true;
-        loadingViews.refresh = getArguments().containsKey(EXTRA_REFRESH);
-
-        //set up gridview
+        headerView.setText(category);
+        swipeRefreshLayout.setColorSchemeColors(Color.argb(255, 0x81, 0xbf, 0xff), Color.WHITE);
         setUpGridView(gridViewWithHeaderAndFooter);
-
-        // Footer progressbar view
-        footerProgressBar = getFooterProgressBar();
         gridViewWithHeaderAndFooter.addFooterView(footerProgressBar);
 
-        // Adapter
+        // Creates and loads new adapter or sets position of existing gridView
         if(categoryAdapter == null) {
-            categoryAdapter = new CategoryAdapter(this, inflater, gridViewWithHeaderAndFooter);
-            // Use Asynctask to fetch article from the given category
+            categoryAdapter = new CategoryAdapter(this, inflater);
             gridViewWithHeaderAndFooter.setAdapter(categoryAdapter);
             isLoadingArticles.set(true);
-            new FetchListArticlesTask(this, gridViewWithHeaderAndFooter, loadingViews, 1).execute(category_url);
-        }
-        else {
-            loadingViews.refreshTextView.get().setVisibility(View.GONE);
+            new FetchListArticlesTask(this, 1, true, isRefresh).execute(category_url);
+//            if (!isRefresh)
+//                splashScreenView.setVisibility(View.VISIBLE);
+        } else {
+            refreshTextView.setVisibility(View.GONE);
             categoryAdapter.notifyDataSetChanged();
             gridViewWithHeaderAndFooter.setAdapter(categoryAdapter);
             if (index != null)
@@ -200,8 +164,6 @@ public class CategoryFragment extends Fragment {
                 SingleRow rowTemp = (SingleRow) adapter.getItem(id_int);
                 String articleTitle = rowTemp.title;
 
-                Log.d("CategoryFragment", "Position: " + String.valueOf(position) + ", id: " + String.valueOf(id));
-
                 // Create new activity for the article here
                 // feed the new activity with the URL of the page
                 String articleLink = rowTemp.link;
@@ -220,6 +182,7 @@ public class CategoryFragment extends Fragment {
             }
         });
 
+        // To load more articles when the bottom of the page is reached
         gridViewWithHeaderAndFooter.setOnScrollListener(new AbsListView.OnScrollListener() {
             int lastPageNum = 0;
 
@@ -234,12 +197,8 @@ public class CategoryFragment extends Fragment {
                     int pageNum = adapter.getPageNum();
                     // Only make one request per page request
                     if (totalItemCount != 0 && lastPageNum != pageNum && isLoadingArticles.weakCompareAndSet(false, true)) {
-                        CategoryViews views = new CategoryViews();
-                        views.firstLoad = false;
-                        views.footerProgress = new WeakReference<ProgressBar>(footerProgressBar);
-
                         lastPageNum = pageNum;
-                        new FetchListArticlesTask(CategoryFragment.this, gridViewWithHeaderAndFooter, views, pageNum + 1).execute(category_url);
+                        new FetchListArticlesTask(CategoryFragment.this, pageNum + 1, false, false).execute(category_url);
                     }
                 }
             }
@@ -249,7 +208,7 @@ public class CategoryFragment extends Fragment {
             }
         });
 
-        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 if (!gridViewWithHeaderAndFooter.getAdapter().isEmpty() || !isLoadingArticles.get()) {
@@ -266,7 +225,7 @@ public class CategoryFragment extends Fragment {
                             .replace(R.id.container_category, fragment)
                             .commit();
                 }
-                refreshLayout.setRefreshing(false);
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
 
@@ -283,10 +242,6 @@ public class CategoryFragment extends Fragment {
         return memoryCache.get(key);
     }
 
-    public void setisLoadingFalse() {
-        isLoadingArticles.set(false);
-    }
-
     public static CategoryFragment findOrCreateRetainFragment(FragmentManager fm) {
         CategoryFragment fragment = (CategoryFragment) fm.findFragmentByTag(TAG);
         if (fragment == null) {
@@ -295,31 +250,7 @@ public class CategoryFragment extends Fragment {
         return fragment;
     }
 
-    TextView getHeaderTextView() {
-        // -get attributes
-        XmlPullParser pullParser = getResources().getXml(R.xml.header_textview);
-
-        // -get first tag of xml
-        try {
-            int type = 0;
-            while (type != XmlPullParser.END_DOCUMENT && type != XmlPullParser.START_TAG) {
-                type = pullParser.next();
-            }
-        } catch (XmlPullParserException | IOException e) {
-            Log.e("CategoryFragment", e.getMessage());
-        }
-
-        // -get attriuteSet
-        AttributeSet attrs = Xml.asAttributeSet(pullParser);
-
-        // Set text to category
-        TextView textView = new TextView(getActivity(), attrs);
-        Log.d("CategoryFragment", "category is " + category);
-        textView.setText(category);
-        return textView;
-    }
-
-    ProgressBar getFooterProgressBar() {
+    ProgressBar getFooterProgressBarXml() {
         // -get attributes for footerProgressBar
         XmlPullParser pullParser = getResources().getXml(R.xml.footer_progressbar);
 
@@ -338,5 +269,29 @@ public class CategoryFragment extends Fragment {
 
         // -create progressBar and add to listView
         return new ProgressBar(getActivity(), attrs);
+    }
+
+    public SwipeRefreshLayout getSwipeRefreshLayout() {
+        return swipeRefreshLayout;
+    }
+
+    public ProgressBar getProgressBar() {
+        return progressBar;
+    }
+
+    public TextView getRefreshTextView() {
+        return refreshTextView;
+    }
+
+    public ImageView getSplashScreenView() {
+        return splashScreenView;
+    }
+
+    public ProgressBar getFooterProgressBar() {
+        return footerProgressBar;
+    }
+
+    public GridViewWithHeaderAndFooter getGridViewWithHeaderAndFooter() {
+        return gridViewWithHeaderAndFooter;
     }
 }

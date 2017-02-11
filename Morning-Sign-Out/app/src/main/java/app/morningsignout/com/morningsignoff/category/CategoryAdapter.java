@@ -1,7 +1,10 @@
 package app.morningsignout.com.morningsignoff.category;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Surface;
@@ -27,23 +30,27 @@ import in.srain.cube.views.GridViewWithHeaderAndFooter;
 // of those articles in the category page as row items
 // It is created in the FetchListArticlesTask which is called in CategoryActivity
 public class CategoryAdapter extends BaseAdapter {
-    ArrayList<SingleRow> articles;
-    Set<String> uniqueArticleNames;
+    private ArrayList<SingleRow> articles;
+    private Set<String> uniqueArticleNames;
 
-    CategoryFragment categoryFragment;
-    LayoutInflater inflater;
-    Boolean canLoadMore;
-    int pageNum;
-    GridViewWithHeaderAndFooter gridViewWithHeaderAndFooter;
+    private CategoryFragment categoryFragment;
+    private LayoutInflater inflater;
+    private int pageNum;
+    private int reqImgWidth, reqImgHeight;
 
-    CategoryAdapter(CategoryFragment categoryFragment, LayoutInflater inflater, GridViewWithHeaderAndFooter gridViewWithHeaderAndFooter) {
+    CategoryAdapter(CategoryFragment categoryFragment, LayoutInflater inflater) {
         this.categoryFragment = categoryFragment;
-        this.articles = new ArrayList<SingleRow>();
-        this.uniqueArticleNames = new HashSet<String>();
+        this.articles = new ArrayList<>();
+        this.uniqueArticleNames = new HashSet<>();
         this.inflater = inflater;
-        canLoadMore = true;
         pageNum = 0;
-        this.gridViewWithHeaderAndFooter = gridViewWithHeaderAndFooter;
+
+        // Downloaded images need to be good quality for landscape and portrait orientations
+        DisplayMetrics metrics = new DisplayMetrics();
+        categoryFragment.getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        reqImgWidth = metrics.widthPixels;
+        Resources r = categoryFragment.getResources();
+        reqImgHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 220, r.getDisplayMetrics());
     }
 
     public synchronized int getPageNum() {
@@ -67,10 +74,9 @@ public class CategoryAdapter extends BaseAdapter {
         return i;
     }
 
-    public static boolean isLandscape(Context con) {
+    static boolean isLandscape(Context con) {
         Display display = ((WindowManager) con.getSystemService(Context.WINDOW_SERVICE))
                 .getDefaultDisplay();
-
         int orientation = display.getRotation();
 
         return (orientation == Surface.ROTATION_90 || orientation == Surface.ROTATION_270);
@@ -107,9 +113,8 @@ public class CategoryAdapter extends BaseAdapter {
 
         // Set the values of the rowItem
         SingleRow rowTemp = articles.get(i);
-        if(isLandscape(row.getContext())){
+        if(isLandscape(row.getContext()))
             viewHolder.title.setLines(3);
-        }
         viewHolder.title.setText(rowTemp.title);
         viewHolder.description.setText(rowTemp.description);
 
@@ -123,9 +128,9 @@ public class CategoryAdapter extends BaseAdapter {
                 CategoryImageTaskDrawable taskWrapper = new CategoryImageTaskDrawable(task);
 
                 viewHolder.image.setImageDrawable(taskWrapper);
-                task.execute();
+                task.execute(reqImgWidth, reqImgHeight);
             }
-        } else {            // set saved imageViewReference
+        } else {    // set saved imageViewReference
             // Cropping imageViewReference to preserve aspect ratio
             viewHolder.image.setScaleType(ImageView.ScaleType.CENTER_CROP);
             viewHolder.image.setCropToPadding(true);
@@ -134,8 +139,6 @@ public class CategoryAdapter extends BaseAdapter {
 
         return row;
     }
-
-
 
     // This function is called along with .notifyDataSetChanged() in Asynctask's onScrollListener function
     // when the viewers scroll to the bottom of the articles

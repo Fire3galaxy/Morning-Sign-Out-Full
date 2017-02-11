@@ -3,8 +3,6 @@ package app.morningsignout.com.morningsignoff.network;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.WrapperListAdapter;
 
@@ -20,7 +18,9 @@ import java.util.List;
 import app.morningsignout.com.morningsignoff.article.Article;
 import app.morningsignout.com.morningsignoff.category.CategoryAdapter;
 import app.morningsignout.com.morningsignoff.category.CategoryFragment;
-import in.srain.cube.views.GridViewWithHeaderAndFooter;
+import app.morningsignout.com.morningsignoff.category.CategoryActivity;
+
+import static android.view.View.GONE;
 
 // This class is called in Category Activity to fetch articles online and feed it to CategoryAdapter
 // do in background gets the article objects from morningsignout, and converts imageURL to bitmap
@@ -31,45 +31,43 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
     private final String logString = FetchListArticlesTask.class.getSimpleName();
 
     private WeakReference<CategoryFragment> fragmentRef;
-    private WeakReference<GridViewWithHeaderAndFooter> listViewWeakRef;
-    private CategoryFragment.CategoryViews loadingViews;
     private int pageNum;
+    private boolean isFirstLoad, isRefresh;
 
     private int adapterPageNum;
 
     // Called by onCreateView on first call
     public FetchListArticlesTask(CategoryFragment fragment,
-                                 GridViewWithHeaderAndFooter gridViewWithHeaderAndFooter,
-                                 CategoryFragment.CategoryViews loadingViews,
-                                 int pageNum) {
-        this.fragmentRef = new WeakReference<CategoryFragment>(fragment);   // ensure fragment still exists
-        this.listViewWeakRef = new WeakReference<GridViewWithHeaderAndFooter>(gridViewWithHeaderAndFooter);       // ensure listview still exists
-        this.loadingViews = loadingViews;       // refresh layout, task, loading message (first time views)
+                                 int pageNum,
+                                 boolean isFirstLoad,
+                                 boolean isRefresh) {
+        this.fragmentRef = new WeakReference<>(fragment);   // ensure fragment still exists
         this.pageNum = pageNum;         // page of mso page called for task
+        this.isFirstLoad = isFirstLoad;
     }
 
     @Override
     protected void onPreExecute() {
-        // Loading animations (first time only, use refresh or center progressbar)
-        if (loadingViews != null) {
-            if (loadingViews.firstLoad) {
-                if (loadingViews.refresh && loadingViews.swipeRefresh.get() != null)
-                    loadingViews.swipeRefresh.get().setRefreshing(true);
-                else if (loadingViews.progressBar.get() != null)
-                    loadingViews.progressBar.get().setVisibility(View.VISIBLE);
-            } else {
-                if (loadingViews.footerProgress.get() != null)
-                    loadingViews.footerProgress.get().setVisibility(View.VISIBLE);
-            }
-        }
+        if (fragmentRef.get() == null)
+            return;
 
-        // initialize variables
-        if (listViewWeakRef.get() != null) {
-            WrapperListAdapter wrappedAdapter = (WrapperListAdapter) listViewWeakRef.get().getAdapter();
+        // Load correct progressbar based on state of fragment
+        // first load & refresh: used refresh layout
+        // just first load: actually first time fragment is created
+        // neither: scrolled to bottom of list
+        if (isFirstLoad) {
+            if (isRefresh)
+                fragmentRef.get().getSwipeRefreshLayout().setRefreshing(true);
+            else
+                fragmentRef.get().getProgressBar().setVisibility(View.VISIBLE);
+        } else
+            fragmentRef.get().getFooterProgressBar().setVisibility(View.VISIBLE);
 
-            CategoryAdapter adapter = (CategoryAdapter) wrappedAdapter.getWrappedAdapter();
-            adapterPageNum = adapter.getPageNum();
-        }
+        // Get page number for list
+        WrapperListAdapter wrappedAdapter =
+                (WrapperListAdapter) fragmentRef.get().getGridViewWithHeaderAndFooter().getAdapter();
+        CategoryAdapter adapter = (CategoryAdapter) wrappedAdapter.getWrappedAdapter();
+        adapterPageNum = adapter.getPageNum();
     }
 
     // takes in the category name as a sufix to the URL, ex. healthcare/  and call getArticles()
@@ -89,53 +87,37 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
     // Articles retrived online are being sent here, and we pass the info to the CategoryAdapter
     protected void onPostExecute(final List<Article> articles) {
-        CategoryAdapter adapter = null;
+        if (fragmentRef.get() == null)
+            return;
 
-        if (listViewWeakRef.get() != null) {
-            WrapperListAdapter wrappedAdapter = (WrapperListAdapter) listViewWeakRef.get().getAdapter();
-            adapter = (CategoryAdapter) wrappedAdapter.getWrappedAdapter();
-        }
+        WrapperListAdapter wrappedAdapter =
+                (WrapperListAdapter) fragmentRef.get().getGridViewWithHeaderAndFooter().getAdapter();
+        CategoryAdapter adapter = (CategoryAdapter) wrappedAdapter.getWrappedAdapter();;
 
         // Loading should only show on first loading list
-        // hide progressbar, refresh message, and refresh icon (if loading is done/successful)
-        if (loadingViews != null) {
-            if (loadingViews.firstLoad) {
-                boolean shouldDisableRefresh = loadingViews.refresh &&
-                        loadingViews.swipeRefresh.get() != null &&
-                        loadingViews.swipeRefresh.get().isRefreshing();
-                boolean canHideProgressBar = loadingViews.progressBar.get() != null &&
-                        loadingViews.progressBar.get().getVisibility() != ProgressBar.GONE;
-
-                if (shouldDisableRefresh)
-                    loadingViews.swipeRefresh.get().setRefreshing(false);
-                else if (canHideProgressBar)
-                    loadingViews.progressBar.get().setVisibility(ProgressBar.GONE);
-
-                // hide how-to-refresh textview
-                if (articles != null) {
-                    TextView refresh = loadingViews.refreshTextView.get();
-                    if (refresh != null) refresh.setVisibility(View.GONE);
-
-                    TextView header = loadingViews.headerTextView.get();
-                    if (header != null) header.setVisibility(View.VISIBLE);
-                }
+        // hide progressbar, refresh message, and refresh icon (if loading is successful)
+        if (isFirstLoad) {
+            if (isRefresh) {
+                fragmentRef.get().getSwipeRefreshLayout().setRefreshing(false);
             } else {
-                if (loadingViews.footerProgress.get() != null)
-                    loadingViews.footerProgress.get().setVisibility(View.GONE);
+                fragmentRef.get().getProgressBar().setVisibility(GONE);
+//                fragmentRef.get().getSplashScreenView().setVisibility(GONE);
             }
-        }
+
+            // hide how-to-refresh textView
+            if (articles != null)
+                fragmentRef.get().getRefreshTextView().setVisibility(GONE);
+        } else
+            fragmentRef.get().getFooterProgressBar().setVisibility(GONE);
 
         // If result and adapter are not null and fragment still exists, load items
         if (adapter != null && fragmentRef.get() != null) {
             fragmentRef.get().getIsLoadingArticles().set(false);
-            if (articles != null) {
+            if (articles != null)
                 adapter.loadMoreItems(articles, pageNum);
-                Log.d("FetchListArticlesTask", "Calling loadMoreItems " + Integer.toString(pageNum));
-            } else if (adapter.isEmpty()){
+            else if (adapter.isEmpty())
                 Toast.makeText(fragmentRef.get().getContext(),
                         "We had trouble trying to connect", Toast.LENGTH_SHORT).show();
-                Log.d("FetchListArticlesTask", "Calling loadMoreItems " + Integer.toString(pageNum));
-            }
         }
     }
 
@@ -203,9 +185,6 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                             String author = p.getAuthor(inputLine);
                             articlesList.get(ind).setAuthor(author);
                         }
-
-                        // convert string to bitmap then feed to each article
-//                        Bitmap imageViewReference = downloadBitmap(imageURL);
                     }
                     // Description of article
                     else if (inputLine.contains("<p>")) {
@@ -218,16 +197,10 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                         closeDiv = 0;
                         inContent = false;
                         ind++;
-                        // System.out.println();
                     }
                 }
-
-                //        		System.out.println(inputLine.trim());
-
             }
             in.close();
-//	        for (int i = 0; i < articlesList.size(); i++)
-//	        	Log.e("FetchListArticlesTask", articlesList.get(i).getDescription());
 
             // If buffer was empty, no items in list, so website has no articles for some reason.
             return articlesList.isEmpty() ? null : articlesList;
@@ -248,14 +221,5 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
         return null; // Exiting try/catch likely means error occurred.
     }
-
-//    static String toUTF16(String s) {
-//        try {
-//            return new String(s.getBytes("UTF-8"), "UTF-8");
-//        } catch (UnsupportedEncodingException e) {
-//            Log.e("FetchListArticlesTask", e.getMessage());
-//        }
-//        return null;
-//    }
 }
 

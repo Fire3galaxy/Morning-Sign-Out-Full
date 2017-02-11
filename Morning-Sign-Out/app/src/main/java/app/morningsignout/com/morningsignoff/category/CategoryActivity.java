@@ -1,15 +1,18 @@
 package app.morningsignout.com.morningsignoff.category;
 
+import android.animation.Animator;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.res.TypedArray;
 import android.os.Bundle;
+import android.os.AsyncTask;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Gravity;
@@ -20,22 +23,24 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.content.res.TypedArray;
+import android.widget.ImageView;
+import android.animation.Animator.AnimatorListener;
 
 import java.util.ArrayList;
+import java.lang.InterruptedException;
 
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.search_results.SearchResultsActivity;
 import app.morningsignout.com.morningsignoff.meet_the_team.MeetTheTeamActivity;
 
 // Category page activity
-public class CategoryActivity extends ActionBarActivity {
+public class CategoryActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
     private SearchView searchView;
+    private ImageView splashScreenView;
 
-    private String mDrawerTitle;        // Title of activity when drawer swipe menu is visible
     private String mTitle;              // Current Title
     private String[] categories_urls,   // category strings for url usage
             categories_titles;          // ... for Title usage
@@ -48,6 +53,28 @@ public class CategoryActivity extends ActionBarActivity {
         }
     }
 
+    private class OneSecondSplashTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            enableSplash();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                Thread.sleep(1500);
+            } catch (InterruptedException ie) {
+                Log.e("CategoryActivity", ie.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            fadeSplash();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,28 +84,14 @@ public class CategoryActivity extends ActionBarActivity {
 
         categories_titles = getResources().getStringArray(R.array.categories);
         categories_urls = getResources().getStringArray(R.array.categories_for_url);
-        position = -1;
-
-        // Set up title
-        if (getIntent() != null)
-            position = getIntent().getIntExtra(Intent.EXTRA_TITLE, -1);
-//        setupActivityTitle();
-
-//        // For DrawerLayout (no fragment)
-//        mDrawerList = (ListView) findViewById(R.id.listView_slide);
-//        ArrayAdapter<String> mAdapter = new ArrayAdapter<String>(this,
-//                R.layout.list_items_slide,
-//                categories_titles);
-//
-//        mDrawerList.setAdapter(mAdapter); // Set up adapter for listview
-//        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-
+        position = 0;
 
         // nav drawer icons from resources
         TypedArray navMenuIcons = getResources().obtainTypedArray(R.array.categories_icons);
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.listView_slide);
+        splashScreenView = (ImageView) findViewById(R.id.imageView_splashScreen);
 
         ArrayList<NavDrawerItem> navDrawerItems = new ArrayList<NavDrawerItem>();
 
@@ -97,17 +110,14 @@ public class CategoryActivity extends ActionBarActivity {
         // Set up button to open/close drawer and change title of current activity
         setDrawerListenerToActionBarToggle();
 
-//        Log.d("CategoryActivity", "mTitle = " + mTitle.toLowerCase());
-
         // For CategoryFragment
-        CategoryFragment fragment = CategoryFragment.findOrCreateRetainFragment(getSupportFragmentManager());
-        Bundle args = new Bundle();
-        args.putString(CategoryFragment.EXTRA_TITLE, categories_titles[position]);
-        args.putString(CategoryFragment.EXTRA_URL, categories_urls[position]);
-        fragment.setArguments(args);
+        if (savedInstanceState == null) {
+            CategoryFragment fragment = CategoryFragment.findOrCreateRetainFragment(getSupportFragmentManager());
+            Bundle args = new Bundle();
+            args.putString(CategoryFragment.EXTRA_TITLE, categories_titles[position]);
+            args.putString(CategoryFragment.EXTRA_URL, categories_urls[position]);
+            fragment.setArguments(args);
 
-        // Set fragment's listview
-        if (getIntent() != null && savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container_category, fragment)
                     .commit();
@@ -126,6 +136,12 @@ public class CategoryActivity extends ActionBarActivity {
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);
         this.getSupportActionBar().setCustomView(ib, params);
         this.getSupportActionBar().setDisplayShowCustomEnabled(true);
+
+        // Splash screen (only on first time opening)
+        if (savedInstanceState == null)
+            (new OneSecondSplashTask()).execute();
+        else
+            splashScreenView.setVisibility(View.GONE);
     }
 
     @Override
@@ -152,7 +168,6 @@ public class CategoryActivity extends ActionBarActivity {
 
         ComponentName componentName = new ComponentName(this, SearchResultsActivity.class);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
-//        return super.onCreateOptionsMenu(menu);
         return true;
     }
 
@@ -192,14 +207,11 @@ public class CategoryActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         return id == R.id.title || super.onOptionsItemSelected(item);
-
     }
 
     @Override
     public void setTitle(CharSequence title) {
         mTitle = title.toString();
-
-//        getSupportActionBar().setDisplayShowHomeEnabled(false);
     }
 
     @Override
@@ -212,21 +224,6 @@ public class CategoryActivity extends ActionBarActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig); // pass it on to toggle
-    }
-
-
-    void setupActivityTitle() {
-        if (position == -1) { // Error
-            mTitle = "";
-            mDrawerTitle = mTitle;
-            setTitle("");
-            Log.e("CategoryActivity", "Titles are blank. Check that intent is not null and " +
-                    "has int position");
-        } else {
-            mTitle = categories_titles[position];
-            mDrawerTitle = "Categories Menu";
-            setTitle(mTitle);
-        }
     }
 
     void setUpButtonToTripleBar() {
@@ -245,16 +242,14 @@ public class CategoryActivity extends ActionBarActivity {
                 R.string.title_slide_menu,
                 R.string.title_activity_category) {
             public void onDrawerClosed(View view) {
-                getSupportActionBar().setTitle(mTitle);
                 invalidateOptionsMenu(); // Show actionbar icons
             }
 
             public void onDrawerOpened(View view) {
-                getSupportActionBar().setTitle(mDrawerTitle);
                 invalidateOptionsMenu(); // Hide actionbar icons
             }
         };
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
     }
 
     void selectItem(int position) {
@@ -287,18 +282,26 @@ public class CategoryActivity extends ActionBarActivity {
         mDrawerLayout.closeDrawer(mDrawerList);
     }
 
+    private void enableSplash() {
+        getSupportActionBar().hide();
+        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        splashScreenView.setVisibility(View.VISIBLE);
+    }
 
-//    // courtesy of http://developer.android.com/training/monitoring-device-state/connectivity-monitoring.html
-//    public boolean checkForInternet() {
-//        ConnectivityManager cm =
-//                (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-//
-//        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-//        return activeNetwork != null &&
-//                activeNetwork.isConnectedOrConnecting();
-//    }
-//
-//    public String getCurrentCategoryUrl() {
-//        return categories_urls[position];
-//    }
+    public void fadeSplash() {
+        getSupportActionBar().show();
+        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+        splashScreenView.animate().alpha(0f).setListener(new AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {}
+            @Override
+            public void onAnimationCancel(Animator animation) {}
+            @Override
+            public void onAnimationRepeat(Animator animation) {}
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                splashScreenView.setVisibility(View.GONE);
+            }
+        });
+    }
 }

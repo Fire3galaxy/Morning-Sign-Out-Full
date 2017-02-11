@@ -9,7 +9,6 @@
     android:background="#e1eaee"
     tools:context=".category.CategoryActivity">
 
-
     <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -68,5 +67,14 @@
         android:layout_centerHorizontal="true"
         android:paddingTop="10dp" />
     <!--paddingTop matches gridview's paddingTop-->
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/imageView_splash"
+        android:src="@drawable/hi_res_splash"
+        android:background="#73b3e2"
+        android:visibility="gone"
+        android:contentDescription="@string/splash_contentDescription"/>
 
 </RelativeLayout>
