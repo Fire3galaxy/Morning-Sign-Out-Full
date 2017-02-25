@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.article.ArticleActivity;
 import app.morningsignout.com.morningsignoff.network.FetchListArticlesTask;
+import app.morningsignout.com.morningsignoff.network.FetchCategoryImageManager;
 import in.srain.cube.views.GridViewWithHeaderAndFooter;
 
 public class CategoryFragment extends Fragment {
@@ -40,6 +41,8 @@ public class CategoryFragment extends Fragment {
     final static String EXTRA_REFRESH = "EXTRA_REFRESH";
     final static String EXTRA_URL = "EXTRA_URL";
     final static String TAG = "CategoryFragment";
+
+    public static CategoryFragment instance = null;
 
     String category = "";
     String category_url = "";
@@ -64,6 +67,12 @@ public class CategoryFragment extends Fragment {
     public void onDetach() {
         index = gridViewWithHeaderAndFooter.getFirstVisiblePosition();
         super.onDetach();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        instance = null;
     }
 
     @Override
@@ -117,6 +126,7 @@ public class CategoryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        instance = this;
         View rootView = inflater.inflate(R.layout.fragment_category_main, container, false);
 
         TextView headerView = (TextView) rootView.findViewById(R.id.textView_categoryHeader);
@@ -135,7 +145,8 @@ public class CategoryFragment extends Fragment {
 
         // Creates and loads new adapter or sets position of existing gridView
         if(categoryAdapter == null) {
-            categoryAdapter = new CategoryAdapter(this, inflater);
+            categoryAdapter = new CategoryAdapter(getActivity(), inflater);
+            categoryAdapter.setAdapterView(gridViewWithHeaderAndFooter);
             gridViewWithHeaderAndFooter.setAdapter(categoryAdapter);
             isLoadingArticles.set(true);
             new FetchListArticlesTask(this, 1, true, isRefresh).execute(category_url);
@@ -232,14 +243,17 @@ public class CategoryFragment extends Fragment {
         return rootView;
     }
 
-    public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+    public static boolean addBitmapToMemoryCache(String key, Bitmap bitmap) {
         if (getBitmapFromMemCache(key) == null) {
-            memoryCache.put(key, bitmap);
+            instance.memoryCache.put(key, bitmap);
+            return true;
         }
+
+        return false;
     }
 
-    public Bitmap getBitmapFromMemCache(String key) {
-        return memoryCache.get(key);
+    public static Bitmap getBitmapFromMemCache(String key) {
+        return (instance != null) ? instance.memoryCache.get(key) : null;
     }
 
     public static CategoryFragment findOrCreateRetainFragment(FragmentManager fm) {

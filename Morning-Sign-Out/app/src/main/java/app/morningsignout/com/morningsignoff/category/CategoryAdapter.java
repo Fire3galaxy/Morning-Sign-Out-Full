@@ -1,9 +1,11 @@
 package app.morningsignout.com.morningsignoff.category;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -11,9 +13,9 @@ import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -23,37 +25,44 @@ import java.util.Set;
 
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.article.Article;
-import app.morningsignout.com.morningsignoff.network.FetchCategoryImageTask;
-import in.srain.cube.views.GridViewWithHeaderAndFooter;
+import app.morningsignout.com.morningsignoff.network.FetchCategoryImageManager;
+import app.morningsignout.com.morningsignoff.network.FetchCategoryImageRunnable;
 
 // CategoryAdapter takes in a list of Articles and displays the titles, descriptions, images
 // of those articles in the category page as row items
-// It is created in the FetchListArticlesTask which is called in CategoryActivity
+// It is created in CategoryFragment and needs a reference to the GridView
+// to fix the weird "GridView calls getView(0, ..) so often" issue.
 public class CategoryAdapter extends BaseAdapter {
-    private ArrayList<SingleRow> articles;
-    private Set<String> uniqueArticleNames;
+    private static final int VISIBLE_PADDING = 8; // To avoid network requests for calls to getView(0,..)
 
-    private CategoryFragment categoryFragment;
     private LayoutInflater inflater;
-    private int pageNum;
-    private int reqImgWidth, reqImgHeight;
+    private AdapterView adapterView = null;
 
-    CategoryAdapter(CategoryFragment categoryFragment, LayoutInflater inflater) {
-        this.categoryFragment = categoryFragment;
+    private ArrayList<SingleRow> articles;
+    private Set<String> uniqueArticleNames; // FIXME: This was a temp fix a long time ago for repeats that somehow got in the list
+    private int pageNum;
+    private int firstVisibleItem, lastVisibleItem;
+
+    static public int REQ_IMG_WIDTH = 0, REQ_IMG_HEIGHT = 0;
+
+    CategoryAdapter(Activity activity, LayoutInflater inflater) {
         this.articles = new ArrayList<>();
         this.uniqueArticleNames = new HashSet<>();
         this.inflater = inflater;
         pageNum = 0;
+        firstVisibleItem = 0;
+        lastVisibleItem = 0;
 
         // Downloaded images need to be good quality for landscape and portrait orientations
         DisplayMetrics metrics = new DisplayMetrics();
-        categoryFragment.getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        reqImgWidth = metrics.widthPixels;
-        Resources r = categoryFragment.getResources();
-        reqImgHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 220, r.getDisplayMetrics());
+        activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        Resources r = activity.getResources();
+
+        REQ_IMG_WIDTH = metrics.widthPixels;
+        REQ_IMG_HEIGHT = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 220, r.getDisplayMetrics());
     }
 
-    public synchronized int getPageNum() {
+    public int getPageNum() {
         return pageNum;
     }
 
@@ -88,9 +97,15 @@ public class CategoryAdapter extends BaseAdapter {
         return articles.isEmpty();
     }
 
+    // FIXME: Next Time, I notice that getView is called 10+ times for the 0th view. This could mean that
+    // if an image existed in the cache already, it would be setting the bitmap from the cache into the
+    // imageview multiple times.
+
     // Get the View route of a single row by id
     @Override
     public View getView(int i, View view, final ViewGroup viewGroup){
+        Log.d("CategoryAdapter", "index: " + Integer.toString(i));
+
         // crate a new rowItem object here
         View row;
         AdapterObject viewHolder;
@@ -99,50 +114,68 @@ public class CategoryAdapter extends BaseAdapter {
             row = inflater.inflate(R.layout.single_row, viewGroup, false);
             viewHolder = new AdapterObject();
 
-            // Get the description, imageViewReference and title of the row item
-            viewHolder.title = (TextView) row.findViewById(R.id.textView);
-            viewHolder.description = (TextView) row.findViewById(R.id.textView2);
+            // Get the author, imageViewReference and title of the row item
+            viewHolder.title = (TextView) row.findViewById(R.id.textViewTitle);
+            viewHolder.author = (TextView) row.findViewById(R.id.textViewAuthor);
             viewHolder.image = (ImageView) row.findViewById(R.id.imageView);
-            viewHolder.pb = (ProgressBar) row.findViewById(R.id.progressBarSingleRow);
+//            viewHolder.pb = (ProgressBar) row.findViewById(R.id.progressBarSingleRow);
             row.setTag(viewHolder);
+
+            // Set imageView settings
+            viewHolder.image.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            viewHolder.image.setCropToPadding(true);
         }
         else {
             row = view;
             viewHolder = (AdapterObject) row.getTag();
         }
 
-        // Set the values of the rowItem
         SingleRow rowTemp = articles.get(i);
+
+        // TEST THIS: Check if correct image is already in imageView
+//        String urlTag = (String) viewHolder.image.getTag();
+//        if (urlTag != null && urlTag.equals(rowTemp.imageURL))
+//            return row;
+
+        // Set the values of the rowItem
         if(isLandscape(row.getContext()))
             viewHolder.title.setLines(3);
         viewHolder.title.setText(rowTemp.title);
-        viewHolder.description.setText(rowTemp.description);
+        viewHolder.author.setText(rowTemp.description);
 
-        final Bitmap b = categoryFragment.getBitmapFromMemCache(rowTemp.title);
+        // Do not process/add images that aren't supposed to be visible
+        // GridViewWithHeaderAndFooter calls getView(0,..) REALLY often
+        if (adapterView != null && i + VISIBLE_PADDING < adapterView.getFirstVisiblePosition()) {
+            Log.d("CategoryAdapter", "View " + Integer.toString(i) + " not visible: " + adapterView.getFirstVisiblePosition());
+            return row;
+        }
+
+        final Bitmap b = CategoryFragment.getBitmapFromMemCache(rowTemp.imageURL);
 
         // Load imageViewReference into row element
         if (b == null) {    // download
             if (cancelPotentialWork(rowTemp.imageURL, viewHolder.image)) {
-                FetchCategoryImageTask task = new FetchCategoryImageTask(categoryFragment,
-                        rowTemp, viewHolder.image);
+                FetchCategoryImageRunnable task =
+                        FetchCategoryImageManager.getDownloadImageTask(rowTemp.imageURL, viewHolder.image);
                 CategoryImageTaskDrawable taskWrapper = new CategoryImageTaskDrawable(task);
 
                 viewHolder.image.setImageDrawable(taskWrapper);
-                task.execute(reqImgWidth, reqImgHeight);
+                FetchCategoryImageManager.runTask(task);    // After imageDrawable is set, so no race
             }
         } else {    // set saved imageViewReference
-            // Cropping imageViewReference to preserve aspect ratio
-            viewHolder.image.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            viewHolder.image.setCropToPadding(true);
             viewHolder.image.setImageBitmap(b);
         }
 
         return row;
     }
 
+    public void setAdapterView(AdapterView adapterView) {
+        this.adapterView = adapterView;
+    }
+
     // This function is called along with .notifyDataSetChanged() in Asynctask's onScrollListener function
     // when the viewers scroll to the bottom of the articles
-    public synchronized void loadMoreItems(List<Article> moreArticles, int pageNum){
+    public void loadMoreItems(List<Article> moreArticles, int pageNum){
         // if prevent the late page from loading twice
         if(moreArticles != null && this.pageNum != pageNum){
             this.pageNum = pageNum;
@@ -162,29 +195,30 @@ public class CategoryAdapter extends BaseAdapter {
         }
     }
 
+    public static FetchCategoryImageRunnable getFetchCategoryImageRunnable(ImageView imageView) {
+        if (imageView != null) {
+            if (imageView.getDrawable() instanceof CategoryImageTaskDrawable) {
+                CategoryImageTaskDrawable taskDrawable = (CategoryImageTaskDrawable) imageView.getDrawable();
+                return taskDrawable.getFetchCategoryImageRunnable();
+            }
+//            else {
+//                Log.d("CategoryAdapter", "Should be here");
+//            }
+        }
+        return null;
+    }
+
     private static boolean cancelPotentialWork(String url, ImageView imageView) {
-        FetchCategoryImageTask task = getFetchCategoryImageTask(imageView);
+        FetchCategoryImageRunnable task = getFetchCategoryImageRunnable(imageView);
 
         if (task != null) {
-            String imageViewUrl = task.getUrl();
+            String imageViewUrl = task.imageUrl;
 
             if (imageViewUrl == null || !imageViewUrl.equals(url))
-                task.cancel(true);
+                FetchCategoryImageManager.interruptThread(task);
             else
                 return false;
         }
         return true;
     }
-
-    public static FetchCategoryImageTask getFetchCategoryImageTask(ImageView imageView) {
-        if (imageView != null) {
-            if (imageView.getDrawable() instanceof CategoryImageTaskDrawable) {
-                CategoryImageTaskDrawable taskDrawable = (CategoryImageTaskDrawable) imageView.getDrawable();
-                return taskDrawable.getFetchCategoryImageTask();
-            }
-        }
-        return null;
-    }
-
-
 }

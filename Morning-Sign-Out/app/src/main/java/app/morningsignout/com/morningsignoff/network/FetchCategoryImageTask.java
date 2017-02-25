@@ -19,6 +19,10 @@ import app.morningsignout.com.morningsignoff.category.SingleRow;
 
 /*
  * Created by Daniel on 6/24/2015. Used by CategoryAdapter class.
+ * Notes: needed reference to drawable inside imageView to confirm task
+ * Need imageview's width, height
+ * Need image row's title (for saving to cache) and url
+ * Need reference to cache
  */
 public class FetchCategoryImageTask extends AsyncTask<Integer, Void, Bitmap> {
     private CategoryFragment categoryFragment;
@@ -35,7 +39,6 @@ public class FetchCategoryImageTask extends AsyncTask<Integer, Void, Bitmap> {
     protected Bitmap doInBackground(Integer... params) {
         if (params.length != 2)
             return null;
-
 
         Bitmap newImage = downloadBitmap(sr.imageURL, params[0], params[1]);
         // Store newImage in temporary cache HERE
@@ -55,20 +58,20 @@ public class FetchCategoryImageTask extends AsyncTask<Integer, Void, Bitmap> {
 
     @Override
     protected void onPostExecute(final Bitmap b) {
-        if (imageViewReference != null && b != null) {
-            final ImageView imageView = imageViewReference.get();
-            final FetchCategoryImageTask task = CategoryAdapter.getFetchCategoryImageTask(imageView);
-
-            if (this == task) {
-                // cache image
-                categoryFragment.addBitmapToMemoryCache(sr.title, b);
-
-                // Preserve aspect ratio of image
-                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP); // FIT_CENTER to just fit x or y
-                imageView.setCropToPadding(true);
-                imageView.setImageBitmap(b);
-            }
-        }
+//        if (imageViewReference != null && b != null) {
+//            final ImageView imageView = imageViewReference.get();
+//            final FetchCategoryImageTask task = CategoryAdapter.getFetchCategoryImageTask(imageView);
+//
+//            if (this == task) {
+//                // cache image
+//                categoryFragment.addBitmapToMemoryCache(sr.title, b);
+//
+//                // Preserve aspect ratio of image
+//                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP); // FIT_CENTER to just fit x or y
+//                imageView.setCropToPadding(true);
+//                imageView.setImageBitmap(b);
+//            }
+//        }
     }
 
     // input an imageViewReference URL, get its bitmap
