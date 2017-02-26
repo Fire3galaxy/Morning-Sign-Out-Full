@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -62,6 +64,7 @@ public class CategoryAdapter extends BaseAdapter {
 
         REQ_IMG_WIDTH = metrics.widthPixels;
         REQ_IMG_HEIGHT = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 220, r.getDisplayMetrics());
+        bitmapPool = new CategoryBitmapPool(REQ_IMG_WIDTH, REQ_IMG_HEIGHT);
     }
 
     public int getPageNum() {
@@ -120,7 +123,6 @@ public class CategoryAdapter extends BaseAdapter {
             viewHolder.title = (TextView) row.findViewById(R.id.textViewTitle);
             viewHolder.author = (TextView) row.findViewById(R.id.textViewAuthor);
             viewHolder.image = (ImageView) row.findViewById(R.id.imageView);
-//            viewHolder.pb = (ProgressBar) row.findViewById(R.id.progressBarSingleRow);
             row.setTag(viewHolder);
 
             // Set imageView settings
@@ -149,13 +151,24 @@ public class CategoryAdapter extends BaseAdapter {
 
         // FIXME: Next time, go back to tasks. Start implementing an internal memory cache.
 
-        final Bitmap b = CategoryFragment.getBitmapFromMemCache(rowTemp.imageURL);
+//        final Bitmap b = CategoryFragment.getBitmapFromMemCache(rowTemp.imageURL);
+        final Bitmap b = null;
 
         // Load imageViewReference into row element
         if (b == null) {    // download
             if (cancelPotentialWork(rowTemp.imageURL, viewHolder.image)) {
-                FetchCategoryImageRunnable task =
-                        FetchCategoryImageManager.getDownloadImageTask(rowTemp.imageURL, viewHolder.image);
+                // Recycle old bitmapDrawable
+                Drawable d = viewHolder.image.getDrawable();
+                if (d != null && d instanceof BitmapDrawable) {
+                    BitmapDrawable bitmapDrawable = (BitmapDrawable) d;
+                    bitmapPool.recycle(bitmapDrawable.getBitmap()); // Drawable will be replaced by taskWrapper
+                }
+
+                Bitmap unusedBitmap = bitmapPool.getBitmap();
+//                Bitmap unusedBitmap = null;
+
+                FetchCategoryImageRunnable task = FetchCategoryImageManager
+                        .getDownloadImageTask(rowTemp.imageURL, viewHolder.image, unusedBitmap);
                 CategoryImageTaskDrawable taskWrapper = new CategoryImageTaskDrawable(task);
 
                 viewHolder.image.setImageDrawable(taskWrapper);

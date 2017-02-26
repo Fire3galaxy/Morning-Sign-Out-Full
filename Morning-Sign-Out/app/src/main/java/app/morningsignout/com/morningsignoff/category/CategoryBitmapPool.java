@@ -10,12 +10,12 @@ import java.util.Stack;
  */
 public class CategoryBitmapPool {
     private Stack<Bitmap> bitmaps;
-    private int reqWidth, reqHeight;
+    private int unusedBitmapWidth, unusedBitmapHeight;
 
     public CategoryBitmapPool(int reqWidth, int reqHeight) {
         bitmaps = new Stack<Bitmap>();
-        this.reqWidth = reqWidth;
-        this.reqHeight = reqHeight;
+        this.unusedBitmapWidth = reqWidth + reqWidth;
+        this.unusedBitmapHeight = reqHeight + reqHeight;
     }
 
 //    static public void push(Bitmap b) {
@@ -26,6 +26,16 @@ public class CategoryBitmapPool {
 //    }
 
     public Bitmap getBitmap() {
+        if (!bitmaps.isEmpty())
+            Log.d("CategoryBitmapPool", "reused bitmap" + ": " + (bitmaps.size() - 1));
+        else
+            Log.d("CategoryBitmapPool", "made new bitmap" + ": " + bitmaps.size());
+        return (bitmaps.isEmpty()) ?
+                null : bitmaps.pop();
+    }
 
+    public void recycle(Bitmap b) {
+        bitmaps.push(b);
+        Log.d("CategoryBitmapPool", "recycled bitmap of size " + b.getHeight() + ", " + b.getWidth() + ": " + bitmaps.size());
     }
 }

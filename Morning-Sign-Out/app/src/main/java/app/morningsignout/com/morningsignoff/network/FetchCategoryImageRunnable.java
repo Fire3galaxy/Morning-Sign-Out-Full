@@ -26,12 +26,14 @@ public class FetchCategoryImageRunnable implements Runnable {
     public String imageUrl;
     int viewWidth, viewHeight;
     WeakReference<ImageView> imageViewRef;
+    Bitmap bitmapToUse;
 
-    public FetchCategoryImageRunnable(String imageUrl, ImageView imageView) {
+    public FetchCategoryImageRunnable(String imageUrl, ImageView imageView, Bitmap unusedBitmap) {
         this.viewWidth = CategoryAdapter.REQ_IMG_WIDTH;
         this.viewHeight = CategoryAdapter.REQ_IMG_HEIGHT;
         this.imageUrl = imageUrl;
         this.imageViewRef = new WeakReference<>(imageView);
+        this.bitmapToUse = unusedBitmap;
     }
 
     @Override
@@ -42,6 +44,14 @@ public class FetchCategoryImageRunnable implements Runnable {
 //        long start = System.currentTimeMillis();
 
         Bitmap downloadedImage = downloadBitmap();
+
+        if (downloadedImage != null) {
+            Log.d("FetchCategoryImageRunnable", "bitmap dimens: " +
+                    Integer.toString(downloadedImage.getWidth()) + ", " + Integer.toString(downloadedImage.getHeight()) +
+                    ". view dimens: " +
+                    Integer.toString(viewWidth) + ", " + Integer.toString(viewHeight));
+            Log.d("FetchCategoryImageRunnable", "config: " + downloadedImage.getConfig());
+        }
 
         // Include chance to cancel thread (return) instead of trying to pass bitmap up to UI
         // if img is not needed anymore or imageviewref is null
@@ -101,6 +111,10 @@ public class FetchCategoryImageRunnable implements Runnable {
                 // Create bitmap from stream
                 downloadOptions.inJustDecodeBounds = false;
                 downloadOptions.inSampleSize = inSampleSize;
+
+//                downloadOptions.inMutable = true;
+//                downloadOptions.inBitmap = bitmapToUse;
+
                 return BitmapFactory.decodeStream(inputStream, null, downloadOptions);
             }
         } catch (IOException e) {

@@ -1,5 +1,6 @@
 package app.morningsignout.com.morningsignoff.network;
 
+import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -55,8 +56,10 @@ public class FetchCategoryImageManager {
                 imagesWorkQueue);
     }
 
-    static public FetchCategoryImageRunnable getDownloadImageTask(String imageUrl, ImageView imageView) {
-        return new FetchCategoryImageRunnable(imageUrl, imageView);
+    static public FetchCategoryImageRunnable getDownloadImageTask(String imageUrl,
+                                                                  ImageView imageView,
+                                                                  Bitmap unusedBitmap) {
+        return new FetchCategoryImageRunnable(imageUrl, imageView, unusedBitmap);
     }
 
     static public void runTask(FetchCategoryImageRunnable task) {
