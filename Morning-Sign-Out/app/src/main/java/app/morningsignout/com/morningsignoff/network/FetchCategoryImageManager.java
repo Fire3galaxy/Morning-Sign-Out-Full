@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import app.morningsignout.com.morningsignoff.category.CategoryAdapter;
+import app.morningsignout.com.morningsignoff.category.CategoryBitmapPool;
 
 /**
  * Created by Daniel on 2/11/2017. Manager that houses thread pool.
@@ -74,8 +75,14 @@ public class FetchCategoryImageManager {
     static public void interruptThread(FetchCategoryImageRunnable task) {
         Log.d("FetchCategoryImageManager", "Interrupt thread with task: " + task.imageUrl);
         synchronized(instance) {
-            if (task.currentThread != null)
+            if (task.currentThread != null) {
                 task.currentThread.interrupt();
+
+                if (task.bitmapToUse != null) {
+                    CategoryBitmapPool.recycle(task.bitmapToUse);
+                    task.bitmapToUse = null;
+                }
+            }
         }
     }
 }

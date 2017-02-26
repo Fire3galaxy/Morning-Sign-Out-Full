@@ -24,9 +24,9 @@ public class FetchCategoryImageRunnable implements Runnable {
     Thread currentThread;
 
     public String imageUrl;
+    public Bitmap bitmapToUse;
     int viewWidth, viewHeight;
     WeakReference<ImageView> imageViewRef;
-    Bitmap bitmapToUse;
 
     public FetchCategoryImageRunnable(String imageUrl, ImageView imageView, Bitmap unusedBitmap) {
         this.viewWidth = CategoryAdapter.REQ_IMG_WIDTH;

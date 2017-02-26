@@ -9,6 +9,8 @@ import java.util.Stack;
  * Created by Daniel on 2/25/2017.
  */
 public class CategoryBitmapPool {
+    static public CategoryBitmapPool instance;
+
     private Stack<Bitmap> bitmaps;
     private int unusedBitmapWidth, unusedBitmapHeight;
 
@@ -18,24 +20,16 @@ public class CategoryBitmapPool {
         this.unusedBitmapHeight = reqHeight + reqHeight;
     }
 
-//    static public void push(Bitmap b) {
-//        if (b != null) {
-//            instance.bitmaps.push(b);
-//            Log.d("CategoryBitmapPool", "Pushed. Size: " + Integer.toString(b.getWidth()) + ", " + Integer.toString(b.getHeight()));
-//        }
-//    }
-
-    public Bitmap getBitmap() {
-        if (!bitmaps.isEmpty())
-            Log.d("CategoryBitmapPool", "reused bitmap" + ": " + (bitmaps.size() - 1));
-        else
-            Log.d("CategoryBitmapPool", "made new bitmap" + ": " + bitmaps.size());
-        return (bitmaps.isEmpty()) ?
-                null : bitmaps.pop();
+    public static Bitmap getBitmap() {
+//        if (!instance.bitmaps.isEmpty())
+//            Log.d("CategoryBitmapPool", "reused bitmap" + ": " + (instance.bitmaps.size() - 1));
+//        else
+//            Log.d("CategoryBitmapPool", "made new bitmap" + ": " + instance.bitmaps.size());
+        return (instance.bitmaps.isEmpty()) ? null : instance.bitmaps.pop();
     }
 
-    public void recycle(Bitmap b) {
-        bitmaps.push(b);
-        Log.d("CategoryBitmapPool", "recycled bitmap of size " + b.getHeight() + ", " + b.getWidth() + ": " + bitmaps.size());
+    public static void recycle(Bitmap b) {
+        instance.bitmaps.push(b);
+//        Log.d("CategoryBitmapPool", "recycled bitmap of size " + b.getHeight() + ", " + b.getWidth() + ": " + instance.bitmaps.size());
     }
 }

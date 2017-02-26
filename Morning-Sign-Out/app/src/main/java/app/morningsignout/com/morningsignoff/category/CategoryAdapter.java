@@ -45,8 +45,6 @@ public class CategoryAdapter extends BaseAdapter {
     private int pageNum;
     private int firstVisibleItem, lastVisibleItem;
 
-    private CategoryBitmapPool bitmapPool;
-
     static public int REQ_IMG_WIDTH = 0, REQ_IMG_HEIGHT = 0;
 
     CategoryAdapter(Activity activity, LayoutInflater inflater) {
@@ -64,7 +62,7 @@ public class CategoryAdapter extends BaseAdapter {
 
         REQ_IMG_WIDTH = metrics.widthPixels;
         REQ_IMG_HEIGHT = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 220, r.getDisplayMetrics());
-        bitmapPool = new CategoryBitmapPool(REQ_IMG_WIDTH, REQ_IMG_HEIGHT);
+        CategoryBitmapPool.instance = new CategoryBitmapPool(REQ_IMG_WIDTH, REQ_IMG_HEIGHT);
     }
 
     public int getPageNum() {
@@ -161,10 +159,10 @@ public class CategoryAdapter extends BaseAdapter {
                 Drawable d = viewHolder.image.getDrawable();
                 if (d != null && d instanceof BitmapDrawable) {
                     BitmapDrawable bitmapDrawable = (BitmapDrawable) d;
-                    bitmapPool.recycle(bitmapDrawable.getBitmap()); // Drawable will be replaced by taskWrapper
+                    CategoryBitmapPool.recycle(bitmapDrawable.getBitmap()); // Drawable will be replaced by taskWrapper
                 }
 
-                Bitmap unusedBitmap = bitmapPool.getBitmap();
+                Bitmap unusedBitmap = CategoryBitmapPool.getBitmap();
 //                Bitmap unusedBitmap = null;
 
                 FetchCategoryImageRunnable task = FetchCategoryImageManager
