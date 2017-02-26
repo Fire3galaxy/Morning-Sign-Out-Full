@@ -27,13 +27,11 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.article.ArticleActivity;
 import app.morningsignout.com.morningsignoff.network.FetchListArticlesTask;
-import app.morningsignout.com.morningsignoff.network.FetchCategoryImageManager;
 import in.srain.cube.views.GridViewWithHeaderAndFooter;
 
 public class CategoryFragment extends Fragment {
@@ -127,7 +125,7 @@ public class CategoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         instance = this;
-        View rootView = inflater.inflate(R.layout.fragment_category_main, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_category, container, false);
 
         TextView headerView = (TextView) rootView.findViewById(R.id.textView_categoryHeader);
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefresh_category);

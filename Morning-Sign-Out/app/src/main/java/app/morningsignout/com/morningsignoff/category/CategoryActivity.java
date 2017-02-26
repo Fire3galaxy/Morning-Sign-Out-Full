@@ -78,8 +78,6 @@ public class CategoryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Use the ListView layout from fragment_category_main.xml,
         setContentView(R.layout.activity_category);
 
         categories_titles = getResources().getStringArray(R.array.categories);

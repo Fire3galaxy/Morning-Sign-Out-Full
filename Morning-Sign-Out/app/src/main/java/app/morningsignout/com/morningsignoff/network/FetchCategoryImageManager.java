@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import app.morningsignout.com.morningsignoff.category.CategoryAdapter;
-import app.morningsignout.com.morningsignoff.category.CategoryFragment;
 
 /**
  * Created by Daniel on 2/11/2017. Manager that houses thread pool.
@@ -35,27 +34,12 @@ public class FetchCategoryImageManager {
             @Override
             public void handleMessage(Message inputMessage) {
                 if (inputMessage.what == SENT_PICTURE) {
-//        if (imageViewReference != null && b != null) {
-//            final ImageView imageView = imageViewReference.get();
-//            final FetchCategoryImageTask task = CategoryAdapter.getFetchCategoryImageTask(imageView);
-//
-//            if (this == task) {
-//                // cache image
-//                categoryFragment.addBitmapToMemoryCache(sr.title, b);
-//
-//                // Preserve aspect ratio of image
-//                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP); // FIT_CENTER to just fit x or y
-//                imageView.setCropToPadding(true);
-//                imageView.setImageBitmap(b);
-//            }
-//        }
-
                     CategoryImageSenderObject sentObject =
                             (CategoryImageSenderObject) inputMessage.obj;
 
-                    final FetchCategoryImageRunnable task = CategoryAdapter.getFetchCategoryImageRunnable(sentObject.imageView);
+                    final FetchCategoryImageRunnable task = CategoryAdapter.getFetchCategoryImageTask(sentObject.imageView);
                     if (sentObject.task.equals(task)) {
-                        CategoryFragment.addBitmapToMemoryCache(sentObject.imageUrl, sentObject.downloadedImage);
+//                        CategoryFragment.addBitmapToMemoryCache(sentObject.imageUrl, sentObject.downloadedImage);
                         sentObject.imageView.setImageBitmap(sentObject.downloadedImage);
                     }
                 }
@@ -77,6 +61,11 @@ public class FetchCategoryImageManager {
 
     static public void runTask(FetchCategoryImageRunnable task) {
         instance.imagesThreadPool.execute(task);
+        Log.d("FetchCategoryImageManager", "Running: " + task.imageUrl);
+        Log.d("FetchCategoryImageManager", "Active: " + Integer.toString(instance.imagesThreadPool.getActiveCount()));
+        Log.d("FetchCategoryImageManager", "Total so far: " + Long.toString(instance.imagesThreadPool.getTaskCount()));
+        Log.d("FetchCategoryImageManager", "Threads in queue: " + Integer.toString(instance.imagesWorkQueue.size()));
+        Log.d("FetchCategoryImageManager", "-----------------");
     }
 
     static public void interruptThread(FetchCategoryImageRunnable task) {

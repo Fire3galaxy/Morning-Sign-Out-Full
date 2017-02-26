@@ -43,6 +43,8 @@ public class CategoryAdapter extends BaseAdapter {
     private int pageNum;
     private int firstVisibleItem, lastVisibleItem;
 
+    private CategoryBitmapPool bitmapPool;
+
     static public int REQ_IMG_WIDTH = 0, REQ_IMG_HEIGHT = 0;
 
     CategoryAdapter(Activity activity, LayoutInflater inflater) {
@@ -132,23 +134,20 @@ public class CategoryAdapter extends BaseAdapter {
 
         SingleRow rowTemp = articles.get(i);
 
-        // TEST THIS: Check if correct image is already in imageView
-//        String urlTag = (String) viewHolder.image.getTag();
-//        if (urlTag != null && urlTag.equals(rowTemp.imageURL))
-//            return row;
-
         // Set the values of the rowItem
         if(isLandscape(row.getContext()))
             viewHolder.title.setLines(3);
         viewHolder.title.setText(rowTemp.title);
         viewHolder.author.setText(rowTemp.description);
 
-        // Do not process/add images that aren't supposed to be visible
-        // GridViewWithHeaderAndFooter calls getView(0,..) REALLY often
-        if (adapterView != null && i + VISIBLE_PADDING < adapterView.getFirstVisiblePosition()) {
-            Log.d("CategoryAdapter", "View " + Integer.toString(i) + " not visible: " + adapterView.getFirstVisiblePosition());
-            return row;
-        }
+//        // Do not process/add images that aren't supposed to be visible
+//        // GridViewWithHeaderAndFooter calls getView(0,..) REALLY often
+//        if (adapterView != null && i + VISIBLE_PADDING < adapterView.getFirstVisiblePosition()) {
+//            Log.d("CategoryAdapter", "View " + Integer.toString(i) + " not visible: " + adapterView.getFirstVisiblePosition());
+//            return row;
+//        }
+
+        // FIXME: Next time, go back to tasks. Start implementing an internal memory cache.
 
         final Bitmap b = CategoryFragment.getBitmapFromMemCache(rowTemp.imageURL);
 
@@ -195,21 +194,18 @@ public class CategoryAdapter extends BaseAdapter {
         }
     }
 
-    public static FetchCategoryImageRunnable getFetchCategoryImageRunnable(ImageView imageView) {
+    public static FetchCategoryImageRunnable getFetchCategoryImageTask(ImageView imageView) {
         if (imageView != null) {
             if (imageView.getDrawable() instanceof CategoryImageTaskDrawable) {
                 CategoryImageTaskDrawable taskDrawable = (CategoryImageTaskDrawable) imageView.getDrawable();
                 return taskDrawable.getFetchCategoryImageRunnable();
             }
-//            else {
-//                Log.d("CategoryAdapter", "Should be here");
-//            }
         }
         return null;
     }
 
     private static boolean cancelPotentialWork(String url, ImageView imageView) {
-        FetchCategoryImageRunnable task = getFetchCategoryImageRunnable(imageView);
+        FetchCategoryImageRunnable task = getFetchCategoryImageTask(imageView);
 
         if (task != null) {
             String imageViewUrl = task.imageUrl;
@@ -219,6 +215,7 @@ public class CategoryAdapter extends BaseAdapter {
             else
                 return false;
         }
+
         return true;
     }
 }

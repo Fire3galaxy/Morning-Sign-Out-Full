@@ -24,7 +24,6 @@
             android:numColumns="1"
             android:divider="#00ffffff"
             android:dividerHeight="10dp"
-            android:paddingTop="10dp"
             android:paddingBottom="10dp"
             android:horizontalSpacing="5dp"
             android:verticalSpacing="15dp"
@@ -65,7 +64,8 @@
         android:id="@+id/textView_categoryHeader"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:paddingTop="10dp" />
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"/>
     <!--paddingTop matches gridview's paddingTop-->
 
     <ImageView

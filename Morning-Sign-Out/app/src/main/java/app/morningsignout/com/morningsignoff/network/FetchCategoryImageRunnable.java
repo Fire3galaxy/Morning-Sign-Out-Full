@@ -39,13 +39,14 @@ public class FetchCategoryImageRunnable implements Runnable {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_DISPLAY);
         currentThread = Thread.currentThread();
 
-        long start = System.currentTimeMillis();
+//        long start = System.currentTimeMillis();
 
-        Bitmap downloadedImage = downloadBitmap(imageUrl, viewWidth, viewHeight);
+        Bitmap downloadedImage = downloadBitmap();
 
         // Include chance to cancel thread (return) instead of trying to pass bitmap up to UI
         // if img is not needed anymore or imageviewref is null
 
+//        CategoryBitmapPool.push(downloadedImage);
 
         CategoryImageSenderObject objectToSend =
                 new CategoryImageSenderObject(imageUrl, imageViewRef.get(), downloadedImage, this);
@@ -58,12 +59,12 @@ public class FetchCategoryImageRunnable implements Runnable {
     }
 
     // input an imageViewReference URL, get its bitmap
-    private static Bitmap downloadBitmap(String url, int width, int height) {
-        if (url == null) return null;
+    private Bitmap downloadBitmap() {
+        if (imageUrl == null) return null;
 
         HttpURLConnection urlConnection = null;
         try {
-            URL uri = new URL(url);
+            URL uri = new URL(imageUrl);
             urlConnection = (HttpURLConnection) uri.openConnection();
             int statusCode = urlConnection.getResponseCode();
             if (statusCode != HttpURLConnection.HTTP_OK) {
@@ -76,15 +77,15 @@ public class FetchCategoryImageRunnable implements Runnable {
             int inSampleSize = 1;
 
             // 1. Resolution
-            if (width != 0 && height != 0) {
+            if (viewWidth != 0 && viewHeight != 0) {
                 if (inputStream != null) {
                     // Check resolution of image and downscale to desired size if needed
                     downloadOptions.inJustDecodeBounds = true;
                     BitmapFactory.decodeStream(inputStream, null, downloadOptions);
-                    inSampleSize = calculateInSampleSize(downloadOptions, width, height);
+                    inSampleSize = calculateInSampleSize(downloadOptions);
                     inputStream.close();
 
-                    String details = width + " " + height + "; ";
+                    String details = viewWidth + " " + viewHeight + "; ";
                     details += downloadOptions.outWidth + " " + downloadOptions.outHeight + "; ";
                     details += inSampleSize;
                     Log.d("FetchCategoryImageTask", details);
@@ -113,21 +114,20 @@ public class FetchCategoryImageRunnable implements Runnable {
     }
 
     // https://developer.android.com/training/displaying-bitmaps/load-bitmap.html
-    private static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+    private int calculateInSampleSize(BitmapFactory.Options options) {
         // Raw height and width of image
         final int height = options.outHeight;
         final int width = options.outWidth;
         int inSampleSize = 1;
 
-        if (height > reqHeight || width > reqWidth) {
+        if (height > viewHeight || width > viewWidth) {
             final int halfHeight = height / 2;
             final int halfWidth = width / 2;
 
             // Calculate the largest inSampleSize value that is a power of 2 and keeps both
             // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) >= reqHeight
-                    && (halfWidth / inSampleSize) >= reqWidth) {
+            while ((halfHeight / inSampleSize) >= viewHeight
+                    && (halfWidth / inSampleSize) >= viewWidth) {
                 inSampleSize *= 2;
             }
         }
