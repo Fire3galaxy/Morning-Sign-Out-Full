@@ -14,6 +14,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import app.morningsignout.com.morningsignoff.category.CategoryAdapter;
 import app.morningsignout.com.morningsignoff.category.CategoryBitmapPool;
+import app.morningsignout.com.morningsignoff.category.CategoryFragment;
 
 /**
  * Created by Daniel on 2/11/2017. Manager that houses thread pool.

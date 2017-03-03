@@ -62,7 +62,6 @@ public class CategoryAdapter extends BaseAdapter {
 
         REQ_IMG_WIDTH = metrics.widthPixels;
         REQ_IMG_HEIGHT = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 220, r.getDisplayMetrics());
-        CategoryBitmapPool.instance = new CategoryBitmapPool(REQ_IMG_WIDTH, REQ_IMG_HEIGHT);
     }
 
     public int getPageNum() {
@@ -146,8 +145,6 @@ public class CategoryAdapter extends BaseAdapter {
 //            Log.d("CategoryAdapter", "View " + Integer.toString(i) + " not visible: " + adapterView.getFirstVisiblePosition());
 //            return row;
 //        }
-
-        // FIXME: Next time, go back to tasks. Start implementing an internal memory cache.
 
 //        final Bitmap b = CategoryFragment.getBitmapFromMemCache(rowTemp.imageURL);
         final Bitmap b = null;
