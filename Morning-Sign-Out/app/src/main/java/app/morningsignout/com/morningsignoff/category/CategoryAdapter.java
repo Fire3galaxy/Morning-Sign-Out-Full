@@ -146,19 +146,22 @@ public class CategoryAdapter extends BaseAdapter {
 //            return row;
 //        }
 
-//        final Bitmap b = CategoryFragment.getBitmapFromMemCache(rowTemp.imageURL);
-        final Bitmap b = null;
+        final Bitmap b = CategoryFragment.getBitmapFromMemCache(rowTemp.imageURL);
+//        final Bitmap b = null;
 
         // Load imageViewReference into row element
         if (b == null) {
             // download
             if (cancelPotentialWork(rowTemp.imageURL, viewHolder.image)) {
-                // Recycle old bitmapDrawable
-                Drawable d = viewHolder.image.getDrawable();
-                if (d != null && d instanceof BitmapDrawable) {
-                    BitmapDrawable bitmapDrawable = (BitmapDrawable) d;
-                    if (bitmapDrawable.getBitmap() != null)
-                        CategoryBitmapPool.recycle(bitmapDrawable.getBitmap()); // Drawable will be replaced by taskWrapper
+                // Recycle old bitmapDrawable if NOT IN LRUCACHE
+                String oldImageUrl = (String) viewHolder.image.getTag();
+                if (oldImageUrl != null && CategoryFragment.getBitmapFromMemCache(oldImageUrl) == null) {
+                    Drawable d = viewHolder.image.getDrawable();
+                    if (d != null && d instanceof BitmapDrawable) {
+                        BitmapDrawable bitmapDrawable = (BitmapDrawable) d;
+                        if (bitmapDrawable.getBitmap() != null)
+                            CategoryBitmapPool.recycle(bitmapDrawable.getBitmap());
+                    }
                 }
 
                 FetchCategoryImageRunnable task = FetchCategoryImageManager

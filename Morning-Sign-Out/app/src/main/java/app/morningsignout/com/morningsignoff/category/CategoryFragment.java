@@ -67,11 +67,11 @@ public class CategoryFragment extends Fragment {
         super.onDetach();
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        instance = null;
-    }
+//    @Override
+//    public void onDestroyView() {
+//        super.onDestroyView();
+//        instance = null;
+//    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

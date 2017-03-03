@@ -42,7 +42,8 @@ public class FetchCategoryImageManager {
 
                     final FetchCategoryImageRunnable task = CategoryAdapter.getFetchCategoryImageTask(sentObject.imageView);
                     if (sentObject.task.equals(task)) {
-//                        CategoryFragment.addBitmapToMemoryCache(sentObject.imageUrl, sentObject.downloadedImage);
+                        CategoryFragment.addBitmapToMemoryCache(sentObject.imageUrl, sentObject.downloadedImage);
+                        sentObject.imageView.setTag(sentObject.imageUrl);
                         sentObject.imageView.setImageBitmap(sentObject.downloadedImage);
                     }
                 }

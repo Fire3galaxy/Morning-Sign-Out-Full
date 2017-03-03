@@ -121,7 +121,8 @@ public class FetchCategoryImageRunnable implements Runnable {
                     downloadOptions.inBitmap = bitmapToUse;
 
                 if (Thread.interrupted()) {
-                    CategoryBitmapPool.instance.recycle(bitmapToUse);
+                    if (bitmapToUse != null)
+                        CategoryBitmapPool.instance.recycle(bitmapToUse);
                     return null;
                 }
 
