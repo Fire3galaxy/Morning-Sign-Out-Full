@@ -26,16 +26,14 @@ public class FetchCategoryImageRunnable implements Runnable {
     Thread currentThread;
 
     public String imageUrl;
-    public Bitmap bitmapToUse;
     int viewWidth, viewHeight;
     WeakReference<ImageView> imageViewRef;
 
-    public FetchCategoryImageRunnable(String imageUrl, ImageView imageView, Bitmap unusedBitmap) {
+    public FetchCategoryImageRunnable(String imageUrl, ImageView imageView) {
         this.viewWidth = CategoryAdapter.REQ_IMG_WIDTH;
         this.viewHeight = CategoryAdapter.REQ_IMG_HEIGHT;
         this.imageUrl = imageUrl;
         this.imageViewRef = new WeakReference<>(imageView);
-        this.bitmapToUse = unusedBitmap;
     }
 
     @Override
@@ -44,6 +42,9 @@ public class FetchCategoryImageRunnable implements Runnable {
         currentThread = Thread.currentThread();
 
 //        long start = System.currentTimeMillis();
+
+        if (Thread.interrupted())
+            return;
 
         Bitmap downloadedImage = downloadBitmap();
 
@@ -97,9 +98,9 @@ public class FetchCategoryImageRunnable implements Runnable {
                     inSampleSize = calculateInSampleSize(downloadOptions);
                     inputStream.close();
 
-                    String details = viewWidth + " " + viewHeight + "; ";
-                    details += downloadOptions.outWidth + " " + downloadOptions.outHeight + "; ";
-                    details += inSampleSize;
+//                    String details = viewWidth + " " + viewHeight + "; ";
+//                    details += downloadOptions.outWidth + " " + downloadOptions.outHeight + "; ";
+//                    details += inSampleSize;
 //                    Log.d("FetchCategoryImageTask", details);
                 }
 
@@ -110,22 +111,19 @@ public class FetchCategoryImageRunnable implements Runnable {
 
             // 2. Image
             if (inputStream != null) {
-                // Create bitmap from stream
+                // Create bitmap from stream or get one from bitmapPool
                 downloadOptions.inJustDecodeBounds = false;
                 downloadOptions.inSampleSize = inSampleSize;
+                downloadOptions.inMutable = true;
+                Bitmap bitmapToUse = CategoryBitmapPool.instance.getBitmap(downloadOptions);
 
-                if (canUseInBitmap(downloadOptions)) {
-                    downloadOptions.inMutable = true;
+                if (bitmapToUse != null)
                     downloadOptions.inBitmap = bitmapToUse;
-                } else if (bitmapToUse != null) {
-                    CategoryBitmapPool.recycle(bitmapToUse);
-                    bitmapToUse = null;
-                }
 
                 return BitmapFactory.decodeStream(inputStream, null, downloadOptions);
             }
         } catch (IOException e) {
-//            Log.e("FetchCategoryImageTask", "Error: " + url);
+            Log.e("Silver Lining", "Error downloading image: " + imageUrl);
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -158,7 +156,7 @@ public class FetchCategoryImageRunnable implements Runnable {
 
     // Bitmap memory optimization:
     // https://developer.android.com/topic/performance/graphics/manage-memory.html#inBitmap
-    private boolean canUseInBitmap(BitmapFactory.Options targetOptions) {
+    private boolean canUseInBitmap(Bitmap bitmapToUse, BitmapFactory.Options targetOptions) {
         if (bitmapToUse == null) return false;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {

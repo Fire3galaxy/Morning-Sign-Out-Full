@@ -160,16 +160,12 @@ public class CategoryAdapter extends BaseAdapter {
                 Drawable d = viewHolder.image.getDrawable();
                 if (d != null && d instanceof BitmapDrawable) {
                     BitmapDrawable bitmapDrawable = (BitmapDrawable) d;
-                    if (bitmapDrawable.getBitmap() != null) {
+                    if (bitmapDrawable.getBitmap() != null)
                         CategoryBitmapPool.recycle(bitmapDrawable.getBitmap()); // Drawable will be replaced by taskWrapper
-                    }
                 }
 
-                Bitmap unusedBitmap = CategoryBitmapPool.getBitmap();
-//                Bitmap unusedBitmap = null;
-
                 FetchCategoryImageRunnable task = FetchCategoryImageManager
-                        .getDownloadImageTask(rowTemp.imageURL, viewHolder.image, unusedBitmap);
+                        .getDownloadImageTask(rowTemp.imageURL, viewHolder.image);
                 CategoryImageTaskDrawable taskWrapper = new CategoryImageTaskDrawable(task);
 
                 viewHolder.image.setImageDrawable(taskWrapper);

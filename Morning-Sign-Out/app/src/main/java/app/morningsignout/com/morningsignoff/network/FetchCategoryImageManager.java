@@ -57,10 +57,8 @@ public class FetchCategoryImageManager {
                 imagesWorkQueue);
     }
 
-    static public FetchCategoryImageRunnable getDownloadImageTask(String imageUrl,
-                                                                  ImageView imageView,
-                                                                  Bitmap unusedBitmap) {
-        return new FetchCategoryImageRunnable(imageUrl, imageView, unusedBitmap);
+    static public FetchCategoryImageRunnable getDownloadImageTask(String imageUrl, ImageView imageView) {
+        return new FetchCategoryImageRunnable(imageUrl, imageView);
     }
 
     static public void runTask(FetchCategoryImageRunnable task) {
@@ -75,14 +73,8 @@ public class FetchCategoryImageManager {
     static public void interruptThread(FetchCategoryImageRunnable task) {
 //        Log.d("FetchCategoryImageManager", "Interrupt thread with task: " + task.imageUrl);
         synchronized(instance) {
-            if (task.currentThread != null) {
+            if (task.currentThread != null)
                 task.currentThread.interrupt();
-
-                if (task.bitmapToUse != null) {
-                    CategoryBitmapPool.recycle(task.bitmapToUse);
-                    task.bitmapToUse = null;
-                }
-            }
         }
     }
 }
