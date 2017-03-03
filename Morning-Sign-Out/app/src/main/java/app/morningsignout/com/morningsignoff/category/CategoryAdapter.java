@@ -153,13 +153,16 @@ public class CategoryAdapter extends BaseAdapter {
         final Bitmap b = null;
 
         // Load imageViewReference into row element
-        if (b == null) {    // download
+        if (b == null) {
+            // download
             if (cancelPotentialWork(rowTemp.imageURL, viewHolder.image)) {
                 // Recycle old bitmapDrawable
                 Drawable d = viewHolder.image.getDrawable();
                 if (d != null && d instanceof BitmapDrawable) {
                     BitmapDrawable bitmapDrawable = (BitmapDrawable) d;
-                    CategoryBitmapPool.recycle(bitmapDrawable.getBitmap()); // Drawable will be replaced by taskWrapper
+                    if (bitmapDrawable.getBitmap() != null) {
+                        CategoryBitmapPool.recycle(bitmapDrawable.getBitmap()); // Drawable will be replaced by taskWrapper
+                    }
                 }
 
                 Bitmap unusedBitmap = CategoryBitmapPool.getBitmap();

@@ -65,15 +65,15 @@ public class FetchCategoryImageManager {
 
     static public void runTask(FetchCategoryImageRunnable task) {
         instance.imagesThreadPool.execute(task);
-        Log.d("FetchCategoryImageManager", "Running: " + task.imageUrl);
-        Log.d("FetchCategoryImageManager", "Active: " + Integer.toString(instance.imagesThreadPool.getActiveCount()));
-        Log.d("FetchCategoryImageManager", "Total so far: " + Long.toString(instance.imagesThreadPool.getTaskCount()));
-        Log.d("FetchCategoryImageManager", "Threads in queue: " + Integer.toString(instance.imagesWorkQueue.size()));
-        Log.d("FetchCategoryImageManager", "-----------------");
+//        Log.d("FetchCategoryImageManager", "Running: " + task.imageUrl);
+//        Log.d("FetchCategoryImageManager", "Active: " + Integer.toString(instance.imagesThreadPool.getActiveCount()));
+//        Log.d("FetchCategoryImageManager", "Total so far: " + Long.toString(instance.imagesThreadPool.getTaskCount()));
+//        Log.d("FetchCategoryImageManager", "Threads in queue: " + Integer.toString(instance.imagesWorkQueue.size()));
+//        Log.d("FetchCategoryImageManager", "-----------------");
     }
 
     static public void interruptThread(FetchCategoryImageRunnable task) {
-        Log.d("FetchCategoryImageManager", "Interrupt thread with task: " + task.imageUrl);
+//        Log.d("FetchCategoryImageManager", "Interrupt thread with task: " + task.imageUrl);
         synchronized(instance) {
             if (task.currentThread != null) {
                 task.currentThread.interrupt();

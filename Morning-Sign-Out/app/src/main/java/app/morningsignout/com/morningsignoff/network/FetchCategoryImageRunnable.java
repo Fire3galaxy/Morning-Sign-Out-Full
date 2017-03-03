@@ -10,10 +10,12 @@ import java.net.URL;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.util.Log;
 import android.widget.ImageView;
 
 import app.morningsignout.com.morningsignoff.category.CategoryAdapter;
+import app.morningsignout.com.morningsignoff.category.CategoryBitmapPool;
 
 /**
  * Created by Daniel on 2/11/2017. A Runnable task that will run in the background and fetch images
@@ -45,13 +47,13 @@ public class FetchCategoryImageRunnable implements Runnable {
 
         Bitmap downloadedImage = downloadBitmap();
 
-        if (downloadedImage != null) {
-            Log.d("FetchCategoryImageRunnable", "bitmap dimens: " +
-                    Integer.toString(downloadedImage.getWidth()) + ", " + Integer.toString(downloadedImage.getHeight()) +
-                    ". view dimens: " +
-                    Integer.toString(viewWidth) + ", " + Integer.toString(viewHeight));
-            Log.d("FetchCategoryImageRunnable", "config: " + downloadedImage.getConfig());
-        }
+//        if (downloadedImage != null) {
+//            Log.d("FetchCategoryImageRunnable", "bitmap dimens: " +
+//                    Integer.toString(downloadedImage.getWidth()) + ", " + Integer.toString(downloadedImage.getHeight()) +
+//                    ". view dimens: " +
+//                    Integer.toString(viewWidth) + ", " + Integer.toString(viewHeight));
+//            Log.d("FetchCategoryImageRunnable", "config: " + downloadedImage.getConfig());
+//        }
 
         // Include chance to cancel thread (return) instead of trying to pass bitmap up to UI
         // if img is not needed anymore or imageviewref is null
@@ -98,7 +100,7 @@ public class FetchCategoryImageRunnable implements Runnable {
                     String details = viewWidth + " " + viewHeight + "; ";
                     details += downloadOptions.outWidth + " " + downloadOptions.outHeight + "; ";
                     details += inSampleSize;
-                    Log.d("FetchCategoryImageTask", details);
+//                    Log.d("FetchCategoryImageTask", details);
                 }
 
                 urlConnection.disconnect(); // Reconnect to link because you only get one go at inputStreams
@@ -112,8 +114,13 @@ public class FetchCategoryImageRunnable implements Runnable {
                 downloadOptions.inJustDecodeBounds = false;
                 downloadOptions.inSampleSize = inSampleSize;
 
-//                downloadOptions.inMutable = true;
-//                downloadOptions.inBitmap = bitmapToUse;
+                if (canUseInBitmap(downloadOptions)) {
+                    downloadOptions.inMutable = true;
+                    downloadOptions.inBitmap = bitmapToUse;
+                } else if (bitmapToUse != null) {
+                    CategoryBitmapPool.recycle(bitmapToUse);
+                    bitmapToUse = null;
+                }
 
                 return BitmapFactory.decodeStream(inputStream, null, downloadOptions);
             }
@@ -147,5 +154,25 @@ public class FetchCategoryImageRunnable implements Runnable {
         }
 
         return inSampleSize;
+    }
+
+    // Bitmap memory optimization:
+    // https://developer.android.com/topic/performance/graphics/manage-memory.html#inBitmap
+    private boolean canUseInBitmap(BitmapFactory.Options targetOptions) {
+        if (bitmapToUse == null) return false;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            // From Android 4.4 (KitKat) onward we can re-use if the byte size of
+            // the new bitmap is smaller than the reusable bitmap candidate
+            // allocation byte count.
+            int width = targetOptions.outWidth / targetOptions.inSampleSize;
+            int height = targetOptions.outHeight / targetOptions.inSampleSize;
+            int byteCount = width * height * 4; // ARGB_8888
+
+            return byteCount <= bitmapToUse.getAllocationByteCount();
+        }
+
+        // FIXME: only considering KitKat+ right now
+        return false;
     }
 }

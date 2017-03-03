@@ -14,13 +14,12 @@
         android:layout_centerHorizontal="true">
 
         <ImageView
-            android:src="@drawable/list_item_1"
+            android:id="@+id/imageView"
             android:layout_width="match_parent"
             android:layout_height="220dp"
-            android:id="@+id/imageView"
-            android:background="#00ffffff"
             android:layout_margin="0dp"
-            android:elevation="3dp"/>
+            android:background="#00ffffff"
+            android:elevation="3dp" />
 
         <LinearLayout
             android:orientation="vertical"
