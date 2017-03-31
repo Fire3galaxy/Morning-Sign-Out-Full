@@ -151,19 +151,24 @@ public class CategoryAdapter extends BaseAdapter {
 
         // Load imageViewReference into row element
         if (b == null) {
-            // download
+            // task is interrupted or does not exist for imageView
             if (cancelPotentialWork(rowTemp.imageURL, viewHolder.image)) {
-                // Recycle old bitmapDrawable if NOT IN LRUCACHE
+                // Recycle old bitmap if NOT IN LRUCACHE
                 String oldImageUrl = (String) viewHolder.image.getTag();
                 if (oldImageUrl != null && CategoryFragment.getBitmapFromMemCache(oldImageUrl) == null) {
                     Drawable d = viewHolder.image.getDrawable();
+
                     if (d != null && d instanceof BitmapDrawable) {
                         BitmapDrawable bitmapDrawable = (BitmapDrawable) d;
-                        if (bitmapDrawable.getBitmap() != null)
+
+                        if (bitmapDrawable.getBitmap() != null) {
                             CategoryBitmapPool.recycle(bitmapDrawable.getBitmap());
+                            viewHolder.image.setImageDrawable(null);
+                        }
                     }
                 }
 
+//                Log.d("CategoryAdapter", "Made task for index " + i + ", imageView " + viewHolder.image.hashCode());
                 FetchCategoryImageRunnable task = FetchCategoryImageManager
                         .getDownloadImageTask(rowTemp.imageURL, viewHolder.image);
                 CategoryImageTaskDrawable taskWrapper = new CategoryImageTaskDrawable(task);
@@ -218,6 +223,7 @@ public class CategoryAdapter extends BaseAdapter {
         FetchCategoryImageRunnable task = getFetchCategoryImageTask(imageView);
 
         if (task != null) {
+//            Log.d("CategoryAdapter", "Task is not null");
             String imageViewUrl = task.imageUrl;
 
             if (imageViewUrl == null || !imageViewUrl.equals(url))
@@ -225,6 +231,7 @@ public class CategoryAdapter extends BaseAdapter {
             else
                 return false;
         }
+//        Log.d("CategoryAdapter", "Task is null");
 
         return true;
     }

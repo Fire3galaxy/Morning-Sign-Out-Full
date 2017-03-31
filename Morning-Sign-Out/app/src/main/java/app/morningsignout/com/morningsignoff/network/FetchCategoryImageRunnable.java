@@ -2,11 +2,14 @@ package app.morningsignout.com.morningsignoff.network;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.IllegalArgumentException;
 import java.lang.Runnable;
 import java.lang.Thread;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Set;
+import java.util.TreeSet;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -29,6 +32,8 @@ public class FetchCategoryImageRunnable implements Runnable {
     int viewWidth, viewHeight;
     WeakReference<ImageView> imageViewRef;
 
+    static Set<Integer> debugAllHashes = new TreeSet<>();
+
     public FetchCategoryImageRunnable(String imageUrl, ImageView imageView) {
         this.viewWidth = CategoryAdapter.REQ_IMG_WIDTH;
         this.viewHeight = CategoryAdapter.REQ_IMG_HEIGHT;
@@ -47,6 +52,8 @@ public class FetchCategoryImageRunnable implements Runnable {
             return;
 
         Bitmap downloadedImage = downloadBitmap();
+
+        debugAllHashes.add(downloadedImage.hashCode());
 
 //        if (downloadedImage != null) {
 //            Log.d("FetchCategoryImageRunnable", "bitmap dimens: " +
@@ -117,12 +124,17 @@ public class FetchCategoryImageRunnable implements Runnable {
                 downloadOptions.inMutable = true;
                 Bitmap bitmapToUse = CategoryBitmapPool.instance.getBitmap(downloadOptions);
 
+                // Use bitmap pool's given bitmap if it exists
                 if (bitmapToUse != null)
                     downloadOptions.inBitmap = bitmapToUse;
 
+                // Don't decode the image if thread is interrupted
                 if (Thread.interrupted()) {
-                    if (bitmapToUse != null)
-                        CategoryBitmapPool.instance.recycle(bitmapToUse);
+                    if (bitmapToUse != null) {
+                        bitmapToUse.recycle();
+//                        CategoryBitmapPool.instance.recycle(bitmapToUse); // Put given image back into pool
+                        bitmapToUse = null;
+                    }
                     return null;
                 }
 
@@ -130,6 +142,8 @@ public class FetchCategoryImageRunnable implements Runnable {
             }
         } catch (IOException e) {
             Log.e("Silver Lining", "Error downloading image: " + imageUrl);
+        } catch (IllegalArgumentException e) {
+            Log.e("Silver Lining", "Thread interrupted during decoding (A natural fact of life)");
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -178,5 +192,14 @@ public class FetchCategoryImageRunnable implements Runnable {
 
         // FIXME: only considering KitKat+ right now
         return false;
+    }
+
+    public static void debugAllHashes() {
+        String TAG = "FetchCategoryImageRunnable";
+        if (debugAllHashes.isEmpty())
+            Log.d(TAG, "No Bitmaps");
+        else
+            for (Integer i : debugAllHashes)
+                Log.d(TAG, i.toString());
     }
 }

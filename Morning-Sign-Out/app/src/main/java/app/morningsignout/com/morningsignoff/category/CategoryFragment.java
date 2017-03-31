@@ -28,6 +28,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Map;
 
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.article.ArticleActivity;
@@ -241,6 +242,7 @@ public class CategoryFragment extends Fragment {
         return rootView;
     }
 
+    // FIXME: Debug the crashing issues next time before trying an external cache
     public static boolean addBitmapToMemoryCache(String key, Bitmap bitmap) {
         if (getBitmapFromMemCache(key) == null) {
             instance.memoryCache.put(key, bitmap);
@@ -305,5 +307,14 @@ public class CategoryFragment extends Fragment {
 
     public GridViewWithHeaderAndFooter getGridViewWithHeaderAndFooter() {
         return gridViewWithHeaderAndFooter;
+    }
+
+    public void debugCache() {
+        Map<String, Bitmap> cacheSnapshot = memoryCache.snapshot();
+        if (cacheSnapshot.isEmpty())
+            Log.d(TAG, "No entries");
+        else
+            for (Map.Entry<String, Bitmap> e : cacheSnapshot.entrySet())
+                Log.d(TAG, Integer.toString(e.getValue().hashCode()) + ": " + e.getKey());
     }
 }

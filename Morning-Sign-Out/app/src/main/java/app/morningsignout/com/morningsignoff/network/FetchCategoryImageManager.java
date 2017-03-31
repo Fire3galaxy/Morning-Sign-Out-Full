@@ -41,7 +41,7 @@ public class FetchCategoryImageManager {
                             (CategoryImageSenderObject) inputMessage.obj;
 
                     final FetchCategoryImageRunnable task = CategoryAdapter.getFetchCategoryImageTask(sentObject.imageView);
-                    if (sentObject.task.equals(task)) {
+                    if (sentObject.task.equals(task) && !task.currentThread.isInterrupted()) {
                         CategoryFragment.addBitmapToMemoryCache(sentObject.imageUrl, sentObject.downloadedImage);
                         sentObject.imageView.setTag(sentObject.imageUrl);
                         sentObject.imageView.setImageBitmap(sentObject.downloadedImage);
@@ -74,6 +74,7 @@ public class FetchCategoryImageManager {
 
     static public void interruptThread(FetchCategoryImageRunnable task) {
 //        Log.d("FetchCategoryImageManager", "Interrupt thread with task: " + task.imageUrl);
+        // Don't interrupt same task twice (is this an issue? not sure)
         synchronized(instance) {
             if (task.currentThread != null)
                 task.currentThread.interrupt();

@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.AsyncTask;
 import android.support.v4.widget.DrawerLayout;
@@ -28,10 +29,12 @@ import android.animation.Animator.AnimatorListener;
 
 import java.util.ArrayList;
 import java.lang.InterruptedException;
+import java.util.Map;
 
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.search_results.SearchResultsActivity;
 import app.morningsignout.com.morningsignoff.meet_the_team.MeetTheTeamActivity;
+import app.morningsignout.com.morningsignoff.network.FetchCategoryImageRunnable;
 
 // Category page activity
 public class CategoryActivity extends AppCompatActivity {
@@ -301,5 +304,12 @@ public class CategoryActivity extends AppCompatActivity {
                 splashScreenView.setVisibility(View.GONE);
             }
         });
+    }
+
+    public void debugAllBitmapSources(View v) {
+        String TAG = "CategoryActivity";
+        CategoryFragment.instance.debugCache();
+        CategoryBitmapPool.debugPool();
+        FetchCategoryImageRunnable.debugAllHashes();
     }
 }

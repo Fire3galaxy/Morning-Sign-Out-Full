@@ -28,16 +28,14 @@ public class CategoryBitmapPool {
     public static void recycle(Bitmap b) {
         synchronized(instance) {
             instance.bitmaps.add(b);
-            Log.d("JustBitmap", Integer.toString(instance.bitmaps.size()));
+            Log.d("CategoryBitmapPool", Integer.toString(instance.bitmaps.size()));
         }
     }
 
     private Bitmap findSuitableBitmap(BitmapFactory.Options targetOptions) {
-        for (int i = 0; i < bitmaps.size(); i++) {
-            if (canUseInBitmap(bitmaps.get(i), targetOptions)) {
+        for (int i = 0; i < bitmaps.size(); i++)
+            if (canUseInBitmap(bitmaps.get(i), targetOptions))
                  return bitmaps.remove(i);
-            }
-        }
 
         return null;
     }
@@ -60,5 +58,13 @@ public class CategoryBitmapPool {
 
         // FIXME: only considering KitKat+ right now
         return false;
+    }
+
+    public static void debugPool() {
+        String TAG = "CategoryBitmapPool";
+        if (instance.bitmaps.isEmpty())
+            Log.d(TAG, "No bitmaps");
+        for (Bitmap b : instance.bitmaps)
+            Log.d(TAG, Integer.toString(b.hashCode()));
     }
 }
