@@ -8,6 +8,7 @@ import java.lang.Thread;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -27,6 +28,7 @@ import app.morningsignout.com.morningsignoff.category.CategoryBitmapPool;
 
 public class FetchCategoryImageRunnable implements Runnable {
     Thread currentThread;
+    AtomicBoolean isInterrupted;
 
     public String imageUrl;
     int viewWidth, viewHeight;
@@ -39,6 +41,8 @@ public class FetchCategoryImageRunnable implements Runnable {
         this.viewHeight = CategoryAdapter.REQ_IMG_HEIGHT;
         this.imageUrl = imageUrl;
         this.imageViewRef = new WeakReference<>(imageView);
+
+        this.isInterrupted = new AtomicBoolean(false);
     }
 
     @Override
@@ -49,11 +53,13 @@ public class FetchCategoryImageRunnable implements Runnable {
 //        long start = System.currentTimeMillis();
 
         if (Thread.interrupted())
+//        if (isInterrupted.get())
             return;
 
         Bitmap downloadedImage = downloadBitmap();
 
-        debugAllHashes.add(downloadedImage.hashCode());
+        if (downloadedImage != null)
+            debugAllHashes.add(downloadedImage.hashCode());
 
 //        if (downloadedImage != null) {
 //            Log.d("FetchCategoryImageRunnable", "bitmap dimens: " +
@@ -67,6 +73,10 @@ public class FetchCategoryImageRunnable implements Runnable {
         // if img is not needed anymore or imageviewref is null
 
 //        CategoryBitmapPool.push(downloadedImage);
+
+        // One more check to NOT send image if the thread was interrupted after/during bitmap decoding
+//        if (isInterrupted.get())
+//            return;
 
         CategoryImageSenderObject objectToSend =
                 new CategoryImageSenderObject(imageUrl, imageViewRef.get(), downloadedImage, this);
@@ -130,6 +140,7 @@ public class FetchCategoryImageRunnable implements Runnable {
 
                 // Don't decode the image if thread is interrupted
                 if (Thread.interrupted()) {
+//                if (isInterrupted.get()) {
                     if (bitmapToUse != null) {
                         bitmapToUse.recycle();
 //                        CategoryBitmapPool.instance.recycle(bitmapToUse); // Put given image back into pool

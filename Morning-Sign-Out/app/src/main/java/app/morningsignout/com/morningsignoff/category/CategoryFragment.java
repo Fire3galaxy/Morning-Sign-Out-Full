@@ -315,6 +315,6 @@ public class CategoryFragment extends Fragment {
             Log.d(TAG, "No entries");
         else
             for (Map.Entry<String, Bitmap> e : cacheSnapshot.entrySet())
-                Log.d(TAG, Integer.toString(e.getValue().hashCode()) + ": " + e.getKey());
+                Log.d(TAG, Integer.toString(e.getValue().hashCode()) + ": " + e.getKey() + ", " + e.getKey().length());
     }
 }

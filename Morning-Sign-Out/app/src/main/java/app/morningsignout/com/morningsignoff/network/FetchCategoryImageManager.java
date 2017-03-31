@@ -41,10 +41,13 @@ public class FetchCategoryImageManager {
                             (CategoryImageSenderObject) inputMessage.obj;
 
                     final FetchCategoryImageRunnable task = CategoryAdapter.getFetchCategoryImageTask(sentObject.imageView);
-                    if (sentObject.task.equals(task) && !task.currentThread.isInterrupted()) {
+                    if (sentObject.task.equals(task) &&
+                            !task.currentThread.isInterrupted()) {
+                            //!task.isInterrupted.get()) {
                         CategoryFragment.addBitmapToMemoryCache(sentObject.imageUrl, sentObject.downloadedImage);
-                        sentObject.imageView.setTag(sentObject.imageUrl);
+                        sentObject.imageView.setTag(sentObject.imageUrl); // Checked in CategoryAdapter
                         sentObject.imageView.setImageBitmap(sentObject.downloadedImage);
+                        Log.d("FetchCategoryImageManager", "Finished with bitmap " + sentObject.downloadedImage.hashCode() + ", " + sentObject.imageUrl);
                     }
                 }
             }
@@ -79,5 +82,6 @@ public class FetchCategoryImageManager {
             if (task.currentThread != null)
                 task.currentThread.interrupt();
         }
+//        task.isInterrupted.set(true);
     }
 }

@@ -154,14 +154,21 @@ public class CategoryAdapter extends BaseAdapter {
             // task is interrupted or does not exist for imageView
             if (cancelPotentialWork(rowTemp.imageURL, viewHolder.image)) {
                 // Recycle old bitmap if NOT IN LRUCACHE
+                // tag: Set in FetchCategoryImageManager or else branch below here if bitmap was in
+                //      the cache
                 String oldImageUrl = (String) viewHolder.image.getTag();
-                if (oldImageUrl != null && CategoryFragment.getBitmapFromMemCache(oldImageUrl) == null) {
+                Bitmap cachedBitmap = (oldImageUrl != null) ? CategoryFragment.getBitmapFromMemCache(oldImageUrl) : null;
+                if (oldImageUrl != null && cachedBitmap == null) {
                     Drawable d = viewHolder.image.getDrawable();
+
+                    if (oldImageUrl != null)
+                        Log.d("CategoryAdapter", "Recycle: " + oldImageUrl + ", " + oldImageUrl.length());
 
                     if (d != null && d instanceof BitmapDrawable) {
                         BitmapDrawable bitmapDrawable = (BitmapDrawable) d;
 
                         if (bitmapDrawable.getBitmap() != null) {
+                            Log.d("CategoryAdapter", "Recycle: " + bitmapDrawable.getBitmap().hashCode());
                             CategoryBitmapPool.recycle(bitmapDrawable.getBitmap());
                             viewHolder.image.setImageDrawable(null);
                         }
@@ -178,6 +185,7 @@ public class CategoryAdapter extends BaseAdapter {
             }
         } else {    // set saved imageViewReference
             viewHolder.image.setImageBitmap(b);
+            viewHolder.image.setTag(rowTemp.imageURL); //
         }
 
         return row;
