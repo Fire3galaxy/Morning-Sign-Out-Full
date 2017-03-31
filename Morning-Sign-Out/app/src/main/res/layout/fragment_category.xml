@@ -77,13 +77,4 @@
         android:visibility="gone"
         android:contentDescription="@string/splash_contentDescription"/>
 
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:onClick="debugAllBitmapSources"
-        android:text="Button" />
-
 </RelativeLayout>

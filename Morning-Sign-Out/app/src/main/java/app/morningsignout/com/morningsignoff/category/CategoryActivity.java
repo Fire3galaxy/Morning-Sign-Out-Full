@@ -307,9 +307,9 @@ public class CategoryActivity extends AppCompatActivity {
     }
 
     public void debugAllBitmapSources(View v) {
-        String TAG = "CategoryActivity";
-        CategoryFragment.instance.debugCache();
-        CategoryBitmapPool.debugPool();
-        FetchCategoryImageRunnable.debugAllHashes();
+//        String TAG = "CategoryActivity";
+//        CategoryFragment.instance.debugCache();
+//        CategoryBitmapPool.debugPool();
+//        FetchCategoryImageRunnable.debugAllHashes();
     }
 }

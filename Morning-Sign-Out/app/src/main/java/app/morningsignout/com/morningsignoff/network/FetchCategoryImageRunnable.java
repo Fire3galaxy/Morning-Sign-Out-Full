@@ -34,7 +34,7 @@ public class FetchCategoryImageRunnable implements Runnable {
     int viewWidth, viewHeight;
     WeakReference<ImageView> imageViewRef;
 
-    static Set<Integer> debugAllHashes = new TreeSet<>();
+//    static Set<Integer> debugAllHashes = new TreeSet<>();
 
     public FetchCategoryImageRunnable(String imageUrl, ImageView imageView) {
         this.viewWidth = CategoryAdapter.REQ_IMG_WIDTH;
@@ -58,25 +58,8 @@ public class FetchCategoryImageRunnable implements Runnable {
 
         Bitmap downloadedImage = downloadBitmap();
 
-        if (downloadedImage != null)
-            debugAllHashes.add(downloadedImage.hashCode());
-
-//        if (downloadedImage != null) {
-//            Log.d("FetchCategoryImageRunnable", "bitmap dimens: " +
-//                    Integer.toString(downloadedImage.getWidth()) + ", " + Integer.toString(downloadedImage.getHeight()) +
-//                    ". view dimens: " +
-//                    Integer.toString(viewWidth) + ", " + Integer.toString(viewHeight));
-//            Log.d("FetchCategoryImageRunnable", "config: " + downloadedImage.getConfig());
-//        }
-
-        // Include chance to cancel thread (return) instead of trying to pass bitmap up to UI
-        // if img is not needed anymore or imageviewref is null
-
-//        CategoryBitmapPool.push(downloadedImage);
-
-        // One more check to NOT send image if the thread was interrupted after/during bitmap decoding
-//        if (isInterrupted.get())
-//            return;
+//        if (downloadedImage != null)
+//            debugAllHashes.add(downloadedImage.hashCode());
 
         CategoryImageSenderObject objectToSend =
                 new CategoryImageSenderObject(imageUrl, imageViewRef.get(), downloadedImage, this);
@@ -206,11 +189,11 @@ public class FetchCategoryImageRunnable implements Runnable {
     }
 
     public static void debugAllHashes() {
-        String TAG = "FetchCategoryImageRunnable";
-        if (debugAllHashes.isEmpty())
-            Log.d(TAG, "No Bitmaps");
-        else
-            for (Integer i : debugAllHashes)
-                Log.d(TAG, i.toString());
+//        String TAG = "FetchCategoryImageRunnable";
+//        if (debugAllHashes.isEmpty())
+//            Log.d(TAG, "No Bitmaps");
+//        else
+//            for (Integer i : debugAllHashes)
+//                Log.d(TAG, i.toString());
     }
 }

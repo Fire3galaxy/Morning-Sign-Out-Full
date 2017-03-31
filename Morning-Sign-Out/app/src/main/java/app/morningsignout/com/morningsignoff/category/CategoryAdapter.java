@@ -106,7 +106,7 @@ public class CategoryAdapter extends BaseAdapter {
     // Get the View route of a single row by id
     @Override
     public View getView(int i, View view, final ViewGroup viewGroup){
-        Log.d("CategoryAdapter", "index: " + Integer.toString(i));
+//        Log.d("CategoryAdapter", "index: " + Integer.toString(i));
 
         // crate a new rowItem object here
         View row;
@@ -157,18 +157,16 @@ public class CategoryAdapter extends BaseAdapter {
                 // tag: Set in FetchCategoryImageManager or else branch below here if bitmap was in
                 //      the cache
                 String oldImageUrl = (String) viewHolder.image.getTag();
-                Bitmap cachedBitmap = (oldImageUrl != null) ? CategoryFragment.getBitmapFromMemCache(oldImageUrl) : null;
-                if (oldImageUrl != null && cachedBitmap == null) {
+                if (oldImageUrl != null && CategoryFragment.getBitmapFromMemCache(oldImageUrl) == null) {
                     Drawable d = viewHolder.image.getDrawable();
-
-                    if (oldImageUrl != null)
-                        Log.d("CategoryAdapter", "Recycle: " + oldImageUrl + ", " + oldImageUrl.length());
+//                    if (oldImageUrl != null)
+//                        Log.d("CategoryAdapter", "Recycle: " + oldImageUrl + ", " + oldImageUrl.length());
 
                     if (d != null && d instanceof BitmapDrawable) {
                         BitmapDrawable bitmapDrawable = (BitmapDrawable) d;
 
                         if (bitmapDrawable.getBitmap() != null) {
-                            Log.d("CategoryAdapter", "Recycle: " + bitmapDrawable.getBitmap().hashCode());
+//                            Log.d("CategoryAdapter", "Recycle: " + bitmapDrawable.getBitmap().hashCode());
                             CategoryBitmapPool.recycle(bitmapDrawable.getBitmap());
                             viewHolder.image.setImageDrawable(null);
                         }
