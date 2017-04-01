@@ -10,6 +10,7 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.AsyncTask;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -36,13 +37,12 @@ import app.morningsignout.com.morningsignoff.search_results.SearchResultsActivit
 import app.morningsignout.com.morningsignoff.meet_the_team.MeetTheTeamActivity;
 import app.morningsignout.com.morningsignoff.network.FetchCategoryImageRunnable;
 
-// Category page activity
+// Category page categoryActivity
 public class CategoryActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
     private SearchView searchView;
-    private ImageView splashScreenView;
 
     private String mTitle;              // Current Title
     private String[] categories_urls,   // category strings for url usage
@@ -57,45 +57,24 @@ public class CategoryActivity extends AppCompatActivity {
         }
     }
 
-    private class OneSecondSplashTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected void onPreExecute() {
-            enableSplash();
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            try {
-                Thread.sleep(1500);
-            } catch (InterruptedException ie) {
-                Log.e("CategoryActivity", ie.getMessage());
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            fadeSplash();
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category);
 
+        // XML resources
         categories_titles = getResources().getStringArray(R.array.categories);
         categories_urls = getResources().getStringArray(R.array.categories_for_url);
         position = 0;
 
-        // nav drawer icons from resources
-        TypedArray navMenuIcons = getResources().obtainTypedArray(R.array.categories_icons);
-
+        // Views
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.listView_slide);
-        splashScreenView = (ImageView) findViewById(R.id.imageView_splashScreen);
 
+        // contents of nav drawer
         ArrayList<NavDrawerItem> navDrawerItems = new ArrayList<NavDrawerItem>();
+        // nav drawer icons from resources
+        TypedArray navMenuIcons = getResources().obtainTypedArray(R.array.categories_icons);
 
         // adding nav drawer items to array
         for (int i = 0; i < navMenuIcons.length(); i++)
@@ -110,21 +89,8 @@ public class CategoryActivity extends AppCompatActivity {
 
         // Change up button of actionbar to 3 horizontal bars for slide
         setUpButtonToTripleBar();
-        // Set up button to open/close drawer and change title of current activity
+        // Set up button to open/close drawer and change title of current categoryActivity
         setDrawerListenerToActionBarToggle();
-
-        // For CategoryFragment
-        if (savedInstanceState == null) {
-            CategoryFragment fragment = CategoryFragment.findOrCreateRetainFragment(getSupportFragmentManager());
-            Bundle args = new Bundle();
-            args.putString(CategoryFragment.EXTRA_TITLE, categories_titles[position]);
-            args.putString(CategoryFragment.EXTRA_URL, categories_urls[position]);
-            fragment.setArguments(args);
-
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container_category, fragment)
-                    .commit();
-        }
 
         // Adding MSO Logo to center of action bar
         if (getSupportActionBar() != null)
@@ -140,11 +106,22 @@ public class CategoryActivity extends AppCompatActivity {
         this.getSupportActionBar().setCustomView(ib, params);
         this.getSupportActionBar().setDisplayShowCustomEnabled(true);
 
-        // Splash screen (only on first time opening)
-        if (savedInstanceState == null)
-            (new OneSecondSplashTask()).execute();
-        else
-            splashScreenView.setVisibility(View.GONE);
+
+        // Fragments added to activity
+        if (savedInstanceState == null) {
+            CategoryFragment fragment = CategoryFragment.findOrCreateRetainFragment(getSupportFragmentManager());
+            Bundle args = new Bundle();
+            args.putString(CategoryFragment.EXTRA_TITLE, categories_titles[position]);
+            args.putString(CategoryFragment.EXTRA_URL, categories_urls[position]);
+            fragment.setArguments(args);
+
+            SplashFragment splashScreenFragment = new SplashFragment();
+
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.container_category, splashScreenFragment)
+                    .add(R.id.container_category, fragment)
+                    .commit();
+        }
     }
 
     @Override
@@ -186,7 +163,7 @@ public class CategoryActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         /* Handle action bar item clicks here. The action bar will
            automatically handle clicks on the Home/Up button, so long
-           as you specify a parent activity in AndroidManifest.xml. */
+           as you specify a parent categoryActivity in AndroidManifest.xml. */
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
@@ -270,27 +247,20 @@ public class CategoryActivity extends AppCompatActivity {
         mDrawerLayout.closeDrawer(mDrawerList);
     }
 
-    private void enableSplash() {
+    void startSplash() {
         getSupportActionBar().hide();
         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-        splashScreenView.setVisibility(View.VISIBLE);
     }
 
-    public void fadeSplash() {
+    void endSplash() {
         getSupportActionBar().show();
         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-        splashScreenView.animate().alpha(0f).setListener(new AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {}
-            @Override
-            public void onAnimationCancel(Animator animation) {}
-            @Override
-            public void onAnimationRepeat(Animator animation) {}
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                splashScreenView.setVisibility(View.GONE);
-            }
-        });
+    }
+
+    void removeSplashFragment(Fragment splashFragment) {
+        getSupportFragmentManager().beginTransaction()
+                .remove(splashFragment)
+                .commit();
     }
 
     public void debugAllBitmapSources(View v) {

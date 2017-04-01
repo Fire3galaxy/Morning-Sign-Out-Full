@@ -174,8 +174,8 @@ public class CategoryFragment extends Fragment {
                 SingleRow rowTemp = (SingleRow) adapter.getItem(id_int);
                 String articleTitle = rowTemp.title;
 
-                // Create new activity for the article here
-                // feed the new activity with the URL of the page
+                // Create new categoryActivity for the article here
+                // feed the new categoryActivity with the URL of the page
                 String articleLink = rowTemp.link;
                 Intent articleActivity = new Intent(gridViewWithHeaderAndFooter.getContext(), ArticleActivity.class);
 

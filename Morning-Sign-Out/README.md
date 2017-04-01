@@ -23,9 +23,9 @@ Settings, subscription, etc. will be considered at a later time.
 (http://morningsignout.com/category/research/)
 
 #### Team member goals
-* Fire3galaxy - Working on creating activity for click event from front page to category
+* Fire3galaxy - Working on creating categoryActivity for click event from front page to category
 
 ## Current goals
 * Edit CategoryActivity (created on clicking category buttons) with basic design.
-* Integrate network calls to new activity to load actual article data.
+* Integrate network calls to new categoryActivity to load actual article data.
 * Integrate network calls to headline fragment in front page to show images/articles

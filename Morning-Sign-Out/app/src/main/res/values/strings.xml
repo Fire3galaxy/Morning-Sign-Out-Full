@@ -118,7 +118,7 @@
     <string name="morning">Morning</string>
     <string name="morning_content">
          <![CDATA[
-        <b>Morning</b> sign outs are particularly interesting. All of the activity, labs,
+        <b>Morning</b> sign outs are particularly interesting. All of the categoryActivity, labs,
         studies, and data that had occurred in the last 24 hours are assessed, and the plan for a
         new day is formulated. Most major medical decisions happen during the day, so the morning
         sign out is often the launching point for the rest of the day’s events.<p>As a society, there

@@ -19,11 +19,6 @@
             android:value=".SearchResultsActivity" />
 
         <activity
-            android:name=".splash.SplashActivity"
-            android:label="@string/app_name" >
-        </activity>
-
-        <activity
             android:launchMode = "singleTop"
             android:name=".category.CategoryActivity"
             android:configChanges="keyboardHidden|screenSize">
@@ -31,9 +26,6 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".category.CategoryActivity" />
         </activity>
         <activity
             android:name=".meet_the_team.MeetTheTeamActivity"
