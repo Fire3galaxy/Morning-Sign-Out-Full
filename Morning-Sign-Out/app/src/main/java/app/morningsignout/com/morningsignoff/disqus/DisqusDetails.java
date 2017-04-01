@@ -28,14 +28,16 @@ import java.util.Stack;
  * Created by Daniel on 11/25/2015.
  */
 public class DisqusDetails {
+    // Disqus Application is on pokeforce72@gmail.com account (Daniel Handojo)
     static public final String PUBLIC_KEY = "W7S5K8Iad6l5z9pWLgdWMg58rVTmGtOPSBtx30eZcXBVaDB7gPYYv3XgztKtQDuS";
     static public final String SECRET_KEY = "P8QbTcCBz9lMn5Dw5sjBSnhB76VFrGfMR4Jb7el6qJmfQOm2CmdbvEjlKTpYbjFR";
 
     static public final String AUTHORIZE_URL = "https://disqus.com/api/oauth/2.0/authorize/?"
             + "client_id=" + PUBLIC_KEY + "&"
             + "scope=read,write&"
-            + "response_type=code&"
-            + "redirect_uri=http://www.morningsignout.com/";
+            + "response_type=code&";
+            // Now Disqus has an explicit setting in the app instead of this parameter
+            //+ "redirect_uri=http://www.morningsignout.com/";
     static public final String GET_ACCESS_TOKEN_URL = "https://disqus.com/api/oauth/2.0/access_token/";
     static public final String GET_ACCESS_TOKEN_DATA = "grant_type=authorization_code&"
             + "client_id=" + PUBLIC_KEY + "&"

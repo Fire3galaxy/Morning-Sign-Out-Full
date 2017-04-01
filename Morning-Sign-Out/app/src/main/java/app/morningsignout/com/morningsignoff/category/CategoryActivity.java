@@ -52,6 +52,7 @@ public class CategoryActivity extends AppCompatActivity {
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView parent, View view, int position, long id) {
+            Log.d("CategoryActivity", "Clicked");
             selectItem(position);
         }
     }
@@ -97,7 +98,7 @@ public class CategoryActivity extends AppCompatActivity {
         ArrayList<NavDrawerItem> navDrawerItems = new ArrayList<NavDrawerItem>();
 
         // adding nav drawer items to array
-        for (int i = 0; i <= 8; i++)
+        for (int i = 0; i < navMenuIcons.length(); i++)
             navDrawerItems.add(new NavDrawerItem(categories_titles[i], navMenuIcons.getResourceId(i, -1)));
 
         navMenuIcons.recycle();
@@ -105,6 +106,7 @@ public class CategoryActivity extends AppCompatActivity {
                 navDrawerItems);
         mDrawerList.setAdapter(adapter);
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+        Log.d("CategoryActivity", "HERE");
 
         // Change up button of actionbar to 3 horizontal bars for slide
         setUpButtonToTripleBar();
@@ -147,11 +149,11 @@ public class CategoryActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // Go back to home screen
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+        Log.d("CategoryActivity","iconified" + String.valueOf(searchView.isIconified()));
+        if (!searchView.isIconified())  // Check if searchView is expanded
+            searchView.setIconified(true);
+        else
+            super.onBackPressed();
     }
 
     @Override
@@ -170,22 +172,6 @@ public class CategoryActivity extends AppCompatActivity {
         ComponentName componentName = new ComponentName(this, SearchResultsActivity.class);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
         return true;
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        // Check if the key event was the Back button
-        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-            Log.d("CategoryActivity","iconified" + String.valueOf(searchView.isIconified()));
-            Log.d("","");
-            if (!searchView.isIconified()) {    // Check if searchView is expanded
-                searchView.setIconified(true);
-                return true;
-            }
-        }
-
-        // If it wasn't the Back key or none of the conditions are met, use default system behavior
-        return super.onKeyDown(keyCode, event);
     }
 
     @Override
@@ -254,6 +240,7 @@ public class CategoryActivity extends AppCompatActivity {
     }
 
     void selectItem(int position) {
+        Log.d("CategoryActivity", Integer.toString(position));
         if (this.position != position && position < categories_urls.length) {
             this.position = position;
 
@@ -268,7 +255,7 @@ public class CategoryActivity extends AppCompatActivity {
                     .replace(R.id.container_category, fragment)
                     .commit();
         } else if (position == categories_urls.length){
-            // Enter code here! categories_urls.length -> About MSO
+            // categories_urls.length -> About MSO
             Intent AboutMSOActivity = new Intent(this, app.morningsignout.com.morningsignoff.about_mso.AboutMSOActivity.class);
             startActivity(AboutMSOActivity);
         } else if (position == categories_urls.length + 1) {
