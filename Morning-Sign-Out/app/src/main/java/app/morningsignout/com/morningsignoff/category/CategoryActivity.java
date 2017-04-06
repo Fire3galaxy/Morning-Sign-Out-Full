@@ -52,7 +52,6 @@ public class CategoryActivity extends AppCompatActivity {
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView parent, View view, int position, long id) {
-            Log.d("CategoryActivity", "Clicked");
             selectItem(position);
         }
     }
@@ -85,7 +84,6 @@ public class CategoryActivity extends AppCompatActivity {
                 navDrawerItems);
         mDrawerList.setAdapter(adapter);
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-        Log.d("CategoryActivity", "HERE");
 
         // Change up button of actionbar to 3 horizontal bars for slide
         setUpButtonToTripleBar();
@@ -126,7 +124,6 @@ public class CategoryActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Log.d("CategoryActivity","iconified" + String.valueOf(searchView.isIconified()));
         if (!searchView.isIconified())  // Check if searchView is expanded
             searchView.setIconified(true);
         else
@@ -217,7 +214,6 @@ public class CategoryActivity extends AppCompatActivity {
     }
 
     void selectItem(int position) {
-        Log.d("CategoryActivity", Integer.toString(position));
         if (this.position != position && position < categories_urls.length) {
             this.position = position;
 

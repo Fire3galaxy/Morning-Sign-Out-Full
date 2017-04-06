@@ -99,10 +99,6 @@ public class CategoryAdapter extends BaseAdapter {
         return articles.isEmpty();
     }
 
-    // FIXME: Next Time, I notice that getView is called 10+ times for the 0th view. This could mean that
-    // if an image existed in the cache already, it would be setting the bitmap from the cache into the
-    // imageview multiple times.
-
     // Get the View route of a single row by id
     @Override
     public View getView(int i, View view, final ViewGroup viewGroup){

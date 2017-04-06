@@ -148,9 +148,7 @@ public class CategoryFragment extends Fragment {
             categoryAdapter.setAdapterView(gridViewWithHeaderAndFooter);
             gridViewWithHeaderAndFooter.setAdapter(categoryAdapter);
             isLoadingArticles.set(true);
-            new FetchListArticlesTask(this, 1, true, isRefresh).execute(category_url);
-//            if (!isRefresh)
-//                splashScreenView.setVisibility(View.VISIBLE);
+            new FetchListArticlesTask(this, 1, true, isRefresh).execute(category_url); // First round of articles
         } else {
             refreshTextView.setVisibility(View.GONE);
             categoryAdapter.notifyDataSetChanged();
@@ -194,7 +192,9 @@ public class CategoryFragment extends Fragment {
 
         // To load more articles when the bottom of the page is reached
         gridViewWithHeaderAndFooter.setOnScrollListener(new AbsListView.OnScrollListener() {
-            int lastPageNum = 0;
+            // Last seen by this listener, not by the program.
+            // So, say, the program has seen page 1 already, but this value is 0 still
+//            int lastSeenPageNum = 0;
 
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
@@ -206,8 +206,8 @@ public class CategoryFragment extends Fragment {
 
                     int pageNum = adapter.getPageNum();
                     // Only make one request per page request
-                    if (totalItemCount != 0 && lastPageNum != pageNum && isLoadingArticles.weakCompareAndSet(false, true)) {
-                        lastPageNum = pageNum;
+                    if (totalItemCount != 0 /*&& lastSeenPageNum != pageNum*/ && isLoadingArticles.weakCompareAndSet(false, true)) {
+//                        lastSeenPageNum = pageNum;
                         new FetchListArticlesTask(CategoryFragment.this, pageNum + 1, false, false).execute(category_url);
                     }
                 }

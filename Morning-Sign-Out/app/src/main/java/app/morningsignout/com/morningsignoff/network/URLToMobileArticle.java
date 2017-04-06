@@ -405,4 +405,3 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
         return doc.toString();
     }
 }
- 

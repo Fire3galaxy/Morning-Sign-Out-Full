@@ -9,16 +9,23 @@ import android.widget.WrapperListAdapter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import app.morningsignout.com.morningsignoff.article.Article;
 import app.morningsignout.com.morningsignoff.category.CategoryAdapter;
 import app.morningsignout.com.morningsignoff.category.CategoryFragment;
 import app.morningsignout.com.morningsignoff.category.CategoryActivity;
+import app.morningsignout.com.morningsignoff.network.CheckConnection;
 
 import static android.view.View.GONE;
 
@@ -32,7 +39,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
     private WeakReference<CategoryFragment> fragmentRef;
     private int pageNum;
-    private boolean isFirstLoad, isRefresh;
+    private boolean isFirstLoad, isRefresh, isCancelled;
 
     private int adapterPageNum;
 
@@ -44,12 +51,15 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         this.fragmentRef = new WeakReference<>(fragment);   // ensure fragment still exists
         this.pageNum = pageNum;         // page of mso page called for task
         this.isFirstLoad = isFirstLoad;
+        this.isCancelled = false;
     }
 
     @Override
     protected void onPreExecute() {
-        if (fragmentRef.get() == null)
+        if (fragmentRef.get() == null || !CheckConnection.isConnected(fragmentRef.get().getContext())) {
+            isCancelled = true;
             return;
+        }
 
         // Load correct progressbar based on state of fragment
         // first load & refresh: used refresh layout
@@ -73,9 +83,13 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
     // takes in the category name as a sufix to the URL, ex. healthcare/  and call getArticles()
     @Override
     protected List<Article> doInBackground(String... params) {
+        if (isCancelled)
+            return null;
+
         // is valid request (next page only, not repeat or excess page)
         if (adapterPageNum == pageNum - 1) {
             try {
+                getArticlesJSON();
                 return getArticles(params[0], pageNum);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -87,8 +101,11 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
     // Articles retrived online are being sent here, and we pass the info to the CategoryAdapter
     protected void onPostExecute(final List<Article> articles) {
-        if (fragmentRef.get() == null)
+        if (isCancelled) {
+            if (fragmentRef.get() != null)
+                fragmentRef.get().getIsLoadingArticles().set(false);
             return;
+        }
 
         WrapperListAdapter wrappedAdapter =
                 (WrapperListAdapter) fragmentRef.get().getGridViewWithHeaderAndFooter().getAdapter();
@@ -112,12 +129,12 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
         // If result and adapter are not null and fragment still exists, load items
         if (adapter != null && fragmentRef.get() != null) {
-            fragmentRef.get().getIsLoadingArticles().set(false);
             if (articles != null)
                 adapter.loadMoreItems(articles, pageNum);
             else if (adapter.isEmpty())
                 Toast.makeText(fragmentRef.get().getContext(),
                         "We had trouble trying to connect", Toast.LENGTH_SHORT).show();
+            fragmentRef.get().getIsLoadingArticles().set(false);
         }
     }
 
@@ -220,6 +237,41 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         }
 
         return null; // Exiting try/catch likely means error occurred.
+    }
+
+    void getArticlesJSON() {
+        StringBuilder builder = new StringBuilder();
+
+        try {
+            URL url = new URL("http://www.morningsignout.com/?json=get_category_posts&slug=featured&include=author,url,title,thumbnail");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            InputStream response = connection.getInputStream();
+
+            byte[] bytes = new byte[128];
+            int bytesRead = 0;
+            while ((bytesRead = response.read(bytes)) > 0) {
+                if (bytesRead == bytes.length)
+                    builder.append(new String(bytes));
+                else
+                    builder.append((new String(bytes)).substring(0, bytesRead));
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String jsonStr = builder.toString();
+//        Log.d("FetchListArticlesTask", json);
+
+        try {
+            JSONObject jsonObj = new JSONObject(jsonStr);
+            JSONArray posts = jsonObj.getJSONArray("posts");
+
+            Log.d("FetchListArticlesTask", posts.getJSONObject(0).getString("title"));
+        } catch (JSONException je) {
+            Log.e("FetchListArticlesTask", je.getMessage());
+        }
     }
 }
 
