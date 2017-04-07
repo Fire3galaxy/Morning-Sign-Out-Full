@@ -245,12 +245,13 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         StringBuilder builder = new StringBuilder();
         String urlPath = "";
         urlPath = "http://morningsignout.com/?json=get_category_posts&slug=" + arg + "&page=" + pageNum;
+        HttpURLConnection connection = null;
 
         // opening URL connection, setup JSON
         try {
 //            URL url = new URL("http://www.morningsignout.com/?json=get_category_posts&slug=featured&page=1&include=author,url,title,thumbnail");
             URL url = new URL(urlPath);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection = (HttpURLConnection) url.openConnection();
             InputStream response = connection.getInputStream();
 
             byte[] bytes = new byte[128];
@@ -273,6 +274,10 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         } catch (Exception e) {
             Log.e("FetchListArticlesTask", "JSON: " + "Exception: " + e.getMessage());
             e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
 
         String jsonStr = builder.toString();
