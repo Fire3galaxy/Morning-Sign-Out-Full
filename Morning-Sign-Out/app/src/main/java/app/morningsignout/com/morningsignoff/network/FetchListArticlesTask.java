@@ -1,5 +1,6 @@
 package app.morningsignout.com.morningsignoff.network;
 
+import android.net.wifi.WifiConfiguration;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
@@ -13,6 +14,7 @@ import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -89,8 +91,8 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         // is valid request (next page only, not repeat or excess page)
         if (adapterPageNum == pageNum - 1) {
             try {
-                getArticlesJSON();
-                return getArticles(params[0], pageNum);
+                return getArticlesJSON(params[0],pageNum);
+//                return getArticles(params[0], pageNum);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -239,11 +241,15 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         return null; // Exiting try/catch likely means error occurred.
     }
 
-    void getArticlesJSON() {
+    List<Article> getArticlesJSON(String arg, int pageNum) { // FIXME: get this working
         StringBuilder builder = new StringBuilder();
+        String urlPath = "";
+        urlPath = "http://morningsignout.com/?json=get_category_posts&slug=" + arg + "&page=" + pageNum;
 
+        // opening URL connection, setup JSON
         try {
-            URL url = new URL("http://www.morningsignout.com/?json=get_category_posts&slug=featured&include=author,url,title,thumbnail");
+//            URL url = new URL("http://www.morningsignout.com/?json=get_category_posts&slug=featured&page=1&include=author,url,title,thumbnail");
+            URL url = new URL(urlPath);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             InputStream response = connection.getInputStream();
 
@@ -256,22 +262,84 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                     builder.append((new String(bytes)).substring(0, bytesRead));
             }
         } catch (MalformedURLException e) {
+            Log.e("FetchListArticlesTask", "JSON: " + "MalformedURLException: " + e.getMessage());
+            e.printStackTrace();
+        } catch (ProtocolException e) {
+            Log.e("FetchListArticlesTask", "JSON: " + "ProtocolException: " + e.getMessage());
             e.printStackTrace();
         } catch (IOException e) {
+            Log.e("FetchListArticlesTask", "JSON: " + "IOException: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            Log.e("FetchListArticlesTask", "JSON: " + "Exception: " + e.getMessage());
             e.printStackTrace();
         }
 
         String jsonStr = builder.toString();
 //        Log.d("FetchListArticlesTask", json);
+        int postCount = 0;
+        List<Article> articlesList = new ArrayList<Article>();
 
-        try {
-            JSONObject jsonObj = new JSONObject(jsonStr);
-            JSONArray posts = jsonObj.getJSONArray("posts");
+        if (jsonStr != null)
+        {
+            try {
 
-            Log.d("FetchListArticlesTask", posts.getJSONObject(0).getString("title"));
-        } catch (JSONException je) {
-            Log.e("FetchListArticlesTask", je.getMessage());
+                // Get JSON object
+                JSONObject jsonObj = new JSONObject(jsonStr);
+
+                // Get postcount
+                postCount = jsonObj.getInt("count");
+//                Log.d("FetchListArticlesTask", "JSON: " + "postCount: " + postCount);
+
+                // create JSONArray of posts
+                JSONArray posts = jsonObj.getJSONArray("posts");
+//                Log.d("FetchListArticlesTask", "JSON: " + "length: " + posts.length());
+
+                // going to steal Parser's replaceUnicode()
+                Parser p = new Parser();
+
+                for (int index = 0; index < postCount; index++)
+                {
+                    articlesList.add(new Article());
+                    // create JSONObj of images
+                    JSONObject imageObj = posts.getJSONObject(index).getJSONObject("thumbnail_images");
+
+                    // Title
+                    String title = p.replaceUnicode(posts.getJSONObject(index).getString("title"));
+//                    Log.d("FetchListArticlesTask", "JSON: " + "title: " + title);
+                    articlesList.get(index).setTitle(title);
+
+                    // Link
+                    String link = posts.getJSONObject(index).getString("url");
+//                    Log.d("FetchListArticlesTask", "JSON: " + "url: " + link);
+                    articlesList.get(index).setLink(link);
+
+                    // ImageURL (full)
+                    String fullURL = imageObj.getJSONObject("full").getString("url");
+//                    Log.d("FetchListArticlesTask", "JSON: " + "fullURL: " + fullURL);
+                    articlesList.get(index).setImageURL(fullURL);
+
+                    // TODO: implement thumbnails for better performance
+                    // Image_medURL
+                    String medURL = imageObj.getJSONObject("medium").getString("url");
+//                    Log.d("FetchListArticlesTask", "JSON: " + "medURL: " + medURL);
+//                    articlesList.get(index).setImageURL(medURL);
+
+                    // Author
+                    JSONObject authorObject = posts.getJSONObject(index).getJSONObject("author");
+                    String author = p.replaceUnicode(authorObject.getString("name"));
+//                    Log.d("FetchListArticlesTask", "JSON: " + "author: " + author);
+                    articlesList.get(index).setAuthor(author);
+
+                    // Description
+                }
+
+            } catch (JSONException je) {
+                Log.e("FetchListArticlesTask", "JSON: " + je.getMessage());
+            }
         }
+        // if no articles found, return nothing
+        return articlesList.isEmpty() ? null : articlesList;
     }
 }
 
