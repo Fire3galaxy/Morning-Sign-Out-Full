@@ -7,6 +7,7 @@ public class Article {
     private String description;
     private String link;
     private String imageURL;
+    private String thumbnailURL;
     private String author;
     private int id;
     private Bitmap bitmap;
@@ -34,6 +35,13 @@ public class Article {
 
     public void setImageURL(String imageURL) {
         this.imageURL = imageURL;
+    }
+
+    public String getThumbnailURL() {
+        return thumbnailURL;
+    }
+    public void setThumbnailURL(String thumbnailURL) {
+        this.thumbnailURL = thumbnailURL;
     }
 
     public String getTitle() {
