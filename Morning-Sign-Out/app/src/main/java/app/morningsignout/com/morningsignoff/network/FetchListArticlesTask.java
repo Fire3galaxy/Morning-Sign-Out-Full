@@ -346,26 +346,27 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                                 }
                             }
                         }
-                        else if (imageObj.has("thumbnail"))
+                        else if (imageObj.has("medium"))
                         {
-                            fullURL = imageObj.optJSONObject("thumbnail").optString("url");
-                        }
-                        else if (imageObj.has("full"))
-                        {
-                            fullURL = imageObj.optJSONObject("full").optString("url");
-                        }
-                        else if (imageObj.has("large"))
-                        {
-                            fullURL = imageObj.optJSONObject("large").optString("url");
+                            fullURL = imageObj.optJSONObject("medium").optString("url");
                         }
                         else if (imageObj.has("medium_large"))
                         {
                             fullURL = imageObj.optJSONObject("medium_large").optString("url");
                         }
-                        else if (imageObj.has("medium"))
+                        else if (imageObj.has("large"))
                         {
-                            fullURL = imageObj.optJSONObject("medium").optString("url");
+                            fullURL = imageObj.optJSONObject("large").optString("url");
                         }
+                        else if (imageObj.has("full"))
+                        {
+                            fullURL = imageObj.optJSONObject("full").optString("url");
+                        }
+                        // Commented out because thumbnail images are weirdly cropped
+//                        else if (imageObj.has("thumbnail"))
+//                        {
+//                            fullURL = imageObj.optJSONObject("thumbnail").optString("url");
+//                        }
                         else {
                             if(imageObj.length() != 0)
                             {

@@ -47,6 +47,7 @@ public class FetchCategoryImageManager {
                         CategoryFragment.addBitmapToMemoryCache(sentObject.imageUrl, sentObject.downloadedImage);
                         sentObject.imageView.setTag(sentObject.imageUrl); // Checked in CategoryAdapter
                         sentObject.imageView.setImageBitmap(sentObject.downloadedImage);
+
 //                        Log.d("FetchCategoryImageManager", "Finished with bitmap " + sentObject.downloadedImage.hashCode() + ", " + sentObject.imageUrl);
                     }
                 }

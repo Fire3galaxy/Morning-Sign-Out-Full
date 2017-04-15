@@ -117,10 +117,6 @@ public class CategoryAdapter extends BaseAdapter {
             viewHolder.author = (TextView) row.findViewById(R.id.textViewAuthor);
             viewHolder.image = (ImageView) row.findViewById(R.id.imageView);
             row.setTag(viewHolder);
-
-            // Set imageView settings
-            viewHolder.image.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            viewHolder.image.setCropToPadding(true);
         }
         else {
             row = view;
