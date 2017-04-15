@@ -1,6 +1,5 @@
 package app.morningsignout.com.morningsignoff.network;
 
-import android.net.wifi.WifiConfiguration;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
@@ -8,9 +7,7 @@ import android.webkit.URLUtil;
 import android.widget.Toast;
 import android.widget.WrapperListAdapter;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
@@ -28,8 +25,6 @@ import org.json.JSONObject;
 import app.morningsignout.com.morningsignoff.article.Article;
 import app.morningsignout.com.morningsignoff.category.CategoryAdapter;
 import app.morningsignout.com.morningsignoff.category.CategoryFragment;
-import app.morningsignout.com.morningsignoff.category.CategoryActivity;
-import app.morningsignout.com.morningsignoff.network.CheckConnection;
 
 import static android.view.View.GONE;
 
@@ -94,7 +89,6 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         if (adapterPageNum == pageNum - 1) {
             try {
                 return getArticlesJSON(params[0],pageNum);
-//                return getArticles(params[0], pageNum);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -122,7 +116,6 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                 fragmentRef.get().getSwipeRefreshLayout().setRefreshing(false);
             } else {
                 fragmentRef.get().getProgressBar().setVisibility(GONE);
-//                fragmentRef.get().getSplashScreenView().setVisibility(GONE);
             }
 
             // hide how-to-refresh textView
@@ -140,107 +133,6 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                         "We had trouble trying to connect", Toast.LENGTH_SHORT).show();
             fragmentRef.get().getIsLoadingArticles().set(false);
         }
-    }
-
-    // Go to MorningSignOut.com and get a list of articles
-    // get 12 articles and sent to onPostExecute()
-    List<Article> getArticles(String arg, int pageNum) {
-        // String arg is "research", "wellness", "humanities", etc.
-        // For getting article titles, descriptions, and images. See class Article
-        Parser p = new Parser();
-        String urlPath = "";
-        if (arg.equals("latest")) urlPath = "http://morningsignout.com/" + arg + "/page/" + pageNum;
-        else urlPath = "http://morningsignout.com/category/" + arg + "/page/" + pageNum;
-        Log.d("FetchListArticlesTask", "loading " + urlPath);
-
-        BufferedReader in = null;
-        HttpURLConnection c = null; // Done because of tutorial
-
-        try {
-            // Open connection to list article url
-            URL url = new URL(urlPath);
-            c = (HttpURLConnection) url.openConnection();
-            c.setRequestMethod("GET");
-            c.connect();
-
-            // Return if failed
-            int statusCode = c.getResponseCode();
-            if (statusCode != HttpURLConnection.HTTP_OK) {
-                return null;
-            }
-
-            // Stream was null, Possibly a timeout issue or something wrong.
-            if (c.getInputStream() == null) return null;
-
-            in = new BufferedReader(new InputStreamReader(c.getInputStream()) );
-            String inputLine;
-
-            // For parsing the html
-            boolean inContent = false; // If in <h1> tags, need to wait 2 tags before
-            int closeDiv = 0, ind = 0; // counts </div> tags, ind is index of articlesList
-
-            List<Article> articlesList = new ArrayList<Article>();
-
-            while ((inputLine = in.readLine()) != null) {
-                if (inputLine.contains("<div class=\"content__post__info\">")) {
-                    articlesList.add(new Article());
-                    inContent = true;
-                }
-
-                if (inContent) {
-                    // Title & Link of article
-                    if (inputLine.contains("<h1>")) {
-                        String title = p.getTitle(inputLine),
-                                link = p.getLink(inputLine);
-
-                        articlesList.get(ind).setTitle(title);
-                        articlesList.get(ind).setLink(link);
-                    } // Image URL and/or Author
-                    else if (inputLine.trim().contains("<img") || inputLine.trim().contains("<h2>")) {
-                        if (inputLine.trim().contains("<img")) {
-                            String imageURL = p.getImageURL(inputLine);
-                            articlesList.get(ind).setImageURL(imageURL);
-                        }
-
-                        if (inputLine.trim().contains("<h2>")) {
-                            String author = p.getAuthor(inputLine);
-                            articlesList.get(ind).setAuthor(author);
-                        }
-                    }
-                    // Description of article
-                    else if (inputLine.contains("<p>")) {
-                        String description = p.getDescription(inputLine);
-                        articlesList.get(ind).setDescription(description);
-                    }
-
-                    if (inputLine.trim().equals("</div>")) closeDiv++;
-                    if (closeDiv == 2) {
-                        closeDiv = 0;
-                        inContent = false;
-                        ind++;
-                    }
-                }
-            }
-            in.close();
-
-            // If buffer was empty, no items in list, so website has no articles for some reason.
-            return articlesList.isEmpty() ? null : articlesList;
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (c != null) {
-                c.disconnect();
-            }
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    Log.e(logString, "error closing stream", e);
-                }
-            }
-        }
-
-        return null; // Exiting try/catch likely means error occurred.
     }
 
     List<Article> getArticlesJSON(String arg, int pageNum) { // FIXME: get this working
@@ -312,7 +204,6 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                     JSONObject currPost = posts.optJSONObject(index);
                     articlesList.add(new Article());
 
-
                     // Title
 //                    String title = p.replaceUnicode(posts.getJSONObject(index).getString("title"));
                     String title = p.replaceUnicode(currPost.optString("title"));
@@ -325,6 +216,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 //                    Log.d("FetchListArticlesTask", "JSON: " + "url: " + link);
                     articlesList.get(index).setLink(link);
 
+                    String mediumURL = "https://upload.wikimedia.org/wikipedia/en/d/d3/No-picture.jpg";
                     String fullURL = "https://upload.wikimedia.org/wikipedia/en/d/d3/No-picture.jpg";
                     // create JSONObj of images
 //                    JSONObject imageObj = posts.getJSONObject(index).getJSONObject("thumbnail_images");
@@ -337,30 +229,30 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                         {
                             Log.d("FetchListArticlesTask","JSON: thumbnail_image empty!");
                             if (currPost.has("thumbnail")) {
-                                fullURL = currPost.optString("thumbnail");
-                                Log.d("FetchListArticlesTask", "JSON: weird format article detected! string: " + fullURL);
-                                if (!URLUtil.isValidUrl(fullURL))
+                                mediumURL = currPost.optString("thumbnail");
+                                Log.d("FetchListArticlesTask", "JSON: weird format article detected! string: " + mediumURL);
+                                if (!URLUtil.isValidUrl(mediumURL))
                                 {
                                     Log.e("FetchListArticlesTask", "JSON: invalid url");
-                                    fullURL = "https://upload.wikimedia.org/wikipedia/en/d/d3/No-picture.jpg";
+                                    mediumURL = "https://upload.wikimedia.org/wikipedia/en/d/d3/No-picture.jpg";
                                 }
                             }
                         }
                         else if (imageObj.has("medium"))
                         {
-                            fullURL = imageObj.optJSONObject("medium").optString("url");
+                            mediumURL = imageObj.optJSONObject("medium").optString("url");
                         }
                         else if (imageObj.has("medium_large"))
                         {
-                            fullURL = imageObj.optJSONObject("medium_large").optString("url");
+                            mediumURL = imageObj.optJSONObject("medium_large").optString("url");
                         }
                         else if (imageObj.has("large"))
                         {
-                            fullURL = imageObj.optJSONObject("large").optString("url");
+                            mediumURL = imageObj.optJSONObject("large").optString("url");
                         }
                         else if (imageObj.has("full"))
                         {
-                            fullURL = imageObj.optJSONObject("full").optString("url");
+                            mediumURL = imageObj.optJSONObject("full").optString("url");
                         }
                         // Commented out because thumbnail images are weirdly cropped
 //                        else if (imageObj.has("thumbnail"))
@@ -379,7 +271,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                                     imgList.add(key);
                                 }
                                 String randomImage = imgList.get(0); // let's just grab the first image we find
-                                fullURL = imageObj.optJSONObject(randomImage).optString("url");
+                                mediumURL = imageObj.optJSONObject(randomImage).optString("url");
 //                            Log.d("FetchListArticlesTask", "JSON: post \"" + title + "\" has unknown img, attempting to thumbnail " + fullURL);
                             }
                             else
@@ -387,6 +279,12 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                                 Log.e("FetchListArticlesTask","JSON: "+ title + ": no images found!");
 //                                articlesList.get(index).setImageURL("https://upload.wikimedia.org/wikipedia/en/d/d3/No-picture.jpg");
                             }
+                        }
+
+                        // Full size URL
+                        if (imageObj.has("full"))
+                        {
+                            fullURL = imageObj.optJSONObject("full").optString("url");
                         }
 //                    if (imageObj.has("medium"))
 //                    {
@@ -403,8 +301,8 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                     }
                     else if (currPost.has("thumbnail"))
                     {
-                        fullURL = currPost.optString("thumbnail");
-                        Log.d("FetchListArticlesTask","JSON: weird format article detected! string: " + fullURL);
+                        mediumURL = currPost.optString("thumbnail");
+                        Log.d("FetchListArticlesTask","JSON: weird format article detected! string: " + mediumURL);
                     }
                     else
                     {
@@ -414,6 +312,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
 
 //                    Log.d("FetchListArticlesTask", "JSON: " + "fullURL: " + fullURL);
+                    articlesList.get(index).setCategoryURL(mediumURL);
                     articlesList.get(index).setImageURL(fullURL);
 
                     // TODO: implement thumbnails for better performance
@@ -441,7 +340,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 //                        }
 //                    }
 //                    Log.d("FetchListArticlesTask", "JSON: " + "medURL: " + medURL);
-//                    articlesList.get(index).setThumbnailURL(medURL);
+//                    articlesList.get(index).setCategoryURL(medURL);
 //                    articlesList.get(index).setImageURL(medURL);
 
                     // Author

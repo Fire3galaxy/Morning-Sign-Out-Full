@@ -37,7 +37,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.List;
 
@@ -169,12 +168,7 @@ public class ArticleActivity extends ActionBarActivity {
 
         webView = (WebView) findViewById(R.id.webView_article);
         String data = readRawTextFile(this, R.raw.html_test);
-//                .replace("\\u00a0", "&#160;")   // Non-breaking space
-//                .replace("\\u201c", "&#8220;")  // Left quote
-//                .replace("\\u201d", "&#8221;")  // Right quote
-//                .replace("\\/", "/")            // For end html tags
-//                .replace("\\n", "\n");          // For newlines
-        data = replaceUnicodeAndEscapes(data).replace("//embed", "embed");
+        data = fixJSONHtml(data);
 
         webView.loadData(data, "text/html", "utf-8");
 
@@ -422,9 +416,7 @@ public class ArticleActivity extends ActionBarActivity {
             debugView.setVisibility(View.INVISIBLE);
     }
 
-    // hex to int
-    String replaceUnicodeAndEscapes(String s) {
-        StringBuffer buffer = new StringBuffer(s);
+    void replaceUnicodeWithHtmlEntity(StringBuffer buffer) {
         int unicode = buffer.indexOf("\\u");
 
         while (unicode != -1) {
@@ -433,7 +425,9 @@ public class ArticleActivity extends ActionBarActivity {
             buffer.insert(unicode, "&#" + codepoint + ";");
             unicode = buffer.indexOf("\\u");
         }
+    }
 
+    void replaceEscapeSequenceWithChar(StringBuffer buffer) {
         // Any other escaped character
         int escape = buffer.indexOf("\\");
 
@@ -459,6 +453,19 @@ public class ArticleActivity extends ActionBarActivity {
                     escape = buffer.indexOf("\\", escape + 1);
             }
         }
+    }
+
+    void fixGettyEmbedLink(StringBuffer buffer) {
+        buffer.insert(buffer.indexOf("//embed"), "http:");
+    }
+
+    // hex to int
+    String fixJSONHtml(String s) {
+        StringBuffer buffer = new StringBuffer(s);
+
+        replaceUnicodeWithHtmlEntity(buffer);
+        replaceEscapeSequenceWithChar(buffer);
+        fixGettyEmbedLink(buffer);
 
         return buffer.toString();
     }
