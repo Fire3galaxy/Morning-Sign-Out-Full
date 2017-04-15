@@ -11,10 +11,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -25,18 +23,21 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebChromeClient;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.List;
 
@@ -164,57 +165,70 @@ public class ArticleActivity extends ActionBarActivity {
         }
 
         // WEBVIEW - Getting article from URL and stripping away extra parts of website for better reading
+        debugView = (TextView) findViewById(R.id.textView);
+
         webView = (WebView) findViewById(R.id.webView_article);
-        final ProgressBar loadPage = (ProgressBar) findViewById(R.id.progressBar_article);
-        webView.setWebChromeClient(new WebChromeClient() { // Progress bar
-            @Override
-            public void onProgressChanged(WebView v, int newProgress) {
-                if (newProgress < 90) {
-                    if (loadPage.getVisibility() == View.GONE)
-                        loadPage.setVisibility(View.VISIBLE);
+        String data = readRawTextFile(this, R.raw.html_test);
+//                .replace("\\u00a0", "&#160;")   // Non-breaking space
+//                .replace("\\u201c", "&#8220;")  // Left quote
+//                .replace("\\u201d", "&#8221;")  // Right quote
+//                .replace("\\/", "/")            // For end html tags
+//                .replace("\\n", "\n");          // For newlines
+        data = replaceUnicodeAndEscapes(data).replace("//embed", "embed");
 
-                    loadPage.setProgress(newProgress);
-                } else if (newProgress >= 90) {
-                    loadPage.setProgress(newProgress);
+        webView.loadData(data, "text/html", "utf-8");
 
-                    if (loadPage.getVisibility() == View.VISIBLE)
-                        loadPage.setVisibility(View.GONE);
-                }
-            }
-        });
-        webView.getSettings().setDisplayZoomControls(false);
-        webView.getSettings().setBuiltInZoomControls(false);
-        webViewClient = new ArticleWebViewClient(this);
-        webView.setWebViewClient(webViewClient);
-
-        // Load first website or restore webview if destroyed and recreated
-        if (savedInstanceState != null)
-            webView.restoreState(savedInstanceState);
-
-        if (savedInstanceState == null || webView.getUrl() == null) {
-            if (getIntent() != null) {
-                String article = getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT);
-                webView.loadUrl(article);
-                shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.putExtra(Intent.EXTRA_TEXT, article);
-            }
-        }
-
-        // Hiding bar before onResume() if activity was recreated by orientation change
-        if (!ArticleWebViewClient.isArticle(webView.getUrl()))
-            hideArticleBar();
-
-        // Refresh listener for webview
-        final SwipeRefreshLayout refreshLayout =
-                (SwipeRefreshLayout) findViewById(R.id.swipeRefresh_article);
-        refreshLayout.setColorSchemeColors(Color.argb(255, 0x81, 0xbf, 0xff), Color.WHITE);
-        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                webView.reload();
-                refreshLayout.setRefreshing(false);
-            }
-        });
+        debugView.setText(data);
+//        final ProgressBar loadPage = (ProgressBar) findViewById(R.id.progressBar_article);
+//        webView.setWebChromeClient(new WebChromeClient() { // Progress bar
+//            @Override
+//            public void onProgressChanged(WebView v, int newProgress) {
+//                if (newProgress < 90) {
+//                    if (loadPage.getVisibility() == View.GONE)
+//                        loadPage.setVisibility(View.VISIBLE);
+//
+//                    loadPage.setProgress(newProgress);
+//                } else if (newProgress >= 90) {
+//                    loadPage.setProgress(newProgress);
+//
+//                    if (loadPage.getVisibility() == View.VISIBLE)
+//                        loadPage.setVisibility(View.GONE);
+//                }
+//            }
+//        });
+//        webView.getSettings().setDisplayZoomControls(false);
+//        webView.getSettings().setBuiltInZoomControls(false);
+//        webViewClient = new ArticleWebViewClient(this);
+//        webView.setWebViewClient(webViewClient);
+//
+//        // Load first website or restore webview if destroyed and recreated
+//        if (savedInstanceState != null)
+//            webView.restoreState(savedInstanceState);
+//
+//        if (savedInstanceState == null || webView.getUrl() == null) {
+//            if (getIntent() != null) {
+//                String article = getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT);
+//                webView.loadUrl(article);
+//                shareIntent = new Intent(Intent.ACTION_SEND);
+//                shareIntent.putExtra(Intent.EXTRA_TEXT, article);
+//            }
+//        }
+//
+//        // Hiding bar before onResume() if activity was recreated by orientation change
+//        if (!ArticleWebViewClient.isArticle(webView.getUrl()))
+//            hideArticleBar();
+//
+//        // Refresh listener for webview
+//        final SwipeRefreshLayout refreshLayout =
+//                (SwipeRefreshLayout) findViewById(R.id.swipeRefresh_article);
+//        refreshLayout.setColorSchemeColors(Color.argb(255, 0x81, 0xbf, 0xff), Color.WHITE);
+//        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//            @Override
+//            public void onRefresh() {
+//                webView.reload();
+//                refreshLayout.setRefreshing(false);
+//            }
+//        });
 
         // SHARE BUTTON
         ImageButton shareButton = (ImageButton) findViewById(R.id.button_share);
@@ -378,6 +392,75 @@ public class ArticleActivity extends ActionBarActivity {
 //            customTransition.setDuration(LayoutTransition.APPEARING, showArticleBar.getDuration());
 
         return customTransition;
+    }
+
+    // DEBUG: get html from file http://stackoverflow.com/questions/4087674/android-read-text-raw-resource-file
+    public static String readRawTextFile(Context ctx, int resId)
+    {
+        InputStream inputStream = ctx.getResources().openRawResource(resId);
+
+        InputStreamReader inputreader = new InputStreamReader(inputStream);
+        BufferedReader buffreader = new BufferedReader(inputreader);
+        String line;
+        StringBuilder text = new StringBuilder();
+
+        try {
+            while (( line = buffreader.readLine()) != null) {
+                text.append(line);
+            }
+        } catch (IOException e) {
+            return null;
+        }
+        return text.toString();
+    }
+
+    TextView debugView;
+    public void toggleDebugView(View v) {
+        if (debugView.getVisibility() == View.INVISIBLE)
+            debugView.setVisibility(View.VISIBLE);
+        else
+            debugView.setVisibility(View.INVISIBLE);
+    }
+
+    // hex to int
+    String replaceUnicodeAndEscapes(String s) {
+        StringBuffer buffer = new StringBuffer(s);
+        int unicode = buffer.indexOf("\\u");
+
+        while (unicode != -1) {
+            int codepoint = Integer.parseInt(buffer.substring(unicode + 2, unicode + 6), 16);
+            buffer.delete(unicode, unicode + 6);
+            buffer.insert(unicode, "&#" + codepoint + ";");
+            unicode = buffer.indexOf("\\u");
+        }
+
+        // Any other escaped character
+        int escape = buffer.indexOf("\\");
+
+        while (escape != -1) {
+            char nextChar = buffer.charAt(escape + 1);
+
+            // eg. html end tags
+            if (!Character.isAlphabetic(nextChar)) {
+                buffer.deleteCharAt(escape);
+                escape = buffer.indexOf("\\");
+            }
+            // eg. new lines or tabs. Handling by case, but this could be changed later.
+            else {
+                if (nextChar == 'n') {
+                    buffer.delete(escape, escape + 2);
+                    buffer.insert(escape, "\n");
+                    escape = buffer.indexOf("\\", escape);
+                } else if (nextChar == 't') {
+                    buffer.delete(escape, escape + 2);
+                    buffer.insert(escape, "\t");
+                    escape = buffer.indexOf("\\", escape);
+                } else
+                    escape = buffer.indexOf("\\", escape + 1);
+            }
+        }
+
+        return buffer.toString();
     }
 }
 

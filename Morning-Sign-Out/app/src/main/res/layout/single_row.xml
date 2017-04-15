@@ -19,7 +19,7 @@
             android:layout_height="220dp"
             android:layout_margin="0dp"
             android:background="#00ffffff"
-            android:elevation="3dp" />
+            android:elevation="3dp"/>
 
         <LinearLayout
             android:orientation="vertical"

@@ -26,6 +26,22 @@
                 android:id="@+id/webView_article" />
         </android.support.v4.widget.SwipeRefreshLayout>
 
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            android:text="TextView"
+            android:visibility="invisible"/>
+
+        <ToggleButton
+            android:id="@+id/toggleButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:text="ToggleButton"
+            android:onClick="toggleDebugView"/>
+
         <ProgressBar
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="wrap_content"
