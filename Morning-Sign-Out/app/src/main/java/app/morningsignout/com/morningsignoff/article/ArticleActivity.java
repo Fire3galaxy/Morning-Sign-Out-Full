@@ -13,9 +13,11 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
+import android.graphics.Color;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Gravity;
@@ -23,12 +25,14 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -89,14 +93,12 @@ public class ArticleActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article);
 
-        ActionBar actionBar = getSupportActionBar();
-
-        isPortrait =
-                getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+        isPortrait = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
 
         // ACTION BAR
         //      ImageButton is Morning Sign Out logo, which sends user back to home screen (see XML)
         //      Setting imageButton to center of actionbar
+        ActionBar actionBar = getSupportActionBar();
         ImageButton home = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null); // could replace null with new LinearLayout. properties not needed though.
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);
         actionBar.setCustomView(home, params);
@@ -111,6 +113,8 @@ public class ArticleActivity extends ActionBarActivity {
         // For Ads by Admobs!
         mAdView = (AdView) findViewById(R.id.adView_article);
 //        mAdView.loadAd(new AdRequest.Builder().build());
+        // For testing
+        mAdView.loadAd(new AdRequest.Builder().addTestDevice("08553BAEE7309E15D80A98E9FB246627").build());
 
         // Setting up objectAnimators for articleBar's show/hide animation (Portrait only)
         if (isPortrait) {
@@ -169,70 +173,49 @@ public class ArticleActivity extends ActionBarActivity {
         }
 
         // WEBVIEW - Getting article from URL and stripping away extra parts of website for better reading
-        debugView = (TextView) findViewById(R.id.textView);
-
         webView = (WebView) findViewById(R.id.webView_article);
-//        String data = readRawTextFile(this, R.raw.html_test);
-        String data = getIntent().getStringExtra(CONTENT);
-        data = fixJSONHtml(data);
-        data = makeHeading(getIntent().getStringExtra(IMAGE_URL), getIntent().getStringExtra(TITLE)) + data;
-//        data = Parser.replaceUnicode(data);
 
-        webView.loadDataWithBaseURL(null, data, "text/html", "utf-8", getIntent().getStringExtra(LINK));
+        // Progress bar
+        webView.setWebChromeClient(new WebChromeClient() {
+            ProgressBar loadPage = (ProgressBar) ArticleActivity.this.findViewById(R.id.progressBar_article);
+            @Override
+            public void onProgressChanged(WebView v, int newProgress) {
+                if (newProgress < 90) {
+                    if (loadPage.getVisibility() == View.GONE)
+                        loadPage.setVisibility(View.VISIBLE);
 
-        debugView.setText(data);
-        // For testing
-        mAdView.loadAd(new AdRequest.Builder().addTestDevice("08553BAEE7309E15D80A98E9FB246627").build());
-//        final ProgressBar loadPage = (ProgressBar) findViewById(R.id.progressBar_article);
-//        webView.setWebChromeClient(new WebChromeClient() { // Progress bar
-//            @Override
-//            public void onProgressChanged(WebView v, int newProgress) {
-//                if (newProgress < 90) {
-//                    if (loadPage.getVisibility() == View.GONE)
-//                        loadPage.setVisibility(View.VISIBLE);
-//
-//                    loadPage.setProgress(newProgress);
-//                } else if (newProgress >= 90) {
-//                    loadPage.setProgress(newProgress);
-//
-//                    if (loadPage.getVisibility() == View.VISIBLE)
-//                        loadPage.setVisibility(View.GONE);
-//                }
-//            }
-//        });
-//        webView.getSettings().setDisplayZoomControls(false);
-//        webView.getSettings().setBuiltInZoomControls(false);
-//        webViewClient = new ArticleWebViewClient(this);
-//        webView.setWebViewClient(webViewClient);
-//
-//        // Load first website or restore webview if destroyed and recreated
-//        if (savedInstanceState != null)
-//            webView.restoreState(savedInstanceState);
-//
-//        if (savedInstanceState == null || webView.getUrl() == null) {
-//            if (getIntent() != null) {
-//                String article = getIntent().getStringExtra(LINK);
-//                webView.loadUrl(article);
-//                shareIntent = new Intent(Intent.ACTION_SEND);
-//                shareIntent.putExtra(TITLE, article);
-//            }
-//        }
-//
-//        // Hiding bar before onResume() if activity was recreated by orientation change
-//        if (!ArticleWebViewClient.isArticle(webView.getUrl()))
-//            hideArticleBar();
-//
-//        // Refresh listener for webview
-//        final SwipeRefreshLayout refreshLayout =
-//                (SwipeRefreshLayout) findViewById(R.id.swipeRefresh_article);
-//        refreshLayout.setColorSchemeColors(Color.argb(255, 0x81, 0xbf, 0xff), Color.WHITE);
-//        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-//            @Override
-//            public void onRefresh() {
-//                webView.reload();
-//                refreshLayout.setRefreshing(false);
-//            }
-//        });
+                    loadPage.setProgress(newProgress);
+                } else if (newProgress >= 90) {
+                    loadPage.setProgress(newProgress);
+
+                    if (loadPage.getVisibility() == View.VISIBLE)
+                        loadPage.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        // Disable zoom settings
+        webView.getSettings().setDisplayZoomControls(false);
+        webView.getSettings().setBuiltInZoomControls(false);
+
+        webViewClient = new ArticleWebViewClient(this);
+        webView.setWebViewClient(webViewClient);
+
+        // Hiding bar before onResume() if activity was recreated by orientation change
+        if (!ArticleWebViewClient.isArticle(webView.getUrl()))
+            hideArticleBar();
+
+        // Refresh listener for webview
+        final SwipeRefreshLayout refreshLayout =
+                (SwipeRefreshLayout) findViewById(R.id.swipeRefresh_article);
+        refreshLayout.setColorSchemeColors(Color.argb(255, 0x81, 0xbf, 0xff), Color.WHITE);
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                webView.reload();
+                refreshLayout.setRefreshing(false);
+            }
+        });
 
         // SHARE BUTTON
         ImageButton shareButton = (ImageButton) findViewById(R.id.button_share);
@@ -275,6 +258,22 @@ public class ArticleActivity extends ActionBarActivity {
                 }
             }
         });
+
+        // Load first website or restore webview if destroyed and recreated
+        if (savedInstanceState != null)
+            webView.restoreState(savedInstanceState);
+
+        if (savedInstanceState == null || webView.getUrl() == null) {
+            if (getIntent() != null) {
+                String data = getIntent().getStringExtra(CONTENT);
+                data = fixJSONHtml(data);
+                data = makeHeading(getIntent().getStringExtra(IMAGE_URL), getIntent().getStringExtra(TITLE)) + data;
+                webView.loadDataWithBaseURL(getIntent().getStringExtra(LINK), data, "text/html", "utf-8", getIntent().getStringExtra(LINK));
+
+                shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.putExtra(Intent.EXTRA_TEXT, getIntent().getStringExtra(TITLE));
+            }
+        }
     }
 
     @Override
@@ -511,9 +510,18 @@ class ArticleWebViewClient extends WebViewClient {
         WebSettings settings = webView.getSettings();
 
         // Hide/show bottom bar
-        if (isArticle(url))
+        if (isArticle(url)) {
             caller.showArticleBar();
-        else
+
+            // Change share intent to new article
+            Intent shareIntent = new Intent();
+            shareIntent.setAction(Intent.ACTION_SEND).putExtra(Intent.EXTRA_TEXT, url);
+            caller.setShareIntent(shareIntent);
+
+            // Slug string for disqus
+            Uri requestUrl = Uri.parse(url);
+            lastArticleSlug = requestUrl.getLastPathSegment();
+        } else
             caller.hideArticleBar();
 
         // Set image page to width of image
@@ -572,74 +580,65 @@ class ArticleWebViewClient extends WebViewClient {
         return true;
     }
 
-    // For API # < 21
-    @SuppressWarnings("deprecation")
-    @Override
-    public WebResourceResponse shouldInterceptRequest(WebView wb, String url) {
-        Log.d(LOG_NAME, url);
-
-        WebResourceResponse wbresponse = super.shouldInterceptRequest(wb, url);
-        Uri requestUrl = Uri.parse(url);
-
-        /* Not from morningsignout, e.g. googleapis, gstatic, or gravatar
-         * or an imageViewReference/theme/plugin from wordpress
-         * or a .* file, e.g. favicon.ico */
-        if (!requestUrl.getHost().endsWith("morningsignout.com")
-                || requestUrl.getPathSegments().get(0).equals("wp-content")
-                || requestUrl.getPathSegments().get(0).matches(".*\\.[a-zA-Z]+"))
-            return wbresponse;
-
-        String html = null;
-        ByteArrayInputStream bais;
-
-        // Article Page
-        if (requestUrl.getPathSegments().size() == 1) {
-            Log.d(LOG_NAME, "changing webresponse to article page");
-            html = URLToMobileArticle.getArticleRevised(requestUrl.toString());
-
-            // Prep slug string
-            lastArticleSlug = requestUrl.getLastPathSegment();
-
-            // Change share intent to new article
-            Intent shareIntent = new Intent();
-            shareIntent.setAction(Intent.ACTION_SEND)
-                    .putExtra(ArticleActivity.TITLE, requestUrl.toString());
-            caller.setShareIntent(shareIntent);
-        }
-        // Author, Tag, Date pages (tag/dermatitis, tag/dermatitis/page/2)
-        else if (requestUrl.getPathSegments().size() == 2 || requestUrl.getPathSegments().size() == 4) {
-            String pathSeg0 = requestUrl.getPathSegments().get(0);
-            int pathYear = -1;
-            try {
-                pathYear = Integer.parseInt(pathSeg0);
-            } catch (NumberFormatException nfe) {
-                // do nothing, basically throw the exception
-            }
-
-            if (pathSeg0.equals("author") ||
-                    pathSeg0.equals("tag") ||
-                    (pathYear >= MINYEAR && pathYear <= CURRENTYEAR)) {
-                Log.d(LOG_NAME, "changing webresponse to other kind of page");
-                try {
-                    html = URLToMobileArticle.getOther(requestUrl.toString());
-                } catch (IOException e) {
-                    Log.e(LOG_NAME, e.getMessage());
-                }
-            }
-        }
-
-        // Let webView load default action (either webpage w/o mobile view, or webpage not found)
-        if (html == null)
-            return null;
-
-        // New webpage loads successfully
-        bais = new ByteArrayInputStream(html.getBytes());
-        wbresponse = new WebResourceResponse(mimeType,
-                encoding,
-                bais);
-
-        return wbresponse;
-    }
+//    // For API # < 21
+//    @SuppressWarnings("deprecation")
+//    @Override
+//    public WebResourceResponse shouldInterceptRequest(WebView wb, String url) {
+//        Log.d(LOG_NAME, url);
+//
+//        WebResourceResponse wbresponse = super.shouldInterceptRequest(wb, url);
+//        Uri requestUrl = Uri.parse(url);
+//
+//        /* Not from morningsignout, e.g. googleapis, gstatic, or gravatar
+//         * or an imageViewReference/theme/plugin from wordpress
+//         * or a .* file, e.g. favicon.ico */
+//        if (!requestUrl.getHost().endsWith("morningsignout.com")
+//                || requestUrl.getPathSegments().get(0).equals("wp-content")
+//                || requestUrl.getPathSegments().get(0).matches(".*\\.[a-zA-Z]+"))
+//            return wbresponse;
+//
+//        String html = null;
+//        ByteArrayInputStream bais;
+//
+//        // Article Page
+//        if (requestUrl.getPathSegments().size() == 1) {
+//            Log.d(LOG_NAME, "changing webresponse to article page");
+//            html = URLToMobileArticle.getArticleRevised(requestUrl.toString());
+//        }
+//        // Author, Tag, Date pages (tag/dermatitis, tag/dermatitis/page/2)
+//        else if (requestUrl.getPathSegments().size() == 2 || requestUrl.getPathSegments().size() == 4) {
+//            String pathSeg0 = requestUrl.getPathSegments().get(0);
+//            int pathYear = -1;
+//            try {
+//                pathYear = Integer.parseInt(pathSeg0);
+//            } catch (NumberFormatException nfe) {
+//                // do nothing, basically throw the exception
+//            }
+//
+//            if (pathSeg0.equals("author") ||
+//                    pathSeg0.equals("tag") ||
+//                    (pathYear >= MINYEAR && pathYear <= CURRENTYEAR)) {
+//                Log.d(LOG_NAME, "changing webresponse to other kind of page");
+//                try {
+//                    html = URLToMobileArticle.getOther(requestUrl.toString());
+//                } catch (IOException e) {
+//                    Log.e(LOG_NAME, e.getMessage());
+//                }
+//            }
+//        }
+//
+//        // Let webView load default action (either webpage w/o mobile view, or webpage not found)
+//        if (html == null)
+//            return null;
+//
+//        // New webpage loads successfully
+//        bais = new ByteArrayInputStream(html.getBytes());
+//        wbresponse = new WebResourceResponse(mimeType,
+//                encoding,
+//                bais);
+//
+//        return wbresponse;
+//    }
 
     public static boolean isArticle(String url) {
         if (url == null || url.isEmpty())
