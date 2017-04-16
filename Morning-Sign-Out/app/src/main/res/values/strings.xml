@@ -68,7 +68,7 @@
         <item>Public Health</item>
         <item>Healthcare</item>
         <item>About MSO</item>
-        <item>Meet the Team</item>
+        <!--<item>Meet the Team</item>--> <!--Non functional for now-->
     </string-array>
 
     <array name="categories_icons">
@@ -80,7 +80,7 @@
         <item>@drawable/category_public_health</item>
         <item>@drawable/category_healthcare</item>
         <item>@drawable/category_about</item>
-        <item>@drawable/category_meettheteam</item>
+        <!--<item>@drawable/category_meettheteam</item>-->
     </array>
 
     <string-array name ="categories_for_url">

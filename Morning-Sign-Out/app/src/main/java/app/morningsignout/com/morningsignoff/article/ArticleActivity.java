@@ -106,15 +106,15 @@ public class ArticleActivity extends ActionBarActivity {
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setDisplayShowCustomEnabled(true);
 
-        // BOTTOM BAR(s)
-        //      Setting global var for bar at the bottom for disappearance/reappearance
-        bottomBar = (RelativeLayout) findViewById(R.id.container_articleBar);
-
         // For Ads by Admobs!
         mAdView = (AdView) findViewById(R.id.adView_article);
 //        mAdView.loadAd(new AdRequest.Builder().build());
         // For testing
         mAdView.loadAd(new AdRequest.Builder().addTestDevice("08553BAEE7309E15D80A98E9FB246627").build());
+
+        // BOTTOM BAR(s)
+        //      Setting global var for bar at the bottom for disappearance/reappearance
+        bottomBar = (RelativeLayout) findViewById(R.id.container_articleBar);
 
         // Setting up objectAnimators for articleBar's show/hide animation (Portrait only)
         if (isPortrait) {
@@ -201,10 +201,6 @@ public class ArticleActivity extends ActionBarActivity {
         webViewClient = new ArticleWebViewClient(this);
         webView.setWebViewClient(webViewClient);
 
-        // Hiding bar before onResume() if activity was recreated by orientation change
-        if (!ArticleWebViewClient.isArticle(webView.getUrl()))
-            hideArticleBar();
-
         // Refresh listener for webview
         final SwipeRefreshLayout refreshLayout =
                 (SwipeRefreshLayout) findViewById(R.id.swipeRefresh_article);
@@ -274,6 +270,10 @@ public class ArticleActivity extends ActionBarActivity {
                 shareIntent.putExtra(Intent.EXTRA_TEXT, getIntent().getStringExtra(TITLE));
             }
         }
+
+        // Hiding bar before onResume() if activity was recreated by orientation change
+        if (!ArticleWebViewClient.isArticle(webView.getUrl()))
+            hideArticleBar();
     }
 
     @Override
