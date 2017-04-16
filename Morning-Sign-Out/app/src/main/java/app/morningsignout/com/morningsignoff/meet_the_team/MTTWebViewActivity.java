@@ -78,7 +78,7 @@ public class MTTWebViewActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_aboutmso, menu);
+        getMenuInflater().inflate(R.menu.menu_justlogo, menu);
 
         return super.onCreateOptionsMenu(menu);
     }

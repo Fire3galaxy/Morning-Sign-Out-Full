@@ -278,19 +278,32 @@ public class ArticleActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_article, menu);
+        // FIXME: While search is unavalaible
+        getMenuInflater().inflate(R.menu.menu_justlogo, menu);
 
-        /* Search results in new SearchResultsActivity, clicked article passed back to articleActivity
-           Associate searchable configuration with the SearchView */
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-
-        ComponentName componentName = new ComponentName(this, SearchResultsActivity.class);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
+//        // Inflate the menu; this adds items to the action bar if it is present.
+//        getMenuInflater().inflate(R.menu.menu_category, menu);
+//
+//        /* Search results in new SearchResultsActivity, clicked article passed back to articleActivity
+//           Associate searchable configuration with the SearchView */
+//        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//        searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+//
+//        ComponentName componentName = new ComponentName(this, SearchResultsActivity.class);
+//        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
 
         return super.onCreateOptionsMenu(menu);
     }
+
+//    @Override
+//    public void onBackPressed() {
+//        if (!searchView.isIconified())  // Check if searchView is expanded
+//            getSupportActionBar().collapseActionView();
+//        else if (webView.canGoBack())   // Check if webView has history
+//            webView.goBack();           // Back through web history
+//        else
+//            super.onBackPressed();
+//    }
 
     /* Handle action bar item clicks here. The action bar will
        automatically handle clicks on the Home/Up button, so long
@@ -307,24 +320,6 @@ public class ArticleActivity extends ActionBarActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        // Check if the key event was the Back button
-        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-            if (!searchView.isIconified()) {    // Check if searchView is expanded
-                getSupportActionBar().collapseActionView();
-                return true;
-            }
-            else if (webView.canGoBack()) {     // Check if webView has history
-                webView.goBack();                   // Back through web history
-                return true;
-            }
-        }
-
-        // If it wasn't the Back key or none of the conditions are met, use default system behavior
-        return super.onKeyDown(keyCode, event);
     }
 
     @Override
