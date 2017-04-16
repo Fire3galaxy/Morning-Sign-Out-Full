@@ -170,19 +170,19 @@ public class CategoryFragment extends Fragment {
                 if (id_int < 0 || id_int > adapter.getCount())
                     return;
 
-                Article rowTemp = (Article) adapter.getItem(id_int);
-                String articleTitle = rowTemp.getTitle();
-
                 // Create new categoryActivity for the article here
                 // feed the new categoryActivity with the URL of the page
-                String articleLink = rowTemp.getLink();
+                Article rowTemp = (Article) adapter.getItem(id_int);
                 Intent articleActivity = new Intent(gridViewWithHeaderAndFooter.getContext(), ArticleActivity.class);
 
-                // EXTRA_HTML_TEXT holds the html link for the article
-                articleActivity.putExtra(Intent.EXTRA_HTML_TEXT, articleLink);
+                // TITLE holds the html link for the article
+                articleActivity.putExtra(ArticleActivity.TITLE, rowTemp.getTitle());
 
-//                // EXTRA_SHORTCUT_NAME holds the name of the article
-//                articleActivity.putExtra(Intent.EXTRA_SHORTCUT_NAME, articleTitle);
+                // LINK holds the name of the article
+                articleActivity.putExtra(ArticleActivity.LINK, rowTemp.getLink());
+
+                // CONTENT holds the html text of the article
+                articleActivity.putExtra(ArticleActivity.CONTENT, rowTemp.getContent());
 
                 gridViewWithHeaderAndFooter.getContext().startActivity(articleActivity);
             }

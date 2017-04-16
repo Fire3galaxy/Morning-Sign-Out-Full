@@ -6,6 +6,7 @@ public class Article {
     private String imageURL;
     private String mediumURL;
     private String author;
+    private String content;
 
     public String getImageURL() {
         return imageURL;
@@ -42,4 +43,13 @@ public class Article {
     public void setAuthor(String author) {
         this.author = author;
     }
+
+    public String getContent() {
+        return content;
+    }
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+
 }

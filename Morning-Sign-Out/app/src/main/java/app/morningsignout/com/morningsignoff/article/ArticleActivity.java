@@ -47,10 +47,12 @@ import app.morningsignout.com.morningsignoff.category.CategoryActivity;
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.search_results.SearchResultsActivity;
 import app.morningsignout.com.morningsignoff.disqus.DisqusMainActivity;
+import app.morningsignout.com.morningsignoff.network.Parser;
 import app.morningsignout.com.morningsignoff.network.URLToMobileArticle;
 
 // Activity class created in FetchListArticleTask when user clicks on an article from the ListView
 public class ArticleActivity extends ActionBarActivity {
+    public final static String TITLE = "Title", LINK = "Link", CONTENT = "Content";
     final static String AD_WAS_LEFT = "AdView is left";
 
     Integer lastSavedY;
@@ -105,7 +107,7 @@ public class ArticleActivity extends ActionBarActivity {
 
         // For Ads by Admobs!
         mAdView = (AdView) findViewById(R.id.adView_article);
-        mAdView.loadAd(new AdRequest.Builder().build());
+//        mAdView.loadAd(new AdRequest.Builder().build());
 
         // Setting up objectAnimators for articleBar's show/hide animation (Portrait only)
         if (isPortrait) {
@@ -167,12 +169,16 @@ public class ArticleActivity extends ActionBarActivity {
         debugView = (TextView) findViewById(R.id.textView);
 
         webView = (WebView) findViewById(R.id.webView_article);
-        String data = readRawTextFile(this, R.raw.html_test);
+//        String data = readRawTextFile(this, R.raw.html_test);
+        String data = getIntent().getStringExtra(CONTENT);
         data = fixJSONHtml(data);
+//        data = Parser.replaceUnicode(data);
 
-        webView.loadData(data, "text/html", "utf-8");
+        webView.loadDataWithBaseURL(null, data, "text/html", "utf-8", getIntent().getStringExtra(LINK));
 
         debugView.setText(data);
+        // For testing
+        mAdView.loadAd(new AdRequest.Builder().addTestDevice("08553BAEE7309E15D80A98E9FB246627").build());
 //        final ProgressBar loadPage = (ProgressBar) findViewById(R.id.progressBar_article);
 //        webView.setWebChromeClient(new WebChromeClient() { // Progress bar
 //            @Override
@@ -201,10 +207,10 @@ public class ArticleActivity extends ActionBarActivity {
 //
 //        if (savedInstanceState == null || webView.getUrl() == null) {
 //            if (getIntent() != null) {
-//                String article = getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT);
+//                String article = getIntent().getStringExtra(LINK);
 //                webView.loadUrl(article);
 //                shareIntent = new Intent(Intent.ACTION_SEND);
-//                shareIntent.putExtra(Intent.EXTRA_TEXT, article);
+//                shareIntent.putExtra(TITLE, article);
 //            }
 //        }
 //
@@ -323,7 +329,7 @@ public class ArticleActivity extends ActionBarActivity {
         // change myActivity intent to the one from SearchResultsActivity
         if (intent != null) {
             setIntent(intent);
-            String searchUrl = intent.getStringExtra(Intent.EXTRA_HTML_TEXT);
+            String searchUrl = intent.getStringExtra(LINK);
             getSupportActionBar().collapseActionView();
             webView.loadUrl(searchUrl);
         }
@@ -463,8 +469,8 @@ public class ArticleActivity extends ActionBarActivity {
     String fixJSONHtml(String s) {
         StringBuffer buffer = new StringBuffer(s);
 
-        replaceUnicodeWithHtmlEntity(buffer);
-        replaceEscapeSequenceWithChar(buffer);
+//        replaceUnicodeWithHtmlEntity(buffer);
+//        replaceEscapeSequenceWithChar(buffer);
         fixGettyEmbedLink(buffer);
 
         return buffer.toString();
@@ -586,7 +592,7 @@ class ArticleWebViewClient extends WebViewClient {
             // Change share intent to new article
             Intent shareIntent = new Intent();
             shareIntent.setAction(Intent.ACTION_SEND)
-                    .putExtra(Intent.EXTRA_TEXT, requestUrl.toString());
+                    .putExtra(ArticleActivity.TITLE, requestUrl.toString());
             caller.setShareIntent(shareIntent);
         }
         // Author, Tag, Date pages (tag/dermatitis, tag/dermatitis/page/2)

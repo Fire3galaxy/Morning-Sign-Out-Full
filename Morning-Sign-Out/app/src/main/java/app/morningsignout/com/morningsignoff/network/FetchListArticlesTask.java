@@ -138,7 +138,10 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
     List<Article> getArticlesJSON(String arg, int pageNum) { // FIXME: get this working
         StringBuilder builder = new StringBuilder();
         String urlPath = "";
-        urlPath = "http://morningsignout.com/?json=get_category_posts&slug=" + arg + "&page=" + pageNum;
+        urlPath = "http://morningsignout.com/?json=get_category_posts"
+                + "&slug=" + arg
+                + "&page=" + pageNum
+                + "&include=author,url,title,thumbnail,content";
         HttpURLConnection connection = null;
 
         // opening URL connection, setup JSON
@@ -196,9 +199,6 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                 JSONArray posts = jsonObj.optJSONArray("posts");
                 Log.d("FetchListArticlesTask", "JSON: " + "length: " + posts.length());
 
-                // going to steal Parser's replaceUnicode()
-                Parser p = new Parser();
-
                 for (int index = 0; index < postCount; index++)
                 {
                     JSONObject currPost = posts.optJSONObject(index);
@@ -206,7 +206,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
                     // Title
 //                    String title = p.replaceUnicode(posts.getJSONObject(index).getString("title"));
-                    String title = p.replaceUnicode(currPost.optString("title"));
+                    String title = Parser.replaceUnicode(currPost.optString("title"));  // going to steal Parser's replaceUnicode()
 //                    Log.d("FetchListArticlesTask", "JSON: " + "title: " + title);
                     articlesList.get(index).setTitle(title);
 
@@ -347,11 +347,12 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 //                    JSONObject authorObject = posts.getJSONObject(index).getJSONObject("author");
                     JSONObject authorObject = currPost.optJSONObject("author");
 //                    String author = p.replaceUnicode(authorObject.getString("name"));
-                    String author = p.replaceUnicode(authorObject.optString("name"));
+                    String author = Parser.replaceUnicode(authorObject.optString("name"));
                     Log.d("FetchListArticlesTask", "JSON: " + "page: " + pageNum + " index:" + index + " post: " + title);
                     articlesList.get(index).setAuthor(author);
 
-                    // Description
+                    // Content
+                    articlesList.get(index).setContent(currPost.optString("content"));
                 }
 
             } catch (JSONException je) {
