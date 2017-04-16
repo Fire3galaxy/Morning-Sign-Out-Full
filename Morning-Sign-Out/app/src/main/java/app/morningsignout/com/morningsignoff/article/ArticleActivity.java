@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.graphics.Color;
+import android.os.PersistableBundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -61,6 +62,7 @@ public class ArticleActivity extends ActionBarActivity {
             CONTENT = "Content",
             IMAGE_URL = "Image url";
     final static String AD_WAS_LEFT = "AdView is left";
+    final static String LAST_SHARE = "Last share intent link";
 
     Integer lastSavedY;
     boolean isPortrait;
@@ -108,9 +110,9 @@ public class ArticleActivity extends ActionBarActivity {
 
         // For Ads by Admobs!
         mAdView = (AdView) findViewById(R.id.adView_article);
-//        mAdView.loadAd(new AdRequest.Builder().build());
-        // For testing
-        mAdView.loadAd(new AdRequest.Builder().addTestDevice("08553BAEE7309E15D80A98E9FB246627").build());
+        mAdView.loadAd(new AdRequest.Builder().build());
+//        // For testing
+//        mAdView.loadAd(new AdRequest.Builder().addTestDevice("08553BAEE7309E15D80A98E9FB246627").build());
 
         // BOTTOM BAR(s)
         //      Setting global var for bar at the bottom for disappearance/reappearance
@@ -255,25 +257,41 @@ public class ArticleActivity extends ActionBarActivity {
             }
         });
 
-        // Load first website or restore webview if destroyed and recreated
-        if (savedInstanceState != null)
+        // Load first website or restore webview if destroyed and recreated, handle share intent
+        if (savedInstanceState != null) {
+            // load old website
             webView.restoreState(savedInstanceState);
 
-        if (savedInstanceState == null || webView.getUrl() == null) {
+            // Share intent
+            char[] lastShare = savedInstanceState.getCharArray(LAST_SHARE);
+            if (lastShare != null)
+                setShareIntent(new String(lastShare));
+            else if (getIntent() != null)
+                setShareIntent(getIntent().getStringExtra(LINK));
+        } else if (webView.getUrl() == null){
             if (getIntent() != null) {
+                // load website
                 String data = getIntent().getStringExtra(CONTENT);
                 data = fixJSONHtml(data);
                 data = makeHeading(getIntent().getStringExtra(IMAGE_URL), getIntent().getStringExtra(TITLE)) + data;
                 webView.loadDataWithBaseURL(getIntent().getStringExtra(LINK), data, "text/html", "utf-8", getIntent().getStringExtra(LINK));
 
-                shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.putExtra(Intent.EXTRA_TEXT, getIntent().getStringExtra(TITLE));
+                // share intent
+                setShareIntent(getIntent().getStringExtra(LINK));
             }
         }
 
-        // Hiding bar before onResume() if activity was recreated by orientation change
-        if (!ArticleWebViewClient.isArticle(webView.getUrl()))
-            hideArticleBar();
+//        // Hiding bar before onResume() if activity was recreated by orientation change
+//        if (!ArticleWebViewClient.isArticle(webView.getUrl()))
+//            hideArticleBar();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+
+        if (webView.getUrl() != null)
+            outState.putCharArray(LAST_SHARE, webView.getUrl().toCharArray());
     }
 
     @Override
@@ -343,8 +361,9 @@ public class ArticleActivity extends ActionBarActivity {
     public void resetLastSavedY() {
         lastSavedY = 0;
     }
-    public void setShareIntent(Intent shareIntent) {
-        this.shareIntent = shareIntent;
+    public void setShareIntent(String url) {
+        shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND).putExtra(Intent.EXTRA_TEXT, url);
     }
     public void showArticleBar() {
         if (bottomBar.getVisibility() != RelativeLayout.VISIBLE) {
@@ -509,9 +528,7 @@ class ArticleWebViewClient extends WebViewClient {
             caller.showArticleBar();
 
             // Change share intent to new article
-            Intent shareIntent = new Intent();
-            shareIntent.setAction(Intent.ACTION_SEND).putExtra(Intent.EXTRA_TEXT, url);
-            caller.setShareIntent(shareIntent);
+            caller.setShareIntent(url);
 
             // Slug string for disqus
             Uri requestUrl = Uri.parse(url);
