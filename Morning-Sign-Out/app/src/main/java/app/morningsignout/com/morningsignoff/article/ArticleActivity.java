@@ -52,7 +52,10 @@ import app.morningsignout.com.morningsignoff.network.URLToMobileArticle;
 
 // Activity class created in FetchListArticleTask when user clicks on an article from the ListView
 public class ArticleActivity extends ActionBarActivity {
-    public final static String TITLE = "Title", LINK = "Link", CONTENT = "Content";
+    public final static String TITLE = "Title",
+            LINK = "Link",
+            CONTENT = "Content",
+            IMAGE_URL = "Image url";
     final static String AD_WAS_LEFT = "AdView is left";
 
     Integer lastSavedY;
@@ -172,6 +175,7 @@ public class ArticleActivity extends ActionBarActivity {
 //        String data = readRawTextFile(this, R.raw.html_test);
         String data = getIntent().getStringExtra(CONTENT);
         data = fixJSONHtml(data);
+        data = makeHeading(getIntent().getStringExtra(IMAGE_URL), getIntent().getStringExtra(TITLE)) + data;
 //        data = Parser.replaceUnicode(data);
 
         webView.loadDataWithBaseURL(null, data, "text/html", "utf-8", getIntent().getStringExtra(LINK));
@@ -474,6 +478,13 @@ public class ArticleActivity extends ActionBarActivity {
         fixGettyEmbedLink(buffer);
 
         return buffer.toString();
+    }
+
+    String header1 = "<div style=\"width:100%;height:auto;max-height:500px;max-width:500px\"><img src=\"",
+        header2 = "\" style=\"width:100%;height:auto\"></div><h1>",
+        header3 = "</h1>";
+    String makeHeading(String imageUrl, String title) {
+        return header1 + imageUrl + header2 + title + header3;
     }
 }
 

@@ -184,6 +184,9 @@ public class CategoryFragment extends Fragment {
                 // CONTENT holds the html text of the article
                 articleActivity.putExtra(ArticleActivity.CONTENT, rowTemp.getContent());
 
+                // IMAGE_URL holds the link to the article's header image
+                articleActivity.putExtra(ArticleActivity.IMAGE_URL, rowTemp.getImageURL());
+
                 gridViewWithHeaderAndFooter.getContext().startActivity(articleActivity);
             }
         });
