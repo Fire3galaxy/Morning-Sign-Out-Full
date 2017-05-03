@@ -178,7 +178,6 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         }
 
         String jsonStr = builder.toString();
-//        Log.d("FetchListArticlesTask", json);
         int postCount = 0;
         List<Article> articlesList = new ArrayList<Article>();
 
@@ -190,14 +189,10 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                 JSONObject jsonObj = new JSONObject(jsonStr);
 
                 // Get postcount
-//                postCount = jsonObj.getInt("count");
                 postCount = jsonObj.optInt("count");
-                Log.d("FetchListArticlesTask", "JSON: " + "postCount: " + postCount);
 
                 // create JSONArray of posts
-//                JSONArray posts = jsonObj.getJSONArray("posts");
                 JSONArray posts = jsonObj.optJSONArray("posts");
-                Log.d("FetchListArticlesTask", "JSON: " + "length: " + posts.length());
 
                 for (int index = 0; index < postCount; index++)
                 {
@@ -205,35 +200,26 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                     articlesList.add(new Article());
 
                     // Title
-//                    String title = p.replaceUnicode(posts.getJSONObject(index).getString("title"));
                     String title = Parser.replaceUnicode(currPost.optString("title"));  // going to steal Parser's replaceUnicode()
-//                    Log.d("FetchListArticlesTask", "JSON: " + "title: " + title);
                     articlesList.get(index).setTitle(title);
 
                     // Link
-//                    String link = posts.getJSONObject(index).getString("url");
                     String link = currPost.optString("url");
-//                    Log.d("FetchListArticlesTask", "JSON: " + "url: " + link);
                     articlesList.get(index).setLink(link);
 
                     String mediumURL = "https://upload.wikimedia.org/wikipedia/en/d/d3/No-picture.jpg";
                     String fullURL = "https://upload.wikimedia.org/wikipedia/en/d/d3/No-picture.jpg";
                     // create JSONObj of images
-//                    JSONObject imageObj = posts.getJSONObject(index).getJSONObject("thumbnail_images");
                     if (currPost.has("thumbnail_images")){
 
                         JSONObject imageObj = currPost.optJSONObject("thumbnail_images");
                         // ImageURL (full)
-//                    String fullURL = imageObj.getJSONObject("full").getString("url");
                         if (imageObj == null)
                         {
-                            Log.d("FetchListArticlesTask","JSON: thumbnail_image empty!");
                             if (currPost.has("thumbnail")) {
                                 mediumURL = currPost.optString("thumbnail");
-                                Log.d("FetchListArticlesTask", "JSON: weird format article detected! string: " + mediumURL);
                                 if (!URLUtil.isValidUrl(mediumURL))
                                 {
-                                    Log.e("FetchListArticlesTask", "JSON: invalid url");
                                     mediumURL = "https://upload.wikimedia.org/wikipedia/en/d/d3/No-picture.jpg";
                                 }
                             }
@@ -254,11 +240,6 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                         {
                             mediumURL = imageObj.optJSONObject("full").optString("url");
                         }
-                        // Commented out because thumbnail images are weirdly cropped
-//                        else if (imageObj.has("thumbnail"))
-//                        {
-//                            fullURL = imageObj.optJSONObject("thumbnail").optString("url");
-//                        }
                         else {
                             if(imageObj.length() != 0)
                             {
@@ -267,17 +248,14 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                                 Iterator<?> keys = imageObj.keys();
                                 while (keys.hasNext()) {
                                     String key = (String) keys.next();
-                                    Log.d("FetchListArticlesTask", "JSON: Images for post \"" + title + "\": " + key);
                                     imgList.add(key);
                                 }
                                 String randomImage = imgList.get(0); // let's just grab the first image we find
                                 mediumURL = imageObj.optJSONObject(randomImage).optString("url");
-//                            Log.d("FetchListArticlesTask", "JSON: post \"" + title + "\" has unknown img, attempting to thumbnail " + fullURL);
                             }
                             else
                             {
                                 Log.e("FetchListArticlesTask","JSON: "+ title + ": no images found!");
-//                                articlesList.get(index).setImageURL("https://upload.wikimedia.org/wikipedia/en/d/d3/No-picture.jpg");
                             }
                         }
 
@@ -286,69 +264,26 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                         {
                             fullURL = imageObj.optJSONObject("full").optString("url");
                         }
-//                    if (imageObj.has("medium"))
-//                    {
-//                        fullURL = imageObj.optJSONObject("full").optString("url");
-//                    }
-//                    else
-//                    {
-//                        for (String key : imgList)
-//                        {
-//                            if (key == "")
-//                        }
-//                        Log.d("FetchListArticlesTask", "JSON: post \"" + title + "\" has no full img, reverting to thumbnail " + fullURL);
-//                    }
                     }
                     else if (currPost.has("thumbnail"))
                     {
                         mediumURL = currPost.optString("thumbnail");
-                        Log.d("FetchListArticlesTask","JSON: weird format article detected! string: " + mediumURL);
                     }
                     else
                     {
                         Log.e("FetchListArticlesTask","JSON: "+ title + ": no images found!");
-//                        articlesList.get(index).setImageURL("https://upload.wikimedia.org/wikipedia/en/d/d3/No-picture.jpg");
                     }
 
 
-//                    Log.d("FetchListArticlesTask", "JSON: " + "fullURL: " + fullURL);
                     articlesList.get(index).setCategoryURL(mediumURL);
                     articlesList.get(index).setImageURL(fullURL);
 
                     // TODO: implement thumbnails for better performance
-                    // Image_medURL
-//                    String medURL = imageObj.getJSONObject("medium").getString("url");
                     String medURL = "";
-//                    if (imageObj.has("medium"))
-//                    {
-//                        medURL = imageObj.optJSONObject("medium").optString("url");
-//                    }
-//                    else if (imageObj.has("thumbnail"))
-//                    {
-//                        medURL = imageObj.optJSONObject("thumbnail").optString("url");
-//                    }
-//                    else
-//                    {
-//                        medURL = imageObj.optJSONObject("thumbnail").optString("url");
-//                        Log.d("FetchListArticlesTask", "JSON: post \"" + title + "\" has no med img, reverting to thumbnail " + medURL);
-//                        List<String> keysList = new ArrayList<String>();
-//                        Iterator<?> keys = imageObj.keys();
-//                        while (keys.hasNext())
-//                        {
-//                            String key = (String) keys.next();
-//                            Log.d("FetchListArticlesTask", "shinray "+ key);
-//                        }
-//                    }
-//                    Log.d("FetchListArticlesTask", "JSON: " + "medURL: " + medURL);
-//                    articlesList.get(index).setCategoryURL(medURL);
-//                    articlesList.get(index).setImageURL(medURL);
 
                     // Author
-//                    JSONObject authorObject = posts.getJSONObject(index).getJSONObject("author");
                     JSONObject authorObject = currPost.optJSONObject("author");
-//                    String author = p.replaceUnicode(authorObject.getString("name"));
                     String author = Parser.replaceUnicode(authorObject.optString("name"));
-                    Log.d("FetchListArticlesTask", "JSON: " + "page: " + pageNum + " index:" + index + " post: " + title);
                     articlesList.get(index).setAuthor(author);
 
                     // Content
@@ -363,12 +298,5 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         // if no articles found, return nothing
         return articlesList.isEmpty() ? null : articlesList;
     }
-
-//
-//    // stupid helper function because java doesn't support goto statements
-//    void whyDoesntJavaHaveGotoDangit()
-//    {
-//          WHY
-//    }
 }
 

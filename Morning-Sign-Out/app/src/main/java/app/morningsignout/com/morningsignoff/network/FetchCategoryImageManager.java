@@ -47,8 +47,6 @@ public class FetchCategoryImageManager {
                         CategoryFragment.addBitmapToMemoryCache(sentObject.imageUrl, sentObject.downloadedImage);
                         sentObject.imageView.setTag(sentObject.imageUrl); // Checked in CategoryAdapter
                         sentObject.imageView.setImageBitmap(sentObject.downloadedImage);
-
-//                        Log.d("FetchCategoryImageManager", "Finished with bitmap " + sentObject.downloadedImage.hashCode() + ", " + sentObject.imageUrl);
                     }
                 }
             }
@@ -69,20 +67,13 @@ public class FetchCategoryImageManager {
 
     static public void runTask(FetchCategoryImageRunnable task) {
         instance.imagesThreadPool.execute(task);
-//        Log.d("FetchCategoryImageManager", "Running: " + task.imageUrl);
-//        Log.d("FetchCategoryImageManager", "Active: " + Integer.toString(instance.imagesThreadPool.getActiveCount()));
-//        Log.d("FetchCategoryImageManager", "Total so far: " + Long.toString(instance.imagesThreadPool.getTaskCount()));
-//        Log.d("FetchCategoryImageManager", "Threads in queue: " + Integer.toString(instance.imagesWorkQueue.size()));
-//        Log.d("FetchCategoryImageManager", "-----------------");
     }
 
     static public void interruptThread(FetchCategoryImageRunnable task) {
-//        Log.d("FetchCategoryImageManager", "Interrupt thread with task: " + task.imageUrl);
         // Don't interrupt same task twice (is this an issue? not sure)
         synchronized(instance) {
             if (task.currentThread != null)
                 task.currentThread.interrupt();
         }
-//        task.isInterrupted.set(true);
     }
 }

@@ -20,6 +20,7 @@ import android.widget.ImageView;
 
 import app.morningsignout.com.morningsignoff.category.CategoryAdapter;
 import app.morningsignout.com.morningsignoff.category.CategoryBitmapPool;
+import app.morningsignout.com.morningsignoff.R;
 
 /**
  * Created by Daniel on 2/11/2017. A Runnable task that will run in the background and fetch images
@@ -27,22 +28,18 @@ import app.morningsignout.com.morningsignoff.category.CategoryBitmapPool;
  */
 
 public class FetchCategoryImageRunnable implements Runnable {
+    public static String NO_IMAGE = "No image";
+
     Thread currentThread;
-    AtomicBoolean isInterrupted;
-
     public String imageUrl;
-    int viewWidth, viewHeight;
-    WeakReference<ImageView> imageViewRef;
-
-//    static Set<Integer> debugAllHashes = new TreeSet<>();
+    private int viewWidth, viewHeight;
+    private WeakReference<ImageView> imageViewRef;
 
     public FetchCategoryImageRunnable(String imageUrl, ImageView imageView) {
         this.viewWidth = CategoryAdapter.REQ_IMG_WIDTH;
         this.viewHeight = CategoryAdapter.REQ_IMG_HEIGHT;
         this.imageUrl = imageUrl;
         this.imageViewRef = new WeakReference<>(imageView);
-
-        this.isInterrupted = new AtomicBoolean(false);
     }
 
     @Override
@@ -50,25 +47,21 @@ public class FetchCategoryImageRunnable implements Runnable {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_DISPLAY);
         currentThread = Thread.currentThread();
 
-//        long start = System.currentTimeMillis();
-
         if (Thread.interrupted())
-//        if (isInterrupted.get())
             return;
 
-        Bitmap downloadedImage = downloadBitmap();
-
-//        if (downloadedImage != null)
-//            debugAllHashes.add(downloadedImage.hashCode());
+        Bitmap downloadedImage = null;
+        if (!imageUrl.equals(NO_IMAGE))
+            downloadedImage = downloadBitmap();
+        else if (imageViewRef.get() != null)
+            downloadedImage = BitmapFactory.decodeResource(
+                    imageViewRef.get().getResources(), R.drawable.no_image);
 
         CategoryImageSenderObject objectToSend =
                 new CategoryImageSenderObject(imageUrl, imageViewRef.get(), downloadedImage, this);
         FetchCategoryImageManager.instance.myHandler
                 .obtainMessage(FetchCategoryImageManager.SENT_PICTURE, objectToSend)
                 .sendToTarget();
-
-//        Log.d("FetchCategoryImageRunnable", "Running time for " + imageUrl + ": " +
-//                Float.toString((System.currentTimeMillis() - start) / 1000.0f));
     }
 
     // input an imageViewReference URL, get its bitmap
@@ -97,11 +90,6 @@ public class FetchCategoryImageRunnable implements Runnable {
                     BitmapFactory.decodeStream(inputStream, null, downloadOptions);
                     inSampleSize = calculateInSampleSize(downloadOptions);
                     inputStream.close();
-
-//                    String details = viewWidth + " " + viewHeight + "; ";
-//                    details += downloadOptions.outWidth + " " + downloadOptions.outHeight + "; ";
-//                    details += inSampleSize;
-//                    Log.d("FetchCategoryImageTask", details);
                 }
 
                 urlConnection.disconnect(); // Reconnect to link because you only get one go at inputStreams
@@ -123,10 +111,8 @@ public class FetchCategoryImageRunnable implements Runnable {
 
                 // Don't decode the image if thread is interrupted
                 if (Thread.interrupted()) {
-//                if (isInterrupted.get()) {
                     if (bitmapToUse != null) {
                         bitmapToUse.recycle();
-//                        CategoryBitmapPool.instance.recycle(bitmapToUse); // Put given image back into pool
                         bitmapToUse = null;
                     }
                     return null;
@@ -186,14 +172,5 @@ public class FetchCategoryImageRunnable implements Runnable {
 
         // FIXME: only considering KitKat+ right now
         return false;
-    }
-
-    public static void debugAllHashes() {
-//        String TAG = "FetchCategoryImageRunnable";
-//        if (debugAllHashes.isEmpty())
-//            Log.d(TAG, "No Bitmaps");
-//        else
-//            for (Integer i : debugAllHashes)
-//                Log.d(TAG, i.toString());
     }
 }
