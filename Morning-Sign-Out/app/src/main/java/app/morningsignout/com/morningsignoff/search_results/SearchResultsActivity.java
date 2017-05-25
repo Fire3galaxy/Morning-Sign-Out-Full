@@ -24,7 +24,11 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import app.morningsignout.com.morningsignoff.R;
+import app.morningsignout.com.morningsignoff.article.Article;
 import app.morningsignout.com.morningsignoff.article.ArticleActivity;
 import app.morningsignout.com.morningsignoff.network.URLToMobileArticle;
 
@@ -148,6 +152,13 @@ public class SearchResultsActivity extends ActionBarActivity {
         }
 
         return null;
+    }
+
+    List<Article> getJSONArticles(String arg, int pagenum)
+    {
+        List<Article> articles = new ArrayList<>();
+
+        return articles;
     }
 }
 

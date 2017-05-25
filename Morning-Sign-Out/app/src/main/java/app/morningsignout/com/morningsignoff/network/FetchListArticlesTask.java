@@ -55,6 +55,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         this.fragmentRef = new WeakReference<>(fragment);   // ensure fragment still exists
         this.pageNum = pageNum;         // page of mso page called for task
         this.isFirstLoad = isFirstLoad;
+        this.isRefresh = isRefresh;
         this.isCancelled = false;
     }
 
@@ -243,7 +244,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         return null; // Exiting try/catch likely means error occurred.
     }
 
-    List<Article> getArticlesJSON(String arg, int pageNum) { // FIXME: get this working
+    List<Article> getArticlesJSON(String arg, int pageNum) {
         StringBuilder builder = new StringBuilder();
         String urlPath = "";
         urlPath = "http://morningsignout.com/?json=get_category_posts&slug=" + arg + "&page=" + pageNum;
