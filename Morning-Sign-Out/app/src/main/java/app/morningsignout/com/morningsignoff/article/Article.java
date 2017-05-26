@@ -1,47 +1,26 @@
 package app.morningsignout.com.morningsignoff.article;
 
-import android.graphics.Bitmap;
-
 public class Article {
     private String title;
-    private String description;
     private String link;
     private String imageURL;
-    private String thumbnailURL;
+    private String mediumURL;
     private String author;
-    private int id;
-    private Bitmap bitmap;
-
-    public Article() {
-    }
-
-    // testing
-    public Article(String title, String description) {
-        this.title = title;
-        this.description = description;
-    }
-
-    public Bitmap getBitmap() {
-        return bitmap;
-    }
-
-    public void setBitmap(Bitmap bitmap) {
-        this.bitmap = bitmap;
-    }
+    private String content;
 
     public String getImageURL() {
         return imageURL;
     }
-
     public void setImageURL(String imageURL) {
         this.imageURL = imageURL;
     }
 
-    public String getThumbnailURL() {
-        return thumbnailURL;
+    // If we decide not to use medium url, we can change it here
+    public String getCategoryURL() {
+        return mediumURL;
     }
-    public void setThumbnailURL(String thumbnailURL) {
-        this.thumbnailURL = thumbnailURL;
+    public void setCategoryURL(String mediumURL) {
+        this.mediumURL = mediumURL;
     }
 
     public String getTitle() {
@@ -49,13 +28,6 @@ public class Article {
 	}
 	public void setTitle(String title) {
 		this.title = title;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-	public void setDescription(String description) {
-		this.description = description;
 	}
 
 	public String getLink() {
@@ -68,16 +40,16 @@ public class Article {
     public String getAuthor() {
         return author;
     }
-
     public void setAuthor(String author) {
         this.author = author;
     }
 
-    public int getId() {
-        return id;
+    public String getContent() {
+        return content;
+    }
+    public void setContent(String content) {
+        this.content = content;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+
 }

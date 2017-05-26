@@ -42,16 +42,17 @@
         android:visibility="invisible"/>
 
     <TextView
+        android:id="@+id/textView_categoryRefresh"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/category_refresh"
-        android:id="@+id/textView_categoryRefresh"
         android:layout_below="@+id/textView_categoryHeader"
-        android:paddingTop="8dp"
         android:layout_centerHorizontal="true"
+        android:drawableTop="@drawable/ic_action_about"
+        android:gravity="center"
         android:maxWidth="180dp"
-        android:drawableTop="@drawable/ic_action_about"/>
+        android:paddingTop="8dp"
+        android:text="@string/category_refresh"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
         android:layout_width="match_parent"

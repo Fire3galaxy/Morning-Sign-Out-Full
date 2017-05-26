@@ -123,38 +123,31 @@ public class CategoryActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {
-        if (!searchView.isIconified())  // Check if searchView is expanded
-            searchView.setIconified(true);
-        else
-            super.onBackPressed();
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
 //        getMenuInflater().inflate(R.menu.menu_category, menu);
-        getMenuInflater().inflate(R.menu.menu_category, menu);
 
-        /* Search results in new SearchResultsActivity, clicked article passed back to articleActivity
-           Associate searchable configuration with the SearchView */
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        // FIXME: While search is unavalaible
+        getMenuInflater().inflate(R.menu.menu_justlogo, menu);
 
-	    // Messing with layout or gravity of searchview here if needed
-
-        ComponentName componentName = new ComponentName(this, SearchResultsActivity.class);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
+//        /* Search results in new SearchResultsActivity, clicked article passed back to articleActivity
+//           Associate searchable configuration with the SearchView */
+//        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//        searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+//
+//        ComponentName componentName = new ComponentName(this, SearchResultsActivity.class);
+//        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
         return true;
     }
 
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        // if drawer is open, hide action items (if using a menu xml)
-//        boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
-//        menu.findItem(R.id.action_settings).setVisible(!drawerOpen);
-        return super.onPrepareOptionsMenu(menu);
-    }
+//    @Override
+//    public void onBackPressed() {
+//        if (!searchView.isIconified())  // Check if searchView is expanded
+//            searchView.setIconified(true);
+//        else
+//            super.onBackPressed();
+//    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

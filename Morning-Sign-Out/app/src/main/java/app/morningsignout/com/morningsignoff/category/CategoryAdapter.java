@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -40,7 +39,7 @@ public class CategoryAdapter extends BaseAdapter {
     private LayoutInflater inflater;
     private AdapterView adapterView = null;
 
-    private ArrayList<SingleRow> articles;
+    private ArrayList<Article> articles;
     private Set<String> uniqueArticleNames; // FIXME: This was a temp fix a long time ago for repeats that somehow got in the list
     private int pageNum;
     private int firstVisibleItem, lastVisibleItem;
@@ -117,23 +116,19 @@ public class CategoryAdapter extends BaseAdapter {
             viewHolder.author = (TextView) row.findViewById(R.id.textViewAuthor);
             viewHolder.image = (ImageView) row.findViewById(R.id.imageView);
             row.setTag(viewHolder);
-
-            // Set imageView settings
-            viewHolder.image.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            viewHolder.image.setCropToPadding(true);
         }
         else {
             row = view;
             viewHolder = (AdapterObject) row.getTag();
         }
 
-        SingleRow rowTemp = articles.get(i);
+        Article rowTemp = articles.get(i);
 
         // Set the values of the rowItem
         if(isLandscape(row.getContext()))
             viewHolder.title.setLines(3);
-        viewHolder.title.setText(rowTemp.title);
-        viewHolder.author.setText(rowTemp.description);
+        viewHolder.title.setText(rowTemp.getTitle());
+        viewHolder.author.setText(rowTemp.getAuthor());
 
 //        // Do not process/add images that aren't supposed to be visible
 //        // GridViewWithHeaderAndFooter calls getView(0,..) REALLY often
@@ -142,13 +137,13 @@ public class CategoryAdapter extends BaseAdapter {
 //            return row;
 //        }
 
-        final Bitmap b = CategoryFragment.getBitmapFromMemCache(rowTemp.imageURL);
+        final Bitmap b = CategoryFragment.getBitmapFromMemCache(rowTemp.getCategoryURL());
 //        final Bitmap b = null;
 
         // Load imageViewReference into row element
         if (b == null) {
             // task is interrupted or does not exist for imageView
-            if (cancelPotentialWork(rowTemp.imageURL, viewHolder.image)) {
+            if (cancelPotentialWork(rowTemp.getCategoryURL(), viewHolder.image)) {
                 // Recycle old bitmap if NOT IN LRUCACHE
                 // tag: Set in FetchCategoryImageManager or else branch below here if bitmap was in
                 //      the cache
@@ -171,7 +166,7 @@ public class CategoryAdapter extends BaseAdapter {
 
 //                Log.d("CategoryAdapter", "Made task for index " + i + ", imageView " + viewHolder.image.hashCode());
                 FetchCategoryImageRunnable task = FetchCategoryImageManager
-                        .getDownloadImageTask(rowTemp.imageURL, viewHolder.image);
+                        .getDownloadImageTask(rowTemp.getCategoryURL(), viewHolder.image);
                 CategoryImageTaskDrawable taskWrapper = new CategoryImageTaskDrawable(task);
 
                 viewHolder.image.setImageDrawable(taskWrapper);
@@ -179,7 +174,7 @@ public class CategoryAdapter extends BaseAdapter {
             }
         } else {    // set saved imageViewReference
             viewHolder.image.setImageBitmap(b);
-            viewHolder.image.setTag(rowTemp.imageURL); //
+            viewHolder.image.setTag(rowTemp.getCategoryURL()); //
         }
 
         return row;
@@ -202,7 +197,7 @@ public class CategoryAdapter extends BaseAdapter {
                 // Hack-ish way of preventing the list from being populated with doubles
                 // which happens if request occurs multiple times...
                 if (!uniqueArticleNames.contains(article) && moreArticles.get(i).getImageURL() != null)
-                    articles.add(SingleRow.newInstance(moreArticles.get(i)));
+                    articles.add(moreArticles.get(i));
                 uniqueArticleNames.add(article);
 //                notifyDataSetChanged();
             }
