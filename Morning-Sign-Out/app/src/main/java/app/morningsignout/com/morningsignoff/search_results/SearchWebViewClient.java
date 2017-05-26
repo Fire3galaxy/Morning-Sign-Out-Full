@@ -54,8 +54,6 @@ public class SearchWebViewClient extends WebViewClient {
             return true;
         }
 
-//        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-//        view.getContext().startActivity(intent);
         return false;
     }
 

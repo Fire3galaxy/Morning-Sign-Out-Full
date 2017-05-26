@@ -60,8 +60,8 @@
     </string-array>
 
     <string-array name ="categories">
-        <!--item>Latest</item--> <!--No latest page on MSO now-->
-        <item>Featured</item>
+        <item>Latest</item> <!--No latest page on MSO now-->
+        <!--<item>Featured</item>-->
         <item>Research</item>
         <item>Wellness</item>
         <item>Medicine</item>
@@ -72,8 +72,8 @@
     </string-array>
 
     <array name="categories_icons">
-        <!--item>@drawable/category_latest</item-->
-        <item>@drawable/category_featured</item>
+        <item>@drawable/category_latest</item>
+        <!--<item>@drawable/category_featured</item>-->
         <item>@drawable/category_research</item>
         <item>@drawable/category_wellness</item>
         <item>@drawable/category_medicine</item>
@@ -84,8 +84,8 @@
     </array>
 
     <string-array name ="categories_for_url">
-        <!--item>latest</item-->
-        <item>featured</item>
+        <item>latest</item>
+        <!--<item>featured</item>-->
         <item>research</item>
         <item>wellness</item>
         <item>medicine</item>

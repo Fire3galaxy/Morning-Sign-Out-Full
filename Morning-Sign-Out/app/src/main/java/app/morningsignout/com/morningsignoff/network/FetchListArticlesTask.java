@@ -135,14 +135,20 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         }
     }
 
-    List<Article> getArticlesJSON(String arg, int pageNum) { // FIXME: get this working
+    List<Article> getArticlesJSON(String arg, int pageNum) {
         StringBuilder builder = new StringBuilder();
-        String urlPath = "";
-        urlPath = "http://morningsignout.com/?json=get_category_posts"
+        String urlPath = "http://morningsignout.com/?json=get_category_posts"
                 + "&slug=" + arg
                 + "&page=" + pageNum
                 + "&include=author,url,title,thumbnail,content";
         HttpURLConnection connection = null;
+
+        // For wordpress JSON code. Use this because there is no "latest" category.
+        if (arg.equals("latest")) {
+            urlPath = "http://morningsignout.com/?json=get_recent_posts"
+                    + "&page=" + pageNum
+                    + "&include=author,url,title,thumbnail,content";
+        }
 
         // opening URL connection, setup JSON
         try {
@@ -207,8 +213,8 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                     String link = currPost.optString("url");
                     articlesList.get(index).setLink(link);
 
-                    String mediumURL = "https://upload.wikimedia.org/wikipedia/en/d/d3/No-picture.jpg";
-                    String fullURL = "https://upload.wikimedia.org/wikipedia/en/d/d3/No-picture.jpg";
+                    String mediumURL = FetchCategoryImageRunnable.NO_IMAGE;
+                    String fullURL = FetchCategoryImageRunnable.NO_IMAGE;
                     // create JSONObj of images
                     if (currPost.has("thumbnail_images")){
 
@@ -220,7 +226,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                                 mediumURL = currPost.optString("thumbnail");
                                 if (!URLUtil.isValidUrl(mediumURL))
                                 {
-                                    mediumURL = "https://upload.wikimedia.org/wikipedia/en/d/d3/No-picture.jpg";
+                                    mediumURL = FetchCategoryImageRunnable.NO_IMAGE;
                                 }
                             }
                         }
