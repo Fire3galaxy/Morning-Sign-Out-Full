@@ -71,35 +71,11 @@ public class SearchResultsActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds search to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_category, menu);
-
         // FIXME: While search is unavalaible
         getMenuInflater().inflate(R.menu.menu_justlogo, menu);
 
-//        /* Search results in new myActivity, clicked article passed back to articleActivity
-//           Associate searchable configuration with the SearchView */
-//        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-//        searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-//
-//        ComponentName componentName = new ComponentName(this, SearchResultsActivity.class);
-//        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
-//
-//        menu.findItem(R.id.action_search).expandActionView();
-//        searchView.setQuery(getIntent().getStringExtra(SearchManager.QUERY), false); // Set contents of searchview to query
-//        searchView.clearFocus(); // Ensure no keyboard shows
-
         return true;
     }
-
-//    @Override
-//    public void onBackPressed() {
-//        // If back is hit, do not collapse searchView, just return to previous activity
-//        if (!searchView.hasFocus())
-//            finish();
-//        else
-//            super.onBackPressed();
-//    }
 
     @Override
     public void onNewIntent(Intent intent) {
