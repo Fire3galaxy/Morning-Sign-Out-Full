@@ -52,8 +52,6 @@
             android:scrollbars="none"
             android:paddingLeft="10dp"
             android:paddingRight="10dp" />
-
-
     </LinearLayout>
 
     <ProgressBar

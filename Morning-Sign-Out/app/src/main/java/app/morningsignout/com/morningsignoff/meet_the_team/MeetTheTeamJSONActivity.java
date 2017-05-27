@@ -1,10 +1,14 @@
 package app.morningsignout.com.morningsignoff.meet_the_team;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -41,14 +45,27 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
 
         String url = "http://morningsignout.com/?json=get_author_index" ;
         listView = (ListView) findViewById(R.id.meet_the_team_json_list);
+
         meetTheTeamJSONAdapter = new MeetTheTeamJSONAdapter(this,new ArrayList<MeetTheTeamAuthor>());
         listView.setAdapter(meetTheTeamJSONAdapter);
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-            {
-                String slug = authorList.get(position).toString();
-                Toast.makeText(context,slug,Toast.LENGTH_LONG).show();
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                String url = "http://morningsignout.com/author/" + authorList.get(position).getSlug();
+
+                WebView webView = new WebView(view.getContext());
+                webView.setWebViewClient(new WebViewClient());
+
+                // Load the url
+                webView.loadUrl(url);
+
+
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(url));
+
+                startActivity(intent);
 
             }
         });
