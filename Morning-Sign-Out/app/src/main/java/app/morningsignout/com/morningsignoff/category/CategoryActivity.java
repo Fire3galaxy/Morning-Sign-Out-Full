@@ -33,6 +33,7 @@ import java.lang.InterruptedException;
 import java.util.Map;
 
 import app.morningsignout.com.morningsignoff.R;
+import app.morningsignout.com.morningsignoff.meet_the_team.MeetTheTeamJSONActivity;
 import app.morningsignout.com.morningsignoff.search_results.SearchResultsActivity;
 import app.morningsignout.com.morningsignoff.meet_the_team.MeetTheTeamActivity;
 import app.morningsignout.com.morningsignoff.network.FetchCategoryImageRunnable;
@@ -226,7 +227,7 @@ public class CategoryActivity extends AppCompatActivity {
             startActivity(AboutMSOActivity);
         } else if (position == categories_urls.length + 1) {
             // categories_urls.length + 1 -> Meet the Team
-            Intent intent = new Intent(this, MeetTheTeamActivity.class);
+            Intent intent = new Intent(this, MeetTheTeamJSONActivity.class);
             startActivity(intent);
         }
 

@@ -52,14 +52,14 @@
     <string name="error_no_internet_2">right now. Please check your internet connection!</string>
     <string name="error_refresh_button">Refresh</string>
 
-    <string-array name ="descriptions">
+    <string-array name="descriptions">
         <item>description 1</item>
         <item>description 2</item>
         <item>description 3</item>
         <item>description 4</item>
     </string-array>
 
-    <string-array name ="categories">
+    <string-array name="categories">
         <item>Latest</item> <!--No latest page on MSO now-->
         <!--<item>Featured</item>-->
         <item>Research</item>
@@ -68,7 +68,7 @@
         <item>Public Health</item>
         <item>Healthcare</item>
         <item>About MSO</item>
-        <!--<item>Meet the Team</item>--> <!--Non functional for now-->
+        <item>Meet the Team</item>
     </string-array>
 
     <array name="categories_icons">
@@ -80,10 +80,10 @@
         <item>@drawable/category_public_health</item>
         <item>@drawable/category_healthcare</item>
         <item>@drawable/category_about</item>
-        <!--<item>@drawable/category_meettheteam</item>-->
+        <item>@drawable/category_meettheteam</item>
     </array>
 
-    <string-array name ="categories_for_url">
+    <string-array name="categories_for_url">
         <item>latest</item>
         <!--<item>featured</item>-->
         <item>research</item>

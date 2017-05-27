@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="app.morningsignout.com.morningsignoff">
-    <!--version number of app (e.g. "1.0") is in build.gradle of app module-->
+
+    <!-- version number of app (e.g. "1.0") is in build.gradle of app module -->
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
-        android:hardwareAccelerated="true"
         android:allowBackup="true"
+        android:hardwareAccelerated="true"
         android:icon="@drawable/mso_launch"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
-
         <meta-data
             android:name="android.app.default_searchable"
             android:value=".SearchResultsActivity" />
@@ -28,31 +28,29 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".meet_the_team.MeetTheTeamActivity"
+            android:name=".meet_the_team.MeetTheTeamJSONActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/meet_the_team"
-            android:parentActivityName=".category.CategoryActivity"
             android:launchMode="singleTop"
-            android:configChanges="orientation|keyboardHidden|screenSize">
-
+            android:parentActivityName=".category.CategoryActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".category.CategoryActivity" >
-            </meta-data>
+                android:value=".category.CategoryActivity"></meta-data>
         </activity>
         <activity
             android:name=".article.ArticleActivity"
-            android:parentActivityName=".category.CategoryActivity"
-            android:configChanges="keyboardHidden|screenSize">
-            <!--android:configChanges="orientation|keyboardHidden|screenSize"-->
+            android:configChanges="keyboardHidden|screenSize"
+            android:parentActivityName=".category.CategoryActivity">
+
+            <!-- android:configChanges="orientation|keyboardHidden|screenSize" -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".category.CategoryActivity" />
         </activity>
         <activity
             android:name=".search_results.SearchResultsActivity"
-            android:launchMode="singleTop"
-            android:configChanges="orientation|keyboardHidden|screenSize">
-
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -61,30 +59,26 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-
         <activity
             android:name=".about_mso.AboutMSOActivity"
-            android:parentActivityName=".category.CategoryActivity"/>
-
+            android:parentActivityName=".category.CategoryActivity" />
         <activity
             android:name=".disqus.DisqusMainActivity"
-            android:parentActivityName=".article.ArticleActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
-            android:theme="@style/DisqusTheme">
-        </activity>
-
+            android:parentActivityName=".article.ArticleActivity"
+            android:theme="@style/DisqusTheme"></activity>
         <activity
             android:name=".disqus.DisqusLogin"
+            android:configChanges="orientation|screenSize|keyboardHidden"
             android:launchMode="singleInstance"
-            android:theme="@style/DisqusTheme"
-            android:configChanges="orientation|screenSize|keyboardHidden" />
-
-        <activity
-            android:name=".meet_the_team.MTTListViewActivity"/>
-
+            android:theme="@style/DisqusTheme" />
+        <activity android:name=".meet_the_team.MTTListViewActivity" />
         <activity
             android:name=".meet_the_team.MTTWebViewActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"/>
+            android:configChanges="orientation|keyboardHidden|screenSize" />
+
+ <!--       <activity android:name=".meet_the_team.MeetTheTeamJSONActivity">
+        </activity> -->
     </application>
 
 </manifest>
