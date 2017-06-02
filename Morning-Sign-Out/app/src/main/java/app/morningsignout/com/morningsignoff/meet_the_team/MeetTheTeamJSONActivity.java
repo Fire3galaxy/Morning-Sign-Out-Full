@@ -4,12 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.Menu;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -22,6 +26,7 @@ import java.util.ArrayList;
 
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.network.FetchMeetTheTeamTask;
+import app.morningsignout.com.morningsignoff.network.Parser;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -40,6 +45,7 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meet_the_team_json);
+        setupActionBar();
 
         context = this;
 
@@ -73,6 +79,21 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
         new FetchMeetTheTeamJSONTask().execute(url);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_justlogo, menu);
+        return true;
+    }
+
+    public void setupActionBar() {
+        ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null);
+        ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);
+        this.getSupportActionBar().setCustomView(ib, params);
+        super.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        super.getSupportActionBar().setDisplayShowCustomEnabled(true);
+    }
+
     public class FetchMeetTheTeamJSONTask extends AsyncTask<String,Void,ArrayList<MeetTheTeamAuthor>> {
 
         @Override
@@ -92,7 +113,7 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
 
                 for(int i=0; i<jsonArray.length(); i++) {
                     String name = jsonArray.getJSONObject(i).getString("name");
-                    String desc = jsonArray.getJSONObject(i).getString("description");
+                    String desc = Parser.replaceUnicode(jsonArray.getJSONObject(i).getString("description"));
                     String slug = jsonArray.getJSONObject(i).getString("slug");
 
                     authorList.add(new MeetTheTeamAuthor(name,desc,slug));
