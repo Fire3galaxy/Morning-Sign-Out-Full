@@ -20,7 +20,7 @@ import app.morningsignout.com.morningsignoff.category.CategoryFragment;
  * Created by shinr on 5/20/2017.
  */
 
-public class FetchListSearchTask extends AsyncTask<String, Void, List<Article> {
+public class FetchListSearchTask extends AsyncTask<String, Void, List<Article>>{
     private WeakReference<CategoryFragment> fragmentRef;
     private int pageNum;
     private boolean isFirstLoad, isCancelled;

@@ -1,5 +1,8 @@
 package app.morningsignout.com.morningsignoff.article;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class Article {
     private String title;
     private String link;
@@ -7,6 +10,8 @@ public class Article {
     private String mediumURL;
     private String author;
     private String content;
+    private String excerpt;
+    private Set<String> tags = new HashSet<String>();
 
     public String getImageURL() {
         return imageURL;
@@ -51,5 +56,9 @@ public class Article {
         this.content = content;
     }
 
+    public String getExcerpt() { return excerpt; }
+    public void setExcerpt(String excerpt) { this.excerpt = excerpt; }
 
+    public Set<String> getTags() { return tags; }
+    public void setTags(String tag) { this.tags.add(tag); }
 }

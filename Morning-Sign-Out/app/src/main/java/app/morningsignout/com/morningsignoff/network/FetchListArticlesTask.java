@@ -89,7 +89,15 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         // is valid request (next page only, not repeat or excess page)
         if (adapterPageNum == pageNum - 1) {
             try {
-                return getArticlesJSON(params[0],pageNum);
+                // Special case: "featured" is outdated, replaced with "latest" (SearchType = JLATEST)
+                //              params[0] is no longer necessary, hopefully it doesn't break anything
+                if (params[0].equals("latest")) {
+                    return FetchJSON.getResultsJSON(FetchJSON.SearchType.JLATEST, params[0], pageNum);
+//                    return getArticlesJSON(params[0], pageNum);
+                } else {
+                    return FetchJSON.getResultsJSON(FetchJSON.SearchType.JCATLIST, params[0], pageNum);
+//                    return getArticlesJSON(params[0], pageNum);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
