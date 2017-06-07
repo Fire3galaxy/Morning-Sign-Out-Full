@@ -1,18 +1,82 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/container_searchFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:paddingLeft="0dp"
+    android:paddingRight="0dp"
+    android:paddingTop="0dp"
+    android:paddingBottom="0dp"
+    android:background="#e1eaee"
+    tools:context=".search_results.SearchResultsActivity">
 
-    <TextView
-        android:id="@+id/id"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh_search"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/textView_searchHeader">
+        <in.srain.cube.views.GridViewWithHeaderAndFooter
+            android:id="@+id/gridView_search"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/app_name"
+            android:clipToPadding="false"
+            android:scrollbars="none"
+            android:numColumns="1"
+            android:divider="#00ffffff"
+            android:dividerHeight="10dp"
+            android:paddingBottom="10dp"
+            android:horizontalSpacing="5dp"
+            android:verticalSpacing="15dp"
+            android:listSelector="@android:color/transparent"
+            android:footerDividersEnabled="true">
+        </in.srain.cube.views.GridViewWithHeaderAndFooter>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar_search"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceListItem" />
+        android:layout_alignParentRight="false"
+        android:layout_alignParentEnd="false"
+        android:layout_centerInParent="true"
+        android:indeterminate="true"
+        android:visibility="invisible" />
 
     <TextView
-        android:id="@+id/content"
+        android:id="@+id/textView_searchRefresh"
+        android:drawableTop="@drawable/ic_action_about"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceListItem" />
-</LinearLayout>
+        android:layout_below="@+id/textView_searchHeader"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:maxWidth="180dp"
+        android:paddingTop="8dp"
+        android:text="If articles do not load, drag down to refresh"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/textView_searchHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:paddingTop="10dp"
+        android:paddingBottom="20dp"
+        android:gravity="center_horizontal"
+        android:textStyle="italic|bold"
+        android:typeface="normal"
+        android:textSize="22sp"
+        android:textColor="@android:color/black" />
+
+    <ImageView
+        android:id="@+id/imageView_splash_search"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/hi_res_splash"
+        android:background="#73b3e2"
+        android:visibility="gone"
+        android:contentDescription="Splash screen with Morning Sign Out Logo" />
+
+</RelativeLayout>

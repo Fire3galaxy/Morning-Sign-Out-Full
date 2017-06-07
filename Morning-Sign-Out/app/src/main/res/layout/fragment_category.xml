@@ -32,9 +32,9 @@
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <ProgressBar
+        android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/progressBar"
         android:layout_alignParentRight="false"
         android:layout_alignParentEnd="false"
         android:layout_centerInParent="true"

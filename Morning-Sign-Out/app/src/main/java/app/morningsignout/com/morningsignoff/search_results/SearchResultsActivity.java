@@ -30,6 +30,7 @@ import java.util.List;
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.article.Article;
 import app.morningsignout.com.morningsignoff.article.ArticleActivity;
+import app.morningsignout.com.morningsignoff.category.SplashFragment;
 import app.morningsignout.com.morningsignoff.network.URLToMobileArticle;
 
 public class SearchResultsActivity extends ActionBarActivity {
@@ -42,6 +43,26 @@ public class SearchResultsActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         super.getSupportActionBar().setDisplayHomeAsUpEnabled(true); //made back arrow in top left corner
+
+        // New search, added by shinray
+        // Fragments added to activity
+        if (savedInstanceState == null) {
+            SearchFragment fragment = SearchFragment.findOrCreateRetainFragment(getSupportFragmentManager());
+            // create a Bundle to pass strings into the fragment
+            Bundle args = new Bundle();
+            // set SEARCH_PARAM in the fragment to the query
+            args.putString(SearchFragment.SEARCH_PARAM, getIntent().getStringExtra(SearchManager.QUERY));
+            fragment.setArguments(args);
+
+            // Do the splash!
+            SplashFragment splashScreenFragment = new SplashFragment();
+
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.container_search, splashScreenFragment)
+                    .add(R.id.container_search, fragment)
+                    .commit();
+        }
+
 
         // Initialize webview with WebViewClient and WebChromeClient
         webView = (WebView) findViewById(R.id.webView_search);
