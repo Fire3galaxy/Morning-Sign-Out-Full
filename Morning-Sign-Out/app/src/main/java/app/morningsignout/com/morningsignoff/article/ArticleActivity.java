@@ -519,6 +519,10 @@ class ArticleWebViewClient extends WebViewClient {
         lastArticleSlug = null;
     }
 
+    public String getLastArticleSlug() {
+        return lastArticleSlug;
+    }
+
     @Override
     public void onPageStarted(WebView webView, String url, Bitmap favicon) {
         WebSettings settings = webView.getSettings();
