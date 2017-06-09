@@ -1,10 +1,14 @@
 package app.morningsignout.com.morningsignoff.category;
 
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -18,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -33,6 +38,7 @@ import java.util.Map;
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.article.Article;
 import app.morningsignout.com.morningsignoff.article.ArticleActivity;
+import app.morningsignout.com.morningsignoff.disqus.DisqusMainActivity;
 import app.morningsignout.com.morningsignoff.network.FetchListArticlesTask;
 import in.srain.cube.views.GridViewWithHeaderAndFooter;
 
@@ -164,6 +170,9 @@ public class CategoryFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 WrapperListAdapter wrappedAdapter = (WrapperListAdapter) parent.getAdapter();
                 CategoryAdapter adapter = (CategoryAdapter) wrappedAdapter.getWrappedAdapter();
+
+                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+
                 int id_int = (int) id;
 
                 // Do nothing if id is invalid
@@ -187,7 +196,18 @@ public class CategoryFragment extends Fragment {
                 // IMAGE_URL holds the link to the article's header image
                 articleActivity.putExtra(ArticleActivity.IMAGE_URL, rowTemp.getImageURL());
 
-                gridViewWithHeaderAndFooter.getContext().startActivity(articleActivity);
+                //Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_comment_black_24dp);
+                Intent commentsIntent = new Intent(getContext(), DisqusMainActivity.class);
+                PendingIntent commentsPendingIntent = PendingIntent.getActivity(getContext(), 0, commentsIntent, 0);
+
+                builder.setToolbarColor(0x81bfff);
+                //builder.setActionButton(icon, "Comments", pendingIntent, false);
+                builder.addMenuItem("Open comments", commentsPendingIntent);
+
+                CustomTabsIntent customTabsIntent = builder.build();
+                customTabsIntent.launchUrl(getContext(), Uri.parse(rowTemp.getLink()));
+
+                //gridViewWithHeaderAndFooter.getContext().startActivity(articleActivity);
             }
         });
 
