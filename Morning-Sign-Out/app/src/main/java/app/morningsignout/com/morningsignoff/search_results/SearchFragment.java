@@ -1,6 +1,7 @@
 package app.morningsignout.com.morningsignoff.search_results;
 
 //import android.app.Fragment; //https://stackoverflow.com/questions/9586218/fragmentactivity-cannot-cast-from-fragment-to-derived-class
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,15 +10,18 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.WrapperListAdapter;
 
 import org.w3c.dom.Text;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import app.morningsignout.com.morningsignoff.R;
+import app.morningsignout.com.morningsignoff.article.ArticleActivity;
 import app.morningsignout.com.morningsignoff.category.CategoryFragment;
 import in.srain.cube.views.GridViewWithHeaderAndFooter;
 
@@ -69,7 +73,7 @@ public class SearchFragment extends Fragment {
         //setUpCache();
     }
 
-
+    // Not sure why this is nullable. Doesn't seem to cause any harm, but I'll keep an eye on this.
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -85,6 +89,28 @@ public class SearchFragment extends Fragment {
         splashScreenView = (ImageView) rootView.findViewById(R.id.imageView_splash_search);
 //        footerProgressBar = getFooterProgressBarXml(); // FIXME
         gridViewWithHeaderAndFooter = (GridViewWithHeaderAndFooter) rootView.findViewById(R.id.gridView_search);
+
+        // Custom adapter? SearchAdapter?
+
+        // Add a click listener for the returned articles.
+        gridViewWithHeaderAndFooter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                WrapperListAdapter wrapperListAdapter = (WrapperListAdapter) parent.getAdapter();
+                SearchAdapter adapter = (SearchAdapter) wrapperListAdapter.getWrappedAdapter();
+                int id_int = (int) id;
+
+                // Do nothing if id is invalid
+                if (id_int < 0 || id_int > adapter.getCount())
+                    return;
+
+                Intent articleActivity = new Intent(gridViewWithHeaderAndFooter.getContext(), ArticleActivity.class);
+
+                // Hmm, do we really want to start an entirely new activity? Maybe. Hopefully can handle
+                // this, and if you press back, you end up back in the search results.
+                gridViewWithHeaderAndFooter.getContext().startActivity(articleActivity);
+            }
+        });
 
         // Sets up a refreshlistener, to let us know when to refresh.
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

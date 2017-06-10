@@ -55,19 +55,19 @@ public class SearchResultsActivity extends ActionBarActivity {
             fragment.setArguments(args);
 
             // Do the splash!
-            SplashFragment splashScreenFragment = new SplashFragment();
+//            SplashFragment splashScreenFragment = new SplashFragment();
 
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container_search, splashScreenFragment)
+//                    .add(R.id.container_search, splashScreenFragment)
                     .add(R.id.container_search, fragment)
                     .commit();
         }
 
 
         // Initialize webview with WebViewClient and WebChromeClient
-        webView = (WebView) findViewById(R.id.webView_search);
-        searchWebViewClient = new SearchWebViewClient(getIntent().getStringExtra(SearchManager.QUERY));
-        webView.setWebViewClient(searchWebViewClient);
+//        webView = (WebView) findViewById(R.id.webView_search);
+//        searchWebViewClient = new SearchWebViewClient(getIntent().getStringExtra(SearchManager.QUERY));
+//        webView.setWebViewClient(searchWebViewClient);
 
         final ProgressBar loadPage = (ProgressBar) findViewById(R.id.progressBar_search);
         webView.setWebChromeClient(new WebChromeClient() { // Progress bar
