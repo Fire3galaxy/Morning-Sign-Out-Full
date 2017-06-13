@@ -2,6 +2,7 @@ package app.morningsignout.com.morningsignoff.category;
 
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -197,12 +198,18 @@ public class CategoryFragment extends Fragment {
                 articleActivity.putExtra(ArticleActivity.IMAGE_URL, rowTemp.getImageURL());
 
                 //Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_comment_black_24dp);
+                // Intent to launch DisqusActivity from overflow menu
                 Intent commentsIntent = new Intent(getContext(), DisqusMainActivity.class);
+                Log.d("CategoryFragment", rowTemp.getSlug());
+                Log.d("CategoryFragment", rowTemp.getDsqThreadId());
+                commentsIntent.putExtra(DisqusMainActivity.SLUG, rowTemp.getSlug());
                 PendingIntent commentsPendingIntent = PendingIntent.getActivity(getContext(), 0, commentsIntent, 0);
-
-                builder.setToolbarColor(0x81bfff);
                 //builder.setActionButton(icon, "Comments", pendingIntent, false);
                 builder.addMenuItem("Open comments", commentsPendingIntent);
+
+                // Color of toolbar
+                Resources res = CategoryFragment.this.getResources();
+                builder.setToolbarColor(res.getColor(R.color.mso_blue));
 
                 CustomTabsIntent customTabsIntent = builder.build();
                 customTabsIntent.launchUrl(getContext(), Uri.parse(rowTemp.getLink()));

@@ -96,7 +96,7 @@ public class DisqusMainActivity extends ActionBarActivity implements DisqusDialo
         });
 
         // FIXME: Later, when we use json to load an article, dsq_thread_id will be passed in
-        // FIXME: intent, instead of slug
+        // intent, instead of slug.
         // Slug to get dsq_thread_id from json of article for get disqus thread data
         slug = null;
         if (getIntent() != null)

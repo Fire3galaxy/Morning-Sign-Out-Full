@@ -77,11 +77,12 @@ public class DisqusDetails {
     // TEMP: Until we don't need a separate call to get thread id (b/c we already have it from using
     // primarily JSON for articles, return both comments and thread id.
     // Used only by DisqusGetComments in background
-    TempCommentsAndThreadId getComments(String s, boolean justRefresh) {
+    TempCommentsAndThreadId getComments(String s, boolean isThreadId) {
         String threadId = s;
 
-        // Request 1
-        if (!justRefresh) {
+        // Request 1 - don't need to get this if refreshing.
+        // If !isThreadId, s is slug instead
+        if (!isThreadId) {
             HttpDetails.ThreadIdPair threadIdPair = httpMethods.getMsoThreadId(s);
 
             // If Request 1 fails, either error 1 or 2
@@ -92,6 +93,7 @@ public class DisqusDetails {
 
         // Request 2 (Pure http request)
         String commentsJson = disqusMethods.getCommentsJson(threadId);
+        Log.d("CategoryFragment", threadId);
 
         if (commentsJson != null)
             return new TempCommentsAndThreadId(Comments.parseCommentsArray(commentsJson), threadId, 0);

@@ -135,24 +135,27 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         }
     }
 
-    List<Article> getArticlesJSON(String arg, int pageNum) {
+    List<Article> getArticlesJSON(String category, int pageNum) {
         StringBuilder builder = new StringBuilder();
-        String urlPath = "http://morningsignout.com/?json=get_category_posts"
-                + "&slug=" + arg
-                + "&page=" + pageNum
-                + "&include=author,url,title,thumbnail,content";
+
+        // Because there are two cases (category or recent), I want a single string to edit so I
+        // don't have to remember to change both (learned this the hard way).
+        // Pro: see above, less code from not pasting url twice (Aside from this comment :P)
+        // Con: having to specify "category" or "recent" as an argument
+        String unformattedPath = "http://morningsignout.com/?json=get_%1$s_posts"
+                + "&slug=%2$s"
+                + "&page=%3$d"
+                + "&include=author,url,title,thumbnail,content,custom_fields";
+
+        String urlPath = String.format(unformattedPath, "category", category, pageNum);
         HttpURLConnection connection = null;
 
         // For wordpress JSON code. Use this because there is no "latest" category.
-        if (arg.equals("latest")) {
-            urlPath = "http://morningsignout.com/?json=get_recent_posts"
-                    + "&page=" + pageNum
-                    + "&include=author,url,title,thumbnail,content";
-        }
+        if (category.equals("latest"))
+            urlPath = String.format(unformattedPath, "recent", "", pageNum);
 
         // opening URL connection, setup JSON
         try {
-//            URL url = new URL("http://www.morningsignout.com/?json=get_category_posts&slug=featured&page=1&include=author,url,title,thumbnail");
             URL url = new URL(urlPath);
             connection = (HttpURLConnection) url.openConnection();
             InputStream response = connection.getInputStream();
@@ -213,6 +216,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                     String link = currPost.optString("url");
                     articlesList.get(index).setLink(link);
 
+                    // Medium and Full Image
                     String mediumURL = FetchCategoryImageRunnable.NO_IMAGE;
                     String fullURL = FetchCategoryImageRunnable.NO_IMAGE;
                     // create JSONObj of images
@@ -280,12 +284,11 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                         Log.e("FetchListArticlesTask","JSON: "+ title + ": no images found!");
                     }
 
-
-                    articlesList.get(index).setCategoryURL(mediumURL);
-                    articlesList.get(index).setImageURL(fullURL);
+                    articlesList.get(index).setCategoryURL(mediumURL);  // Lower res, the one we use
+                    articlesList.get(index).setImageURL(fullURL);       // Max res, not used yet
 
                     // TODO: implement thumbnails for better performance
-                    String medURL = "";
+                    //String medURL = "";
 
                     // Author
                     JSONObject authorObject = currPost.optJSONObject("author");
@@ -294,6 +297,14 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
                     // Content
                     articlesList.get(index).setContent(currPost.optString("content"));
+
+                    // Disqus Thread ID (Comments Section)
+                    JSONObject customFieldsObject = currPost.optJSONObject("custom_fields");
+                    String dsq_thread_id = customFieldsObject.optString("dsq_thread_id");
+
+                    // JSON String is '"[###]"'. Must trim first and last 2 characters off.
+                    dsq_thread_id = dsq_thread_id.substring(3, dsq_thread_id.length() - 2);
+                    articlesList.get(index).setDsqThreadId(dsq_thread_id);
                 }
 
             } catch (JSONException je) {

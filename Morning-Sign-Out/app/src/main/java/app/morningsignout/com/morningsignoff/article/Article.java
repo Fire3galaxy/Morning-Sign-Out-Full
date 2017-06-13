@@ -7,6 +7,7 @@ public class Article {
     private String mediumURL;
     private String author;
     private String content;
+    private String dsq_thread_id;
 
     public String getImageURL() {
         return imageURL;
@@ -51,5 +52,21 @@ public class Article {
         this.content = content;
     }
 
+    public String getDsqThreadId() {
+        return dsq_thread_id;
+    }
 
+    public void setDsqThreadId(String dsq_thread_id) {
+        this.dsq_thread_id = dsq_thread_id;
+    }
+
+    // From the link
+    public String getSlug() {
+        if (link == null)
+            return null;
+
+        // 26 -> Length of "http://morningsignout.com/", which is constant
+        // length - 1 -> remove an extra '/' at the end
+        return link.substring(26, link.length() - 1);
+    }
 }
