@@ -19,6 +19,7 @@ import java.util.List;
 import app.morningsignout.com.morningsignoff.article.Article;
 import app.morningsignout.com.morningsignoff.category.CategoryFragment;
 import app.morningsignout.com.morningsignoff.search_results.SearchAdapter;
+import app.morningsignout.com.morningsignoff.search_results.SearchFragment;
 
 import static android.view.View.GONE;
 
@@ -27,13 +28,13 @@ import static android.view.View.GONE;
  */
 
 public class FetchListSearchTask extends AsyncTask<String, Void, List<Article>>{
-    private WeakReference<CategoryFragment> fragmentRef;
+    private WeakReference<SearchFragment> fragmentRef;
     private int pageNum;
     private boolean isFirstLoad, isRefresh, isCancelled;
 
     private int adapterPageNum;
 
-    public FetchListSearchTask(CategoryFragment fragment,
+    public FetchListSearchTask(SearchFragment fragment,
                                int pageNum,
                                boolean isFirstLoad,
                                boolean isRefresh) {

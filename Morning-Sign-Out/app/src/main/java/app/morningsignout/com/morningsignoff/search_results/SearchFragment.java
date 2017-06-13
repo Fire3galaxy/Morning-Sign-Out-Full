@@ -11,6 +11,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -22,7 +23,9 @@ import org.w3c.dom.Text;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import app.morningsignout.com.morningsignoff.R;
+import app.morningsignout.com.morningsignoff.article.Article;
 import app.morningsignout.com.morningsignoff.article.ArticleActivity;
+import app.morningsignout.com.morningsignoff.category.CategoryAdapter;
 import app.morningsignout.com.morningsignoff.category.CategoryFragment;
 import app.morningsignout.com.morningsignoff.network.FetchListArticlesTask;
 import app.morningsignout.com.morningsignoff.network.FetchListSearchTask;
@@ -42,7 +45,7 @@ public class SearchFragment extends Fragment {
     public static SearchFragment instance = null;
 
     // local copies of metadata
-    String search = "";
+    String search = ""; // holds the search argument
 
     //Helpful stuff.
     private SwipeRefreshLayout swipeRefreshLayout; // used to handle refreshing on swipe
@@ -107,7 +110,13 @@ public class SearchFragment extends Fragment {
 //            searchAdapter.setAdapterView(gridViewWithHeaderAndFooter); // this may be unnecessary for now
             gridViewWithHeaderAndFooter.setAdapter(searchAdapter);
             isLoadingArticles.set(true);
-            new FetchListSearchTask(this, 1, true, isRefresh).execute()
+            new FetchListSearchTask(this, 1, true, isRefresh).execute(search);
+        } else {
+            refreshTextView.setVisibility(View.GONE);
+            searchAdapter.notifyDataSetChanged();
+            gridViewWithHeaderAndFooter.setAdapter(searchAdapter);
+            if (index != null)
+                gridViewWithHeaderAndFooter.setSelection(index);
         }
 
         // Add a click listener for the returned articles.
@@ -122,11 +131,50 @@ public class SearchFragment extends Fragment {
                 if (id_int < 0 || id_int > adapter.getCount())
                     return;
 
+                // Spawn a new ArticleActivity using the data.
+                Article rowTemp = (Article) adapter.getItem(id_int);
                 Intent articleActivity = new Intent(gridViewWithHeaderAndFooter.getContext(), ArticleActivity.class);
+
+                // Load title
+                articleActivity.putExtra(ArticleActivity.TITLE, rowTemp.getTitle());
+                // Load link
+                articleActivity.putExtra(ArticleActivity.LINK, rowTemp.getLink());
+                // Load content
+                articleActivity.putExtra(ArticleActivity.CONTENT, rowTemp.getContent());
+                // Load header image
+                articleActivity.putExtra(ArticleActivity.IMAGE_URL, rowTemp.getImageURL());
 
                 // Hmm, do we really want to start an entirely new activity? Maybe. Hopefully can handle
                 // this, and if you press back, you end up back in the search results.
                 gridViewWithHeaderAndFooter.getContext().startActivity(articleActivity);
+            }
+        });
+
+        // To load more articles when the bottom of the page is reached
+        gridViewWithHeaderAndFooter.setOnScrollListener(new AbsListView.OnScrollListener() {
+            // Last seen by this listener, not by the program.
+            // So, say, the program has seen page 1 already, but this value is 0 still
+//            int lastSeenPageNum = 0;
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                int lastVisibleItem = firstVisibleItem + visibleItemCount;
+                // At last item
+                if (lastVisibleItem >= totalItemCount) {
+                    WrapperListAdapter wrappedAdapter = (WrapperListAdapter) gridViewWithHeaderAndFooter.getAdapter();
+                    SearchAdapter adapter = (SearchAdapter) wrappedAdapter.getWrappedAdapter();
+
+                    int pageNum = adapter.getPageNum();
+                    // Only make one request per page request
+                    if (totalItemCount != 0 /*&& lastSeenPageNum != pageNum*/ && isLoadingArticles.weakCompareAndSet(false, true)) {
+//                        lastSeenPageNum = pageNum;
+                        new FetchListSearchTask(SearchFragment.this, pageNum + 1, false, false).execute(search);
+                    }
+                }
+            }
+
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
             }
         });
 
