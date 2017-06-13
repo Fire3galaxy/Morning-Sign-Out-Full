@@ -145,7 +145,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         String unformattedPath = "http://morningsignout.com/?json=get_%1$s_posts"
                 + "&slug=%2$s"
                 + "&page=%3$d"
-                + "&include=author,url,title,thumbnail,content,custom_fields";
+                + "&include=author,url,title,thumbnail,content";
 
         String urlPath = String.format(unformattedPath, "category", category, pageNum);
         HttpURLConnection connection = null;
@@ -297,14 +297,6 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
                     // Content
                     articlesList.get(index).setContent(currPost.optString("content"));
-
-                    // Disqus Thread ID (Comments Section)
-                    JSONObject customFieldsObject = currPost.optJSONObject("custom_fields");
-                    String dsq_thread_id = customFieldsObject.optString("dsq_thread_id");
-
-                    // JSON String is '"[###]"'. Must trim first and last 2 characters off.
-                    dsq_thread_id = dsq_thread_id.substring(3, dsq_thread_id.length() - 2);
-                    articlesList.get(index).setDsqThreadId(dsq_thread_id);
                 }
 
             } catch (JSONException je) {

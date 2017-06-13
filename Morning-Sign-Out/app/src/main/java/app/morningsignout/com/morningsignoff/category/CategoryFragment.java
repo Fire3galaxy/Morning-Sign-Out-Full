@@ -38,8 +38,6 @@ import java.util.Map;
 
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.article.Article;
-import app.morningsignout.com.morningsignoff.article.ArticleActivity;
-import app.morningsignout.com.morningsignoff.disqus.DisqusMainActivity;
 import app.morningsignout.com.morningsignoff.network.FetchListArticlesTask;
 import in.srain.cube.views.GridViewWithHeaderAndFooter;
 
@@ -171,9 +169,7 @@ public class CategoryFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 WrapperListAdapter wrappedAdapter = (WrapperListAdapter) parent.getAdapter();
                 CategoryAdapter adapter = (CategoryAdapter) wrappedAdapter.getWrappedAdapter();
-
                 CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-
                 int id_int = (int) id;
 
                 // Do nothing if id is invalid
@@ -183,29 +179,6 @@ public class CategoryFragment extends Fragment {
                 // Create new categoryActivity for the article here
                 // feed the new categoryActivity with the URL of the page
                 Article rowTemp = (Article) adapter.getItem(id_int);
-                Intent articleActivity = new Intent(gridViewWithHeaderAndFooter.getContext(), ArticleActivity.class);
-
-                // TITLE holds the html link for the article
-                articleActivity.putExtra(ArticleActivity.TITLE, rowTemp.getTitle());
-
-                // LINK holds the name of the article
-                articleActivity.putExtra(ArticleActivity.LINK, rowTemp.getLink());
-
-                // CONTENT holds the html text of the article
-                articleActivity.putExtra(ArticleActivity.CONTENT, rowTemp.getContent());
-
-                // IMAGE_URL holds the link to the article's header image
-                articleActivity.putExtra(ArticleActivity.IMAGE_URL, rowTemp.getImageURL());
-
-                //Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_comment_black_24dp);
-                // Intent to launch DisqusActivity from overflow menu
-                Intent commentsIntent = new Intent(getContext(), DisqusMainActivity.class);
-                Log.d("CategoryFragment", rowTemp.getSlug());
-                Log.d("CategoryFragment", rowTemp.getDsqThreadId());
-                commentsIntent.putExtra(DisqusMainActivity.SLUG, rowTemp.getSlug());
-                PendingIntent commentsPendingIntent = PendingIntent.getActivity(getContext(), 0, commentsIntent, 0);
-                //builder.setActionButton(icon, "Comments", pendingIntent, false);
-                builder.addMenuItem("Open comments", commentsPendingIntent);
 
                 // Color of toolbar
                 Resources res = CategoryFragment.this.getResources();
@@ -213,17 +186,11 @@ public class CategoryFragment extends Fragment {
 
                 CustomTabsIntent customTabsIntent = builder.build();
                 customTabsIntent.launchUrl(getContext(), Uri.parse(rowTemp.getLink()));
-
-                //gridViewWithHeaderAndFooter.getContext().startActivity(articleActivity);
             }
         });
 
         // To load more articles when the bottom of the page is reached
         gridViewWithHeaderAndFooter.setOnScrollListener(new AbsListView.OnScrollListener() {
-            // Last seen by this listener, not by the program.
-            // So, say, the program has seen page 1 already, but this value is 0 still
-//            int lastSeenPageNum = 0;
-
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 int lastVisibleItem = firstVisibleItem + visibleItemCount;
@@ -234,8 +201,7 @@ public class CategoryFragment extends Fragment {
 
                     int pageNum = adapter.getPageNum();
                     // Only make one request per page request
-                    if (totalItemCount != 0 /*&& lastSeenPageNum != pageNum*/ && isLoadingArticles.weakCompareAndSet(false, true)) {
-//                        lastSeenPageNum = pageNum;
+                    if (totalItemCount != 0 && isLoadingArticles.weakCompareAndSet(false, true)) {
                         new FetchListArticlesTask(CategoryFragment.this, pageNum + 1, false, false).execute(category_url);
                     }
                 }

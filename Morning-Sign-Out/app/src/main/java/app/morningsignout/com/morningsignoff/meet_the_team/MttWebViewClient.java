@@ -10,7 +10,6 @@ import android.webkit.WebViewClient;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import app.morningsignout.com.morningsignoff.article.ArticleActivity;
 import app.morningsignout.com.morningsignoff.network.URLToMobileArticle;
 
 /**
@@ -57,10 +56,12 @@ public class MttWebViewClient extends WebViewClient {
             if (url.contains(baseUrl))
                 return false;
 
-            Intent intent = new Intent(view.getContext(), ArticleActivity.class);
-            intent.putExtra(Intent.EXTRA_HTML_TEXT, url); // Put url in intent
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP); // Open w/ old articleActivity if exists
-            view.getContext().startActivity(intent);
+            // This class (MttWebViewClient) is likely deprecated. If it isn't we're using
+            // Kareem's chrome tabs anyway
+//            Intent intent = new Intent(view.getContext(), ArticleActivity.class);
+//            intent.putExtra(Intent.EXTRA_HTML_TEXT, url); // Put url in intent
+//            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP); // Open w/ old articleActivity if exists
+//            view.getContext().startActivity(intent);
             return true;
         }
 

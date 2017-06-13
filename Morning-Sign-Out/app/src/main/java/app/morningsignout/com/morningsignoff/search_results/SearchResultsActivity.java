@@ -25,7 +25,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import app.morningsignout.com.morningsignoff.R;
-import app.morningsignout.com.morningsignoff.article.ArticleActivity;
 import app.morningsignout.com.morningsignoff.network.URLToMobileArticle;
 
 public class SearchResultsActivity extends ActionBarActivity {
