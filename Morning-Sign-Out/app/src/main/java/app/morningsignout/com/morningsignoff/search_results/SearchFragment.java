@@ -2,6 +2,7 @@ package app.morningsignout.com.morningsignoff.search_results;
 
 //import android.app.Fragment; //https://stackoverflow.com/questions/9586218/fragmentactivity-cannot-cast-from-fragment-to-derived-class
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -23,6 +24,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.article.ArticleActivity;
 import app.morningsignout.com.morningsignoff.category.CategoryFragment;
+import app.morningsignout.com.morningsignoff.network.FetchListArticlesTask;
+import app.morningsignout.com.morningsignoff.network.FetchListSearchTask;
 import in.srain.cube.views.GridViewWithHeaderAndFooter;
 
 /**
@@ -32,7 +35,7 @@ import in.srain.cube.views.GridViewWithHeaderAndFooter;
 public class SearchFragment extends Fragment {
     // these are the "key" strings for getArguments() and setArguments() and so on.
     final static String SEARCH_PARAM = "SEARCH_PARAM"; // have SearchResultsActivity set this so we can put this as header
-    final static String SEARCH_REFRESH = "SEARCH_REFRESH"; // shouldn't this be a boolean?
+    final static String SEARCH_REFRESH = "SEARCH_REFRESH"; // shouldn't this be a boolean? e: no, this is a tag.
     final static String TAG = "SearchFragment";
 
     // instance
@@ -49,6 +52,7 @@ public class SearchFragment extends Fragment {
     private ProgressBar footerProgressBar; // refers to footer progress bar
     private GridViewWithHeaderAndFooter gridViewWithHeaderAndFooter; // gridview
 
+    private SearchAdapter searchAdapter; // custom adapter for our "listview"
     private AtomicBoolean isLoadingArticles;
     protected static Integer index = null; // marks index of current selection (I think?)
 
@@ -89,8 +93,22 @@ public class SearchFragment extends Fragment {
         splashScreenView = (ImageView) rootView.findViewById(R.id.imageView_splash_search);
 //        footerProgressBar = getFooterProgressBarXml(); // FIXME
         gridViewWithHeaderAndFooter = (GridViewWithHeaderAndFooter) rootView.findViewById(R.id.gridView_search);
+        boolean isRefresh = getArguments().getBoolean(SEARCH_REFRESH, false);
 
         // Custom adapter? SearchAdapter?
+        //headerView.setText(); header may be unnecessary
+        swipeRefreshLayout.setColorSchemeColors(Color.argb(255,0x81,0xbf,0xff), Color.WHITE);
+        //setUpGridView(gridViewWithHeaderAndFooter);
+        gridViewWithHeaderAndFooter.addFooterView(footerProgressBar);
+
+        // Creates and loads new adapter or sets position of existing gridView
+        if(searchAdapter == null) {
+            searchAdapter = new SearchAdapter(getActivity(), inflater);
+//            searchAdapter.setAdapterView(gridViewWithHeaderAndFooter); // this may be unnecessary for now
+            gridViewWithHeaderAndFooter.setAdapter(searchAdapter);
+            isLoadingArticles.set(true);
+            new FetchListSearchTask(this, 1, true, isRefresh).execute()
+        }
 
         // Add a click listener for the returned articles.
         gridViewWithHeaderAndFooter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
