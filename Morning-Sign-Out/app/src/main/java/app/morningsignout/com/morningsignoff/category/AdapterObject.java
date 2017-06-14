@@ -6,4 +6,5 @@ public class AdapterObject {
     public TextView title;
     public TextView author;
     public ImageView image;
+    public TextView excerpt; // added for search_revamp SearchAdapter
 }

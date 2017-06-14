@@ -214,4 +214,16 @@ public class SearchFragment extends Fragment {
         }
         return fragment;
     }
+
+    // Helper functions, used in the Fetch/Async task
+    public SwipeRefreshLayout getSwipeRefreshLayout() { return swipeRefreshLayout; }
+
+    public ProgressBar getProgressBar() { return progressBar; }
+
+    public TextView getRefreshTextView() { return refreshTextView; }
+
+    public ProgressBar getFooterProgressBar() { return footerProgressBar; }
+
+    public GridViewWithHeaderAndFooter getGridViewWithHeaderAndFooter()
+    { return gridViewWithHeaderAndFooter; }
 }

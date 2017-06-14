@@ -92,6 +92,7 @@ public class SearchAdapter extends BaseAdapter {
             viewHolder.title = (TextView) row.findViewById(R.id.textViewTitle_search);
             viewHolder.author = (TextView) row.findViewById(R.id.textViewAuthor_search);
             viewHolder.image = (ImageView) row.findViewById(R.id.imageView_search);
+            viewHolder.excerpt = (TextView) row.findViewById(R.id.textViewExcerpt_search);
             row.setTag(viewHolder);
         }
         else {
