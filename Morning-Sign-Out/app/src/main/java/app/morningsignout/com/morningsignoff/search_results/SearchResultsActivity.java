@@ -69,25 +69,25 @@ public class SearchResultsActivity extends ActionBarActivity {
 //        searchWebViewClient = new SearchWebViewClient(getIntent().getStringExtra(SearchManager.QUERY));
 //        webView.setWebViewClient(searchWebViewClient);
 
-        final ProgressBar loadPage = (ProgressBar) findViewById(R.id.progressBar_search);
-        webView.setWebChromeClient(new WebChromeClient() { // Progress bar
-            @Override
-            public void onProgressChanged(WebView v, int newProgress) {
-                if (newProgress < 100) {
-                    if (loadPage.getVisibility() == View.GONE)
-                        loadPage.setVisibility(View.VISIBLE);
-
-                    loadPage.setProgress(newProgress);
-                } else if (newProgress == 100) {
-                    loadPage.setProgress(newProgress);
-
-                    if (loadPage.getVisibility() == View.VISIBLE)
-                        loadPage.setVisibility(View.GONE);
-                }
-            }
-        });
-
-        handleSearch(getIntent());
+//        final ProgressBar loadPage = (ProgressBar) findViewById(R.id.progressBar_search);
+//        webView.setWebChromeClient(new WebChromeClient() { // Progress bar
+//            @Override
+//            public void onProgressChanged(WebView v, int newProgress) {
+//                if (newProgress < 100) {
+//                    if (loadPage.getVisibility() == View.GONE)
+//                        loadPage.setVisibility(View.VISIBLE);
+//
+//                    loadPage.setProgress(newProgress);
+//                } else if (newProgress == 100) {
+//                    loadPage.setProgress(newProgress);
+//
+//                    if (loadPage.getVisibility() == View.VISIBLE)
+//                        loadPage.setVisibility(View.GONE);
+//                }
+//            }
+//        });
+//
+//        handleSearch(getIntent());
     }
 
     @Override
@@ -101,7 +101,7 @@ public class SearchResultsActivity extends ActionBarActivity {
     @Override
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        handleSearch(intent);
+//        handleSearch(intent);
     }
 
     private void handleSearch(Intent intent) {

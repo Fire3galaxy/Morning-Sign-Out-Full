@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.util.Xml;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +22,10 @@ import android.widget.TextView;
 import android.widget.WrapperListAdapter;
 
 import org.w3c.dom.Text;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import app.morningsignout.com.morningsignoff.R;
@@ -94,7 +100,7 @@ public class SearchFragment extends Fragment {
         progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar_search);
         refreshTextView = (TextView) rootView.findViewById(R.id.textView_searchRefresh);
         splashScreenView = (ImageView) rootView.findViewById(R.id.imageView_splash_search);
-//        footerProgressBar = getFooterProgressBarXml(); // FIXME
+        footerProgressBar = getFooterProgressBarXml(); // FIXME
         gridViewWithHeaderAndFooter = (GridViewWithHeaderAndFooter) rootView.findViewById(R.id.gridView_search);
         boolean isRefresh = getArguments().getBoolean(SEARCH_REFRESH, false);
 
@@ -216,6 +222,26 @@ public class SearchFragment extends Fragment {
     }
 
     // Helper functions, used in the Fetch/Async task
+    ProgressBar getFooterProgressBarXml() {
+        // -get attributes for footerProgressBar
+        XmlPullParser pullParser = getResources().getXml(R.xml.footer_progressbar);
+
+        // -get first tag of xml
+        try {
+            int type = 0;
+            while (type != XmlPullParser.END_DOCUMENT && type != XmlPullParser.START_TAG) {
+                type = pullParser.next();
+            }
+        } catch (XmlPullParserException | IOException e) {
+            Log.e("SearchFragment", e.getMessage());
+        }
+
+        // -get attriuteSet
+        AttributeSet attrs = Xml.asAttributeSet(pullParser);
+
+        // -create progressBar and add to listView
+        return new ProgressBar(getActivity(), attrs);
+    }
     public SwipeRefreshLayout getSwipeRefreshLayout() { return swipeRefreshLayout; }
 
     public ProgressBar getProgressBar() { return progressBar; }
