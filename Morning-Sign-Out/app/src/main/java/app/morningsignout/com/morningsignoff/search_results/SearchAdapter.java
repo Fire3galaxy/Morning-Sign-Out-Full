@@ -41,7 +41,7 @@ public class SearchAdapter extends BaseAdapter {
     // constructor
     SearchAdapter(Activity activity, LayoutInflater inflater) {
         this.articles = new ArrayList<>();
-//        this.uniqueArticleNames = new HashSet<>();
+        this.uniqueArticleNames = new HashSet<>();
         this.inflater = inflater;
         pageNum = 0;
         firstVisibleItem = 0;

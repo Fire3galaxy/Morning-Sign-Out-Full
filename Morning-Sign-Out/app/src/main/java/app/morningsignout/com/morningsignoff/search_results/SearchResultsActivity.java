@@ -34,9 +34,9 @@ import app.morningsignout.com.morningsignoff.category.SplashFragment;
 import app.morningsignout.com.morningsignoff.network.URLToMobileArticle;
 
 public class SearchResultsActivity extends ActionBarActivity {
-    SearchView searchView;
-    WebView webView;
-    SearchWebViewClient searchWebViewClient;
+//    SearchView searchView;
+//    WebView webView;
+//    SearchWebViewClient searchWebViewClient;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -103,27 +103,27 @@ public class SearchResultsActivity extends ActionBarActivity {
         super.onNewIntent(intent);
 //        handleSearch(intent);
     }
-
-    private void handleSearch(Intent intent) {
-        if (intent == null) return;
-
-        // Create search url and load webView
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            setTitle(query); // In actionbar
-            String searchURI = getURI(query);
-
-            // Open webView with search results of query
-            if (searchURI != null) {
-                searchWebViewClient.setQuery(query);
-                webView.loadUrl(searchURI);
-            } else {
-                Log.e("Search", "Error: Failed Search (null string)");
-            }
-        }
-
-        else Log.e("Search", "Error: Failed Search (intent not for search)");
-    }
+//
+//    private void handleSearch(Intent intent) {
+//        if (intent == null) return;
+//
+//        // Create search url and load webView
+//        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+//            String query = intent.getStringExtra(SearchManager.QUERY);
+//            setTitle(query); // In actionbar
+//            String searchURI = getURI(query);
+//
+//            // Open webView with search results of query
+//            if (searchURI != null) {
+//                searchWebViewClient.setQuery(query);
+//                webView.loadUrl(searchURI);
+//            } else {
+//                Log.e("Search", "Error: Failed Search (null string)");
+//            }
+//        }
+//
+//        else Log.e("Search", "Error: Failed Search (intent not for search)");
+//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
