@@ -6,6 +6,10 @@
         <item name="colorPrimary">@color/mso_blue</item>
         <item name="android:actionBarSize">45dp</item>
         <item name="actionBarSize">45dp</item>
+        <item name="android:fastScrollThumbDrawable">@drawable/fastscroll</item>
+        <item name="android:fastScrollOverlayPosition">aboveThumb</item>
+        <item name="android:fastScrollTextColor">@color/background_white</item>
+        <item name="android:fastScrollPreviewBackgroundRight">@drawable/fastscroll_display</item>
     </style>
 
     <style name="DisqusTheme" parent="Theme.AppCompat.Light.DarkActionBar">

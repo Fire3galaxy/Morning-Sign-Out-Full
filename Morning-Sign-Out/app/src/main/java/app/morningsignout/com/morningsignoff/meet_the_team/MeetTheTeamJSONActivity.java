@@ -56,6 +56,7 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.meet_the_team_json_list);
 
         meetTheTeamJSONAdapter = new MeetTheTeamJSONAdapter(this,new ArrayList<MeetTheTeamAuthor>());
+        listView.setFastScrollEnabled(true);
         listView.setAdapter(meetTheTeamJSONAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -164,6 +165,7 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(ArrayList<MeetTheTeamAuthor> meetTheTeamAuthors) {
             MeetTheTeamJSONAdapter meetTheTeamJSONAdapter = new MeetTheTeamJSONAdapter(context,meetTheTeamAuthors);
+            listView.setFastScrollEnabled(true);
             listView.setAdapter(meetTheTeamJSONAdapter);
         }
     }

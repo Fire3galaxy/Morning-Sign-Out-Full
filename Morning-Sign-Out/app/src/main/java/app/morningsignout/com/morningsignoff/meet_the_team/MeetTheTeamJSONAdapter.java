@@ -9,9 +9,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.SectionIndexer;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Set;
 
 import app.morningsignout.com.morningsignoff.R;
 
@@ -19,13 +25,37 @@ import app.morningsignout.com.morningsignoff.R;
  * Created by maniknarang on 5/25/17.
  */
 
-public class MeetTheTeamJSONAdapter extends ArrayAdapter<MeetTheTeamAuthor> {
+public class MeetTheTeamJSONAdapter extends ArrayAdapter<MeetTheTeamAuthor> implements SectionIndexer {
 
     private ArrayList<MeetTheTeamAuthor> meetTheTeamAuthors;
+    private HashMap<String, Integer> mapIndex;
+    private String[] sections;
 
     public MeetTheTeamJSONAdapter(Context context, ArrayList<MeetTheTeamAuthor> meetTheTeamAuthors) {
         super(context, 0, meetTheTeamAuthors);
         this.meetTheTeamAuthors = meetTheTeamAuthors;
+
+        mapIndex = new LinkedHashMap<String, Integer>();
+
+        for (int i = 0; i < meetTheTeamAuthors.size(); i++) {
+            MeetTheTeamAuthor author = meetTheTeamAuthors.get(i);
+            String ch = author.getName().substring(0,1);
+            ch = ch.toUpperCase(Locale.US);
+
+            // HashMap will prevent duplicates
+            mapIndex.put(ch, i);
+        }
+
+        Set<String> sectionLetters = mapIndex.keySet();
+
+        // create a list from the set to sort
+        ArrayList<String> sectionList = new ArrayList<String>(sectionLetters);
+
+        Collections.sort(sectionList);
+
+        sections = new String[sectionList.size()];
+
+        sectionList.toArray(sections);
     }
 
     @NonNull
@@ -47,5 +77,20 @@ public class MeetTheTeamJSONAdapter extends ArrayAdapter<MeetTheTeamAuthor> {
         }
 
         return listView;
+    }
+
+    @Override
+    public Object[] getSections() {
+        return sections;
+    }
+
+    @Override
+    public int getPositionForSection(int sectionIndex) {
+        return mapIndex.get(sections[sectionIndex]);
+    }
+
+    @Override
+    public int getSectionForPosition(int position) {
+        return 0;
     }
 }
