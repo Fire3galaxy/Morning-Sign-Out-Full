@@ -23,6 +23,9 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.network.FetchMeetTheTeamTask;
@@ -67,7 +70,6 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
                 // Load the url
                 webView.loadUrl(url);
 
-
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(Uri.parse(url));
 
@@ -111,10 +113,40 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
                 JSONObject jsonObject = new JSONObject(response.body().string());
                 JSONArray jsonArray = jsonObject.getJSONArray("authors");
 
-                for(int i=0; i<jsonArray.length(); i++) {
-                    String name = jsonArray.getJSONObject(i).getString("name");
-                    String desc = Parser.replaceUnicode(jsonArray.getJSONObject(i).getString("description"));
-                    String slug = jsonArray.getJSONObject(i).getString("slug");
+                // To sort the JSON array
+                JSONArray sortedjsonArray = new JSONArray();
+
+                List<JSONObject> list = new ArrayList<>();
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    list.add(jsonArray.getJSONObject(i));
+                }
+
+                Collections.sort(list, new Comparator<JSONObject>() {
+                    @Override
+                    public int compare(JSONObject o1, JSONObject o2) {
+                        String s1 = new String();
+                        String s2 = new String();
+
+                        try {
+                            s1 = (String) o1.get("name");
+                            s2 = (String) o2.get("name");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        return s1.compareTo(s2);
+                    }
+                });
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    sortedjsonArray.put(list.get(i));
+                }
+
+                for(int i = 0; i < sortedjsonArray.length(); i++) {
+                    String name = sortedjsonArray.getJSONObject(i).getString("name");
+                    String desc = Parser.replaceUnicode(sortedjsonArray.getJSONObject(i).getString("description"));
+                    String slug = sortedjsonArray.getJSONObject(i).getString("slug");
 
                     authorList.add(new MeetTheTeamAuthor(name,desc,slug));
                 }
