@@ -24,7 +24,7 @@ public class MeetTheTeamJSONAdapter extends ArrayAdapter<MeetTheTeamAuthor> {
     private ArrayList<MeetTheTeamAuthor> meetTheTeamAuthors;
 
     public MeetTheTeamJSONAdapter(Context context, ArrayList<MeetTheTeamAuthor> meetTheTeamAuthors) {
-        super(context, 0,meetTheTeamAuthors);
+        super(context, 0, meetTheTeamAuthors);
         this.meetTheTeamAuthors = meetTheTeamAuthors;
     }
 
@@ -35,11 +35,16 @@ public class MeetTheTeamJSONAdapter extends ArrayAdapter<MeetTheTeamAuthor> {
         listView = LayoutInflater.from(getContext()).inflate(R.layout.meet_the_team_author_list, parent, false);
         MeetTheTeamAuthor meetTheTeamAuthor = meetTheTeamAuthors.get(position);
 
-        TextView nameView = (TextView)listView.findViewById(R.id.meet_the_team_json_name);
-        TextView descView = (TextView)listView.findViewById(R.id.meet_the_team_json_desc);
+        TextView nameView = (TextView) listView.findViewById(R.id.meet_the_team_json_name);
+        TextView descView = (TextView) listView.findViewById(R.id.meet_the_team_json_desc);
 
         nameView.setText(meetTheTeamAuthor.getName());
-        descView.setText(meetTheTeamAuthor.getDesc());
+
+        if (meetTheTeamAuthor.getDesc().equals("")) {
+            descView.setHeight(3);
+        } else {
+            descView.setText(meetTheTeamAuthor.getDesc());
+        }
 
         return listView;
     }
