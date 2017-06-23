@@ -5,13 +5,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="app.morningsignout.com.morningsignoff.meet_the_team.MeetTheTeamJSONActivity">
+    tools:context="app.morningsignout.com.morningsignoff.meet_the_team.MeetTheTeamJSONActivity"
+    android:orientation="vertical">
+
+    <TextView
+        android:gravity="center"
+        android:id="@+id/meet_the_team_heading"
+        android:layout_width="match_parent"
+        android:layout_height="27dp"
+        android:text="Meet the Team"
+        android:textSize="18dp"
+        android:textColor="#87BFFF"
+        android:textStyle="bold" />
 
     <ListView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/meet_the_team_json_list"
-        tools:layout_editor_absoluteY="0dp"
-        tools:layout_editor_absoluteX="8dp">
-    </ListView>
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="0dp"></ListView>
+
 </LinearLayout>
