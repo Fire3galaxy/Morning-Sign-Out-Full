@@ -2,15 +2,19 @@ package app.morningsignout.com.morningsignoff.search_results;
 
 //import android.app.Fragment; //https://stackoverflow.com/questions/9586218/fragmentactivity-cannot-cast-from-fragment-to-derived-class
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.util.LruCache;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Xml;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,6 +66,7 @@ public class SearchFragment extends Fragment {
     private GridViewWithHeaderAndFooter gridViewWithHeaderAndFooter; // gridview
 
     private SearchAdapter searchAdapter; // custom adapter for our "listview"
+    private LruCache<String, Bitmap> memoryCache; // sets up a cache for images
     private AtomicBoolean isLoadingArticles;
     protected static Integer index = null; // marks index of current selection (I think?)
 
@@ -83,13 +88,49 @@ public class SearchFragment extends Fragment {
         }
 
         isLoadingArticles = new AtomicBoolean(false);
-        //setUpCache();
+        setUpCache();
+    }
+
+    private void setUpGridView(GridViewWithHeaderAndFooter grid) {
+//        if (SearchAdapter.isLandscape(getContext())) {
+//            grid.setNumColumns(2);
+//            grid.setPadding(5,10,5,10);
+//        } else
+//        {
+            grid.setNumColumns(1); // for now let's just try only the one column
+//        }
+    }
+
+    private void setUpCache() {
+        /*  Thanks to http://developer.android.com/training/displaying-bitmaps/cache-bitmap.html
+        * for caching code */
+        // max memory of hdpi ~32 MB
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+        // memory for images ~4.5 MB = 7-8 images
+        final int cacheSize;
+
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int width = size.x;
+        if (width <= 320) {
+            cacheSize = maxMemory / 3;
+        } else
+            cacheSize = maxMemory / 8;
+        memoryCache = new LruCache<String, Bitmap>(cacheSize) {
+            @Override
+            protected int sizeOf(String key, Bitmap bitmap) {
+                // The cache size will be measured in kilobytes rather than the number of items.
+                return bitmap.getByteCount() / 1024;
+            }
+        };
     }
 
     // Not sure why this is nullable. Doesn't seem to cause any harm, but I'll keep an eye on this.
-    @Nullable
+//    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+//    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         instance = this;
         View rootView = inflater.inflate(R.layout.fragment_search, container, false);
@@ -105,15 +146,15 @@ public class SearchFragment extends Fragment {
         boolean isRefresh = getArguments().getBoolean(SEARCH_REFRESH, false);
 
         // Custom adapter? SearchAdapter?
-        //headerView.setText(); header may be unnecessary
+        headerView.setText(search); //header may be unnecessary
         swipeRefreshLayout.setColorSchemeColors(Color.argb(255,0x81,0xbf,0xff), Color.WHITE);
-        //setUpGridView(gridViewWithHeaderAndFooter);
+        setUpGridView(gridViewWithHeaderAndFooter);
         gridViewWithHeaderAndFooter.addFooterView(footerProgressBar);
 
         // Creates and loads new adapter or sets position of existing gridView
         if(searchAdapter == null) {
             searchAdapter = new SearchAdapter(getActivity(), inflater);
-//            searchAdapter.setAdapterView(gridViewWithHeaderAndFooter); // this may be unnecessary for now
+            searchAdapter.setAdapterView(gridViewWithHeaderAndFooter); // this may be unnecessary for now
             gridViewWithHeaderAndFooter.setAdapter(searchAdapter);
             isLoadingArticles.set(true);
             new FetchListSearchTask(this, 1, true, isRefresh).execute(search);
@@ -165,11 +206,12 @@ public class SearchFragment extends Fragment {
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 int lastVisibleItem = firstVisibleItem + visibleItemCount;
+//                Log.d("SearchFragment","onscroll @ lastvisibleitem: " + lastVisibleItem + ", totalitemcount: " + totalItemCount);
                 // At last item
                 if (lastVisibleItem >= totalItemCount) {
                     WrapperListAdapter wrappedAdapter = (WrapperListAdapter) gridViewWithHeaderAndFooter.getAdapter();
                     SearchAdapter adapter = (SearchAdapter) wrappedAdapter.getWrappedAdapter();
-
+                    Log.d("SearchFragment","onscroll - first if");
                     int pageNum = adapter.getPageNum();
                     // Only make one request per page request
                     if (totalItemCount != 0 /*&& lastSeenPageNum != pageNum*/ && isLoadingArticles.weakCompareAndSet(false, true)) {

@@ -90,7 +90,7 @@ public class SearchAdapter extends BaseAdapter {
 
             // Get the author, imageViewReference and title of the row item
             viewHolder.title = (TextView) row.findViewById(R.id.textViewTitle_search);
-            viewHolder.author = (TextView) row.findViewById(R.id.textViewAuthor_search);
+//            viewHolder.author = (TextView) row.findViewById(R.id.textViewAuthor_search);
             viewHolder.image = (ImageView) row.findViewById(R.id.imageView_search);
             viewHolder.excerpt = (TextView) row.findViewById(R.id.textViewExcerpt_search);
             row.setTag(viewHolder);
@@ -106,7 +106,8 @@ public class SearchAdapter extends BaseAdapter {
         if(isLandscape(row.getContext()))
             viewHolder.title.setLines(3);
         viewHolder.title.setText(rowTemp.getTitle());
-        viewHolder.author.setText(rowTemp.getAuthor());
+//        viewHolder.author.setText(rowTemp.getAuthor());
+        viewHolder.excerpt.setText(rowTemp.getExcerpt());
 
         // add image stuff here
 

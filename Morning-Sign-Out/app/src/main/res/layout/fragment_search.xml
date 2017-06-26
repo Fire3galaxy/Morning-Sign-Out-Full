@@ -68,7 +68,8 @@
         android:textStyle="italic|bold"
         android:typeface="normal"
         android:textSize="22sp"
-        android:textColor="@android:color/black" />
+        android:textColor="@android:color/black"
+        android:visibility="gone" />
 
     <ImageView
         android:id="@+id/imageView_splash_search"
