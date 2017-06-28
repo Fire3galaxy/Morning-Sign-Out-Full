@@ -35,7 +35,6 @@ import java.util.Map;
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.meet_the_team.MeetTheTeamJSONActivity;
 import app.morningsignout.com.morningsignoff.search_results.SearchResultsActivity;
-import app.morningsignout.com.morningsignoff.meet_the_team.MeetTheTeamActivity;
 import app.morningsignout.com.morningsignoff.network.FetchCategoryImageRunnable;
 
 // Category page categoryActivity

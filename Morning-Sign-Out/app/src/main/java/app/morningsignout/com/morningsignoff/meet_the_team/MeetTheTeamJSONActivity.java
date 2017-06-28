@@ -5,10 +5,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.NavUtils;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
 import android.webkit.WebView;
@@ -30,7 +28,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import app.morningsignout.com.morningsignoff.R;
-import app.morningsignout.com.morningsignoff.network.FetchMeetTheTeamTask;
 import app.morningsignout.com.morningsignoff.network.Parser;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -103,7 +100,7 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
 
     public void setupActionBar() {
         ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null);
-        this.getSupportActionBar().setCustomView(ib, params);
+        this.getSupportActionBar().setCustomView(ib);
         super.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         super.getSupportActionBar().setDisplayShowCustomEnabled(true);
     }
