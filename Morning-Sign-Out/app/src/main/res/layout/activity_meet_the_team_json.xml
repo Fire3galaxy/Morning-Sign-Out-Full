@@ -12,15 +12,17 @@
         android:gravity="center"
         android:id="@+id/meet_the_team_heading"
         android:layout_width="match_parent"
-        android:layout_height="27dp"
-        android:text="Meet the Team"
-        android:textSize="18dp"
-        android:textColor="#87BFFF"
-        android:textStyle="bold" />
+        android:layout_height="wrap_content"
+        android:text="@string/meet_the_team"
+        android:textSize="24sp"
+        android:textColor="@android:color/black"
+        android:textStyle="bold|italic"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"/>
 
     <ListView
         android:id="@+id/meet_the_team_json_list"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout_editor_absoluteX="8dp"
         tools:layout_editor_absoluteY="0dp"></ListView>

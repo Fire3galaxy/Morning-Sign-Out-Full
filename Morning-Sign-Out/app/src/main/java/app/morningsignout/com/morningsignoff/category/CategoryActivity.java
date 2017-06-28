@@ -92,18 +92,7 @@ public class CategoryActivity extends AppCompatActivity {
         setDrawerListenerToActionBarToggle();
 
         // Adding MSO Logo to center of action bar
-        if (getSupportActionBar() != null)
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-        ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null);
-        ib.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectItem(0);
-            }
-        });
-        ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);
-        this.getSupportActionBar().setCustomView(ib, params);
-        this.getSupportActionBar().setDisplayShowCustomEnabled(true);
+        setupActionBar();
 
 
         // Fragments added to activity
@@ -258,5 +247,21 @@ public class CategoryActivity extends AppCompatActivity {
 //        CategoryFragment.instance.debugCache();
 //        CategoryBitmapPool.debugPool();
 //        FetchCategoryImageRunnable.debugAllHashes();
+    }
+
+    public void setupActionBar() {
+        if (getSupportActionBar() != null) {
+            ImageView ib = (ImageView) getLayoutInflater().inflate(R.layout.title_main, null);
+            this.getSupportActionBar().setCustomView(ib);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowCustomEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            ib.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    selectItem(0);
+                }
+            });
+        }
     }
 }

@@ -14,6 +14,7 @@
     <string name="action_login">Log in </string>
     <string name="action_logout">Log out</string>
     <string name="action_refresh">Refresh</string>
+    <string name="action_blank">Blank</string>
 
     <string name="disqus_login">Log In - Disqus</string>
     <string name="disqus_reply">Reply</string>
@@ -46,6 +47,7 @@
     <string name="button_mttPrev">Prev</string>
     <string name="button_mttNext">Next</string>
 
+    <string name="error_fail_to_connect">We had trouble trying to connect</string>
     <string name="error">Something went wrong. Please report this bug to the developers in the play
         store comment section.</string>
     <string name="error_no_internet_1">We cannot connect to</string>
