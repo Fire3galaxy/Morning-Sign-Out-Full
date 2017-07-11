@@ -22,11 +22,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.article.Article;
 import app.morningsignout.com.morningsignoff.category.CategoryAdapter;
 import app.morningsignout.com.morningsignoff.category.CategoryFragment;
-
-import static android.view.View.GONE;
 
 // This class is called in Category Activity to fetch articles online and feed it to CategoryAdapter
 // do in background gets the article objects from morningsignout, and converts imageURL to bitmap
@@ -115,22 +114,22 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
             if (isRefresh) {
                 fragmentRef.get().getSwipeRefreshLayout().setRefreshing(false);
             } else {
-                fragmentRef.get().getProgressBar().setVisibility(GONE);
+                fragmentRef.get().getProgressBar().setVisibility(View.GONE);
             }
 
             // hide how-to-refresh textView
             if (articles != null)
-                fragmentRef.get().getRefreshTextView().setVisibility(GONE);
+                fragmentRef.get().getRefreshTextView().setVisibility(View.GONE);
         } else
-            fragmentRef.get().getFooterProgressBar().setVisibility(GONE);
+            fragmentRef.get().getFooterProgressBar().setVisibility(View.GONE);
 
         // If result and adapter are not null and fragment still exists, load items
         if (adapter != null && fragmentRef.get() != null) {
             if (articles != null)
                 adapter.loadMoreItems(articles, pageNum);
             else if (adapter.isEmpty())
-                Toast.makeText(fragmentRef.get().getContext(),
-                        "We had trouble trying to connect", Toast.LENGTH_SHORT).show();
+                Toast.makeText(fragmentRef.get().getContext(), R.string.error_fail_to_connect,
+                        Toast.LENGTH_SHORT).show();
             fragmentRef.get().getIsLoadingArticles().set(false);
         }
     }

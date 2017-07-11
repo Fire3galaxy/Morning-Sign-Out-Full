@@ -4,10 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v7.app.ActionBar;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
 import android.webkit.WebView;
@@ -15,6 +14,7 @@ import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -28,7 +28,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import app.morningsignout.com.morningsignoff.R;
-import app.morningsignout.com.morningsignoff.network.FetchMeetTheTeamTask;
 import app.morningsignout.com.morningsignoff.network.Parser;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -55,9 +54,15 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
         String url = "http://morningsignout.com/?json=get_author_index" ;
         listView = (ListView) findViewById(R.id.meet_the_team_json_list);
 
-        meetTheTeamJSONAdapter = new MeetTheTeamJSONAdapter(this,new ArrayList<MeetTheTeamAuthor>());
+        // Daniel: Wasn't sure you needed this empty adapter here. You assign a new one in the AsyncTask anyway.
+//        meetTheTeamJSONAdapter = new MeetTheTeamJSONAdapter(this,new ArrayList<MeetTheTeamAuthor>());
         listView.setFastScrollEnabled(true);
-        listView.setAdapter(meetTheTeamJSONAdapter);
+//        listView.setAdapter(meetTheTeamJSONAdapter);
+
+        // Daniel: Manik, you can start at this function for the header.
+        // Note: When you add header views, the indexing in your on click listener will be off by the
+        // number of header views you have. They get counted in the index too. Account for this.
+//        listView.addHeaderView(getHeaderIntro(), null, false);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -89,12 +94,21 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
         return true;
     }
 
+    public void returnToParent(View view) {
+        NavUtils.navigateUpFromSameTask(this);
+    }
+
     public void setupActionBar() {
         ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null);
-        ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);
-        this.getSupportActionBar().setCustomView(ib, params);
+        this.getSupportActionBar().setCustomView(ib);
         super.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         super.getSupportActionBar().setDisplayShowCustomEnabled(true);
+    }
+
+    private TextView getHeaderIntro() {
+        TextView meetWritersTv = new TextView(this);
+        meetWritersTv.setText("Meet our Writing Team!");
+        return meetWritersTv;
     }
 
     public class FetchMeetTheTeamJSONTask extends AsyncTask<String,Void,ArrayList<MeetTheTeamAuthor>> {
@@ -164,9 +178,14 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(ArrayList<MeetTheTeamAuthor> meetTheTeamAuthors) {
-            MeetTheTeamJSONAdapter meetTheTeamJSONAdapter = new MeetTheTeamJSONAdapter(context,meetTheTeamAuthors);
-            listView.setFastScrollEnabled(true);
-            listView.setAdapter(meetTheTeamJSONAdapter);
+            if (meetTheTeamAuthors != null) {
+                MeetTheTeamJSONAdapter meetTheTeamJSONAdapter = new MeetTheTeamJSONAdapter(context, meetTheTeamAuthors);
+                listView.setFastScrollEnabled(true);
+                listView.setAdapter(meetTheTeamJSONAdapter);
+            } else {
+                Toast.makeText(MeetTheTeamJSONActivity.this, R.string.error_fail_to_connect,
+                        Toast.LENGTH_LONG).show();
+            }
         }
     }
 }

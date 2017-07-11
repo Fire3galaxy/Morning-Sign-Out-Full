@@ -72,10 +72,6 @@
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:launchMode="singleInstance"
             android:theme="@style/DisqusTheme" />
-        <activity android:name=".meet_the_team.MTTListViewActivity" />
-        <activity
-            android:name=".meet_the_team.MTTWebViewActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize" />
     </application>
 
 </manifest>
