@@ -217,6 +217,7 @@ public class SearchFragment extends Fragment {
                     if (totalItemCount != 0 /*&& lastSeenPageNum != pageNum*/ && isLoadingArticles.weakCompareAndSet(false, true)) {
 //                        lastSeenPageNum = pageNum;
                         new FetchListSearchTask(SearchFragment.this, pageNum + 1, false, false).execute(search);
+                        Log.d("SearchFragment", "Making new request");
                     }
                 }
             }
