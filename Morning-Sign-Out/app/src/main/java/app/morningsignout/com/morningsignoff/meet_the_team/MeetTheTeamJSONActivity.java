@@ -58,9 +58,6 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
 
         listView.setFastScrollEnabled(true);
 
-        // Daniel: Manik, you can start at this function for the header.
-        // Note: When you add header views, the indexing in your on click listener will be off by the
-        // number of header views you have. They get counted in the index too. Account for this.
         // Header Views for the List View
         listView.addHeaderView(getHeaderIntro(), null, false);
         listView.addHeaderView(getHeaderBody1(), null, false);
@@ -70,7 +67,8 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                String url = "http://morningsignout.com/author/" + authorList.get(position).getSlug();
+                // Subtracting 3 from the position as there are 3 header views (to fix the offset)
+                String url = "http://morningsignout.com/author/" + authorList.get(position - 3).getSlug();
 
                 WebView webView = new WebView(view.getContext());
                 webView.setWebViewClient(new WebViewClient());
