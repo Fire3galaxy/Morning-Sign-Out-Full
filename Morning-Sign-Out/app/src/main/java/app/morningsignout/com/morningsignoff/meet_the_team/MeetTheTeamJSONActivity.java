@@ -2,11 +2,13 @@ package app.morningsignout.com.morningsignoff.meet_the_team;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
 import android.webkit.WebView;
@@ -54,15 +56,15 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
         String url = "http://morningsignout.com/?json=get_author_index" ;
         listView = (ListView) findViewById(R.id.meet_the_team_json_list);
 
-        // Daniel: Wasn't sure you needed this empty adapter here. You assign a new one in the AsyncTask anyway.
-//        meetTheTeamJSONAdapter = new MeetTheTeamJSONAdapter(this,new ArrayList<MeetTheTeamAuthor>());
         listView.setFastScrollEnabled(true);
-//        listView.setAdapter(meetTheTeamJSONAdapter);
 
         // Daniel: Manik, you can start at this function for the header.
         // Note: When you add header views, the indexing in your on click listener will be off by the
         // number of header views you have. They get counted in the index too. Account for this.
-//        listView.addHeaderView(getHeaderIntro(), null, false);
+        // Header Views for the List View
+        listView.addHeaderView(getHeaderIntro(), null, false);
+        listView.addHeaderView(getHeaderBody1(), null, false);
+        listView.addHeaderView(getHeaderBody2(), null, false);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -80,7 +82,6 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
                 intent.setData(Uri.parse(url));
 
                 startActivity(intent);
-
             }
         });
 
@@ -107,7 +108,43 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
 
     private TextView getHeaderIntro() {
         TextView meetWritersTv = new TextView(this);
-        meetWritersTv.setText("Meet our Writing Team!");
+
+        meetWritersTv.setText(R.string.meet_the_team_header_intro);
+
+        // Center align the TextView
+        meetWritersTv.setGravity(Gravity.CENTER);
+
+        // mso_blue color hex
+        meetWritersTv.setTextColor(Color.parseColor("#81bfff"));
+
+        return meetWritersTv;
+    }
+
+    private TextView getHeaderBody1() {
+        // For the first paragraph in the header view
+        TextView meetWritersTv = new TextView(this);
+
+        meetWritersTv.setText(R.string.meet_the_team_header_body1);
+
+        meetWritersTv.setPadding(12,5,12,0);
+
+        // mso_blue color hex
+        meetWritersTv.setTextColor(Color.parseColor("#81bfff"));
+
+        return meetWritersTv;
+    }
+
+    private TextView getHeaderBody2() {
+        // For the second paragraph in the header view
+        TextView meetWritersTv = new TextView(this);
+
+        meetWritersTv.setText(R.string.meet_the_team_header_body2);
+
+        meetWritersTv.setPadding(12,5,12,0);
+
+        // mso_blue color hex
+        meetWritersTv.setTextColor(Color.parseColor("#81bfff"));
+
         return meetWritersTv;
     }
 
