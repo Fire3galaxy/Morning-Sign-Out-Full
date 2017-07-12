@@ -16,6 +16,7 @@ import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,12 +45,16 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
     private Context context;
     private ListView listView;
     private ArrayList<MeetTheTeamAuthor> authorList;
+    private ProgressBar spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meet_the_team_json);
         setupActionBar();
+
+        spinner = (ProgressBar) findViewById(R.id.meet_the_team_progress_bar);
+        spinner.setVisibility(View.VISIBLE);
 
         context = this;
 
@@ -217,6 +222,8 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
                 MeetTheTeamJSONAdapter meetTheTeamJSONAdapter = new MeetTheTeamJSONAdapter(context, meetTheTeamAuthors);
                 listView.setFastScrollEnabled(true);
                 listView.setAdapter(meetTheTeamJSONAdapter);
+
+                spinner.setVisibility(View.GONE);
             } else {
                 Toast.makeText(MeetTheTeamJSONActivity.this, R.string.error_fail_to_connect,
                         Toast.LENGTH_LONG).show();
