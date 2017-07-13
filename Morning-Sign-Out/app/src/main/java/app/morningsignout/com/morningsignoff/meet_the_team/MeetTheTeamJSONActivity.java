@@ -8,6 +8,9 @@ import android.os.AsyncTask;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.util.Xml;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
@@ -23,6 +26,8 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,6 +51,7 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
     private ListView listView;
     private ArrayList<MeetTheTeamAuthor> authorList;
     private ProgressBar spinner;
+    private enum HeaderViews {Intro, Body1, Body2};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,9 +70,9 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
         listView.setFastScrollEnabled(true);
 
         // Header Views for the List View
-        listView.addHeaderView(getHeaderIntro(), null, false);
-        listView.addHeaderView(getHeaderBody1(), null, false);
-        listView.addHeaderView(getHeaderBody2(), null, false);
+        listView.addHeaderView(getTextHeaderView(HeaderViews.Intro), null, false);
+        listView.addHeaderView(getTextHeaderView(HeaderViews.Body1), null, false);
+        listView.addHeaderView(getTextHeaderView(HeaderViews.Body2), null, false);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -109,46 +115,35 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
         super.getSupportActionBar().setDisplayShowCustomEnabled(true);
     }
 
-    private TextView getHeaderIntro() {
-        TextView meetWritersTv = new TextView(this);
+    private TextView getTextHeaderView(HeaderViews viewNum) {
+        // -get attributes for needed view
+        XmlPullParser pullParser = null;
+        switch (viewNum) {
+            case Intro:
+                pullParser = getResources().getXml(R.xml.meet_the_team_intro);
+                break;
+            case Body1:
+                pullParser = getResources().getXml(R.xml.meet_the_team_body1);
+                break;
+            case Body2:
+                pullParser = getResources().getXml(R.xml.meet_the_team_body2);
+                break;
+            default:
+                return null; // This should not happen
+        }
 
-        meetWritersTv.setText(R.string.meet_the_team_header_intro);
+        // -get first tag of xml (the first property of the textview)
+        try {
+            int type = 0;
+            while (type != XmlPullParser.END_DOCUMENT && type != XmlPullParser.START_TAG) {
+                type = pullParser.next();
+            }
+        } catch (XmlPullParserException | IOException e) {
+            Log.e("MeetTheTeamJSONActivity", e.getMessage());
+        }
 
-        // Center align the TextView
-        meetWritersTv.setGravity(Gravity.CENTER);
-
-        // mso_blue color hex
-        meetWritersTv.setTextColor(Color.parseColor("#81bfff"));
-
-        return meetWritersTv;
-    }
-
-    private TextView getHeaderBody1() {
-        // For the first paragraph in the header view
-        TextView meetWritersTv = new TextView(this);
-
-        meetWritersTv.setText(R.string.meet_the_team_header_body1);
-
-        meetWritersTv.setPadding(12,5,12,0);
-
-        // mso_blue color hex
-        meetWritersTv.setTextColor(Color.parseColor("#81bfff"));
-
-        return meetWritersTv;
-    }
-
-    private TextView getHeaderBody2() {
-        // For the second paragraph in the header view
-        TextView meetWritersTv = new TextView(this);
-
-        meetWritersTv.setText(R.string.meet_the_team_header_body2);
-
-        meetWritersTv.setPadding(12,5,12,0);
-
-        // mso_blue color hex
-        meetWritersTv.setTextColor(Color.parseColor("#81bfff"));
-
-        return meetWritersTv;
+        // -make attriuteSet out of textview properties
+        return new TextView(this, Xml.asAttributeSet(pullParser));
     }
 
     public class FetchMeetTheTeamJSONTask extends AsyncTask<String,Void,ArrayList<MeetTheTeamAuthor>> {

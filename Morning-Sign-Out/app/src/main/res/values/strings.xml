@@ -134,18 +134,30 @@
         more knowledgeable than before.</string>
 
     <!-- Meet the team header view for the list view -->
-    <string name="meet_the_team_header_intro">
-        <p><center><i>Meet our <b>Writing Team!</b></i></center></p>
-    </string>
+    <!--<string name="meet_the_team_header_intro">-->
+        <!--<p><center><i>Meet our <b>Writing Team!</b></i></center></p>-->
+    <!--</string>-->
+    <!--<string name="meet_the_team_header_body1">-->
+        <!--<p><b>We have an amazing team of writers composed almost entirely of students from the University-->
+        <!--of California system. These students work hard to gather research, write informative-->
+        <!--articles, and boil it down into the simple-to-read format that you can expect from Morning-->
+        <!--Sign Out, the biomedical magazine that anyone can read!</b></p>-->
+        <!--<p></p><p></p>-->
+    <!--</string>-->
+    <!--<string name="meet_the_team_header_body2">-->
+        <!--<p><b>To quickly find a particular author, place your finger along the rightmost edge of the-->
+        <!--screen and scroll from there. Authors are arranged by first name.</b></p>-->
+    <!--</string>-->
+
+    <string name="meet_the_team_header_intro">Meet our Writing Team!</string>
     <string name="meet_the_team_header_body1">
-        <p><b>We have an amazing team of writers composed almost entirely of students from the University
+        We have an amazing team of writers composed almost entirely of students from the University
         of California system. These students work hard to gather research, write informative
         articles, and boil it down into the simple-to-read format that you can expect from Morning
-        Sign Out, the biomedical magazine that anyone can read!</b></p>
-        <p></p><p></p>
+        Sign Out, the biomedical magazine that anyone can read!
     </string>
     <string name="meet_the_team_header_body2">
-        <p><b>To quickly find a particular author, place your finger along the rightmost edge of the
-        screen and scroll from there. Authors are arranged by first name.</b></p>
+        To quickly find a particular author, place your finger along the rightmost edge of the
+        screen and scroll from there. Authors are arranged by first name.
     </string>
 </resources>
