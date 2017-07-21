@@ -30,7 +30,8 @@ import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.article.Article;
 import app.morningsignout.com.morningsignoff.category.AdapterObject;
 import app.morningsignout.com.morningsignoff.category.CategoryBitmapPool;
-import app.morningsignout.com.morningsignoff.category.CategoryImageTaskDrawable;
+//import app.morningsignout.com.morningsignoff.category.CategoryImageTaskDrawable;
+import app.morningsignout.com.morningsignoff.search_results.SearchImageTaskDrawable;
 import app.morningsignout.com.morningsignoff.network.CategoryImageSenderObject;
 import app.morningsignout.com.morningsignoff.network.FetchCategoryImageManager;
 import app.morningsignout.com.morningsignoff.network.FetchCategoryImageRunnable;
@@ -160,7 +161,7 @@ public class SearchAdapter extends BaseAdapter {
 
                 FetchCategoryImageRunnable task = FetchCategoryImageManager
                         .getDownloadImageTask(rowTemp.getCategoryURL(), viewHolder.image);
-                CategoryImageTaskDrawable taskWrapper = new CategoryImageTaskDrawable(task);
+                SearchImageTaskDrawable taskWrapper = new SearchImageTaskDrawable(task);
 
                 viewHolder.image.setImageDrawable(taskWrapper);
                 FetchCategoryImageManager.runTask(task);
@@ -193,8 +194,8 @@ public class SearchAdapter extends BaseAdapter {
 
     public static FetchCategoryImageRunnable getFetchCategoryImageTask(ImageView imageView) {
         if (imageView != null) {
-            if (imageView.getDrawable() instanceof CategoryImageTaskDrawable) {
-                CategoryImageTaskDrawable taskDrawable = (CategoryImageTaskDrawable) imageView.getDrawable();
+            if (imageView.getDrawable() instanceof SearchImageTaskDrawable) {
+                SearchImageTaskDrawable taskDrawable = (SearchImageTaskDrawable) imageView.getDrawable();
                 return taskDrawable.getFetchCategoryImageRunnable();
             }
         }
