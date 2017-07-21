@@ -216,6 +216,7 @@ public class SearchFragment extends Fragment {
 //                        lastSeenPageNum = pageNum;
                         Log.d("SearchFragment","start loading more");
                         new FetchListSearchTask(SearchFragment.this, pageNum + 1, false, false).execute(search);
+                        Log.d("SearchFragment", "Making new request");
                     }
                 }
             }

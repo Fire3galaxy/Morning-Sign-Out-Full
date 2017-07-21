@@ -58,6 +58,11 @@ public class FetchListSearchTask extends AsyncTask<String, Void, List<Article>>{
                 fragmentRef.get().getProgressBar().setVisibility(View.VISIBLE);
         } else
             fragmentRef.get().getFooterProgressBar().setVisibility(View.VISIBLE);
+
+        WrapperListAdapter wrappedAdapter =
+                (WrapperListAdapter) fragmentRef.get().getGridViewWithHeaderAndFooter().getAdapter();
+        SearchAdapter adapter = (SearchAdapter) wrappedAdapter.getWrappedAdapter();;
+        adapterPageNum = adapter.getPageNum();
     }
 
     @Override
@@ -90,11 +95,10 @@ public class FetchListSearchTask extends AsyncTask<String, Void, List<Article>>{
         // Loading should only show on first loading list
         // hide progressbar, refresh message, and refresh icon (if loading is successful)
         if (isFirstLoad) {
-            if (isRefresh) {
+            if (isRefresh)
                 fragmentRef.get().getSwipeRefreshLayout().setRefreshing(false);
-            } else {
+            else
                 fragmentRef.get().getProgressBar().setVisibility(GONE);
-            }
 
             // hide how-to-refresh textView
             if (articles != null)
