@@ -35,9 +35,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.article.Article;
 import app.morningsignout.com.morningsignoff.article.ArticleActivity;
-import app.morningsignout.com.morningsignoff.category.CategoryAdapter;
-import app.morningsignout.com.morningsignoff.category.CategoryFragment;
-import app.morningsignout.com.morningsignoff.network.FetchListArticlesTask;
 import app.morningsignout.com.morningsignoff.network.FetchListSearchTask;
 import in.srain.cube.views.GridViewWithHeaderAndFooter;
 
@@ -211,11 +208,13 @@ public class SearchFragment extends Fragment {
                 if (lastVisibleItem >= totalItemCount) {
                     WrapperListAdapter wrappedAdapter = (WrapperListAdapter) gridViewWithHeaderAndFooter.getAdapter();
                     SearchAdapter adapter = (SearchAdapter) wrappedAdapter.getWrappedAdapter();
-                    Log.d("SearchFragment","onscroll - first if");
+//                    Log.d("SearchFragment","onscroll - first if");
                     int pageNum = adapter.getPageNum();
+                    Log.d("SearchFragment","pageNum: " + pageNum);
                     // Only make one request per page request
                     if (totalItemCount != 0 /*&& lastSeenPageNum != pageNum*/ && isLoadingArticles.weakCompareAndSet(false, true)) {
 //                        lastSeenPageNum = pageNum;
+                        Log.d("SearchFragment","start loading more");
                         new FetchListSearchTask(SearchFragment.this, pageNum + 1, false, false).execute(search);
                     }
                 }
@@ -250,6 +249,20 @@ public class SearchFragment extends Fragment {
         });
 
         return rootView;
+    }
+
+    // FIXME: Debug the crashing issues next time before trying an external cache
+    public static boolean addBitmapToMemoryCache(String key, Bitmap bitmap) {
+        if (getBitmapFromMemCache(key) == null) {
+            instance.memoryCache.put(key,bitmap);
+            return true;
+        }
+
+        return false;
+    }
+
+    public static Bitmap getBitmapFromMemCache(String key) {
+        return (instance != null) ? instance.memoryCache.get(key) : null;
     }
 
     // Not sure exactly what this does. Seems like it finds the fragment, or creates a new one if

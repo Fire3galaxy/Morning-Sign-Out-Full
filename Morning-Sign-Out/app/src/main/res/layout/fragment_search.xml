@@ -29,8 +29,7 @@
             android:horizontalSpacing="5dp"
             android:verticalSpacing="15dp"
             android:listSelector="@android:color/transparent"
-            android:footerDividersEnabled="true">
-        </in.srain.cube.views.GridViewWithHeaderAndFooter>
+            android:footerDividersEnabled="true" />
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <ProgressBar
@@ -63,13 +62,13 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:paddingTop="10dp"
-        android:paddingBottom="20dp"
+        android:paddingBottom="10dp"
         android:gravity="center_horizontal"
         android:textStyle="italic|bold"
         android:typeface="normal"
         android:textSize="22sp"
         android:textColor="@android:color/black"
-        android:visibility="gone" />
+        />
 
     <ImageView
         android:id="@+id/imageView_splash_search"

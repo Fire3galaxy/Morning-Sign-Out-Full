@@ -2,6 +2,12 @@ package app.morningsignout.com.morningsignoff.search_results;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Surface;
@@ -23,6 +29,11 @@ import java.util.Set;
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.article.Article;
 import app.morningsignout.com.morningsignoff.category.AdapterObject;
+import app.morningsignout.com.morningsignoff.category.CategoryBitmapPool;
+import app.morningsignout.com.morningsignoff.category.CategoryImageTaskDrawable;
+import app.morningsignout.com.morningsignoff.network.CategoryImageSenderObject;
+import app.morningsignout.com.morningsignoff.network.FetchCategoryImageManager;
+import app.morningsignout.com.morningsignoff.network.FetchCategoryImageRunnable;
 
 /**
  * Created by shinr on 6/1/2017.
@@ -38,6 +49,9 @@ public class SearchAdapter extends BaseAdapter {
     private int pageNum;
     private int firstVisibleItem, lastVisibleItem;
 
+    // Holds the results from display metrics
+    static public int REQ_IMAGE_WIDTH = 0, REQ_IMG_HEIGHT = 0;
+
     // constructor
     SearchAdapter(Activity activity, LayoutInflater inflater) {
         this.articles = new ArrayList<>();
@@ -46,6 +60,15 @@ public class SearchAdapter extends BaseAdapter {
         pageNum = 0;
         firstVisibleItem = 0;
         lastVisibleItem = 0;
+
+        // Downloaded images need to be good quality for landscape and portrait orientations
+        DisplayMetrics metrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        Resources r = activity.getResources();
+
+        // TODO: figure out what this actually means.
+        REQ_IMAGE_WIDTH = metrics.widthPixels;
+        REQ_IMG_HEIGHT = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 220, r.getDisplayMetrics());
     }
 
     public int getPageNum() {
@@ -110,6 +133,39 @@ public class SearchAdapter extends BaseAdapter {
         viewHolder.excerpt.setText(rowTemp.getExcerpt());
 
         // add image stuff here
+        // I know it says categoryURL, but that's where image is stored for now.
+        // TODO: change when appropriate for different image quality.
+        final Bitmap b = SearchFragment.getBitmapFromMemCache(rowTemp.getCategoryURL());
+
+        // Load imageViewReference into row element
+        if (b == null) {
+            // task is interrupted or does not exist for imageView
+            if (cancelPotentialWork(rowTemp.getCategoryURL(), viewHolder.image)) {
+                // Recycle old bitmap if NOT in LruCache
+                // tag: Set in FetchCategoryImageManager or else branch below here if bitmap was in
+                //      the cache
+                String oldImageUrl = (String) viewHolder.image.getTag();
+                if (oldImageUrl != null && SearchFragment.getBitmapFromMemCache(oldImageUrl) == null) {
+                    Drawable d = viewHolder.image.getDrawable();
+
+                    if (d != null && d instanceof BitmapDrawable) {
+                        BitmapDrawable bitmapDrawable = (BitmapDrawable) d;
+
+                        if (bitmapDrawable.getBitmap() != null) {
+                            CategoryBitmapPool.recycle(bitmapDrawable.getBitmap());
+                            viewHolder.image.setImageDrawable(null);
+                        }
+                    }
+                }
+
+                FetchCategoryImageRunnable task = FetchCategoryImageManager
+                        .getDownloadImageTask(rowTemp.getCategoryURL(), viewHolder.image);
+                CategoryImageTaskDrawable taskWrapper = new CategoryImageTaskDrawable(task);
+
+                viewHolder.image.setImageDrawable(taskWrapper);
+                FetchCategoryImageManager.runTask(task);
+            }
+        }
 
         return row;
     }
@@ -133,5 +189,28 @@ public class SearchAdapter extends BaseAdapter {
 
             notifyDataSetChanged(); // update the fragment and force display
         }
+    }
+
+    public static FetchCategoryImageRunnable getFetchCategoryImageTask(ImageView imageView) {
+        if (imageView != null) {
+            if (imageView.getDrawable() instanceof CategoryImageTaskDrawable) {
+                CategoryImageTaskDrawable taskDrawable = (CategoryImageTaskDrawable) imageView.getDrawable();
+                return taskDrawable.getFetchCategoryImageRunnable();
+            }
+        }
+        return null;
+    }
+
+    private static boolean cancelPotentialWork(String url, ImageView imageView) {
+        FetchCategoryImageRunnable task = getFetchCategoryImageTask(imageView);
+        if (task != null) {
+            String imageViewUrl = task.imageUrl;
+
+            if (imageViewUrl == null || !imageViewUrl.equals(url))
+                FetchCategoryImageManager.interruptThread(task);
+            else
+                return false;
+        }
+        return true;
     }
 }
