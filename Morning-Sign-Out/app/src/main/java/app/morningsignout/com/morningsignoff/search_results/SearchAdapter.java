@@ -166,6 +166,10 @@ public class SearchAdapter extends BaseAdapter {
                 viewHolder.image.setImageDrawable(taskWrapper);
                 FetchCategoryImageManager.runTask(task);
             }
+//            else {
+//                viewHolder.image.setImageBitmap(b);
+//                viewHolder.image.setTag(rowTemp.getCategoryURL());
+//            }
         }
 
         return row;
