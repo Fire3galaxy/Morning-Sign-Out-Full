@@ -91,6 +91,7 @@ public class FetchListSearchTask extends AsyncTask<String, Void, List<Article>>{
         WrapperListAdapter wrappedAdapter =
                 (WrapperListAdapter) fragmentRef.get().getGridViewWithHeaderAndFooter().getAdapter();
         SearchAdapter adapter = (SearchAdapter) wrappedAdapter.getWrappedAdapter();;
+        adapterPageNum = adapter.getPageNum();
 
         // Loading should only show on first loading list
         // hide progressbar, refresh message, and refresh icon (if loading is successful)
