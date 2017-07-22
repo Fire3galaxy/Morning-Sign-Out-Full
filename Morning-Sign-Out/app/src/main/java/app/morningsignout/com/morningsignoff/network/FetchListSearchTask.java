@@ -61,7 +61,7 @@ public class FetchListSearchTask extends AsyncTask<String, Void, List<Article>>{
 
         WrapperListAdapter wrappedAdapter =
                 (WrapperListAdapter) fragmentRef.get().getGridViewWithHeaderAndFooter().getAdapter();
-        SearchAdapter adapter = (SearchAdapter) wrappedAdapter.getWrappedAdapter();;
+        SearchAdapter adapter = (SearchAdapter) wrappedAdapter.getWrappedAdapter();
         adapterPageNum = adapter.getPageNum();
     }
 
