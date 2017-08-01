@@ -18,31 +18,18 @@ import app.morningsignout.com.morningsignoff.article.Article;
  * Created by Daniel on 8/1/2017.
  */
 
-public abstract class ImageListAdapter extends BaseAdapter {
-    private LayoutInflater inflater;
+public abstract class ArticleListAdapter extends BaseAdapter {
+    protected LayoutInflater inflater;
 
-    private ArrayList<Article> articles;
+    protected ArrayList<Article> articles;
     private Set<String> uniqueArticleNames; // FIXME: This was a temp fix a long time ago for repeats that somehow got in the list
     private int pageNum;
 
-    private static int REQ_IMG_WIDTH = 0, REQ_IMG_HEIGHT = 0;
-    private final int VIEW_HEIGHT_DP = 220; // From single_row_category's imageview
-
-    ImageListAdapter(Activity activity, LayoutInflater inflater) {
+    public ArticleListAdapter(Activity activity, LayoutInflater inflater) {
         this.articles = new ArrayList<>();
         this.uniqueArticleNames = new HashSet<>();
         this.inflater = inflater;
         pageNum = 0;
-
-        // Get width/height of the images we download for use in FetchImageRunnable
-        // (hardcoded height of imageview in single_row_category)
-        DisplayMetrics metrics = new DisplayMetrics();
-        activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        Resources r = activity.getResources();
-
-        REQ_IMG_WIDTH = metrics.widthPixels;
-        REQ_IMG_HEIGHT = (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, VIEW_HEIGHT_DP, r.getDisplayMetrics());
     }
 
     public int getPageNum() {
