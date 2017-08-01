@@ -34,10 +34,6 @@ import app.morningsignout.com.morningsignoff.category.SplashFragment;
 import app.morningsignout.com.morningsignoff.network.URLToMobileArticle;
 
 public class SearchResultsActivity extends ActionBarActivity {
-//    SearchView searchView;
-//    WebView webView;
-//    SearchWebViewClient searchWebViewClient;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,40 +50,10 @@ public class SearchResultsActivity extends ActionBarActivity {
             args.putString(SearchFragment.SEARCH_PARAM, getIntent().getStringExtra(SearchManager.QUERY));
             fragment.setArguments(args);
 
-            // Do the splash!
-//            SplashFragment splashScreenFragment = new SplashFragment();
-
             getSupportFragmentManager().beginTransaction()
-//                    .add(R.id.container_search, splashScreenFragment)
                     .add(R.id.container_search, fragment)
                     .commit();
         }
-
-
-        // Initialize webview with WebViewClient and WebChromeClient
-//        webView = (WebView) findViewById(R.id.webView_search);
-//        searchWebViewClient = new SearchWebViewClient(getIntent().getStringExtra(SearchManager.QUERY));
-//        webView.setWebViewClient(searchWebViewClient);
-
-//        final ProgressBar loadPage = (ProgressBar) findViewById(R.id.progressBar_search);
-//        webView.setWebChromeClient(new WebChromeClient() { // Progress bar
-//            @Override
-//            public void onProgressChanged(WebView v, int newProgress) {
-//                if (newProgress < 100) {
-//                    if (loadPage.getVisibility() == View.GONE)
-//                        loadPage.setVisibility(View.VISIBLE);
-//
-//                    loadPage.setProgress(newProgress);
-//                } else if (newProgress == 100) {
-//                    loadPage.setProgress(newProgress);
-//
-//                    if (loadPage.getVisibility() == View.VISIBLE)
-//                        loadPage.setVisibility(View.GONE);
-//                }
-//            }
-//        });
-//
-//        handleSearch(getIntent());
     }
 
     @Override
@@ -101,7 +67,6 @@ public class SearchResultsActivity extends ActionBarActivity {
     @Override
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-//        handleSearch(intent);
     }
 //
 //    private void handleSearch(Intent intent) {
@@ -134,27 +99,6 @@ public class SearchResultsActivity extends ActionBarActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    static String getURI(String query) {
-        if (query != null) {
-            String searchURI;
-            try {
-                searchURI = "http://morningsignout.com/?s=" + URLEncoder.encode(query, "UTF-8");
-                return searchURI;
-            } catch (UnsupportedEncodingException e) {
-                Log.e("Search", e.getMessage());
-            }
-        }
-
-        return null;
-    }
-
-    List<Article> getJSONArticles(String arg, int pagenum)
-    {
-        List<Article> articles = new ArrayList<>();
-
-        return articles;
     }
 }
 

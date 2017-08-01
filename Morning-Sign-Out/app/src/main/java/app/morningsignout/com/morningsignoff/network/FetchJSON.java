@@ -1,6 +1,5 @@
 package app.morningsignout.com.morningsignoff.network;
 
-import android.text.Html;
 import android.util.Log;
 import android.webkit.URLUtil;
 
@@ -19,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import app.morningsignout.com.morningsignoff.article.Article;
+import app.morningsignout.com.morningsignoff.image_loading.FetchImageRunnable;
 
 /**
  * Created by shinr on 5/25/2017.
@@ -128,8 +128,8 @@ public class FetchJSON {
                     articleList.get(index).setLink(link);
 
                     // Images.
-                    String mediumURL = FetchCategoryImageRunnable.NO_IMAGE;
-                    String fullURL = FetchCategoryImageRunnable.NO_IMAGE;
+                    String mediumURL = FetchImageRunnable.NO_IMAGE;
+                    String fullURL = FetchImageRunnable.NO_IMAGE;
                     // create JSONObj of images
                     if (currPost.has("thumbnail_images")){
 
@@ -141,7 +141,7 @@ public class FetchJSON {
                                 mediumURL = currPost.optString("thumbnail");
                                 if (!URLUtil.isValidUrl(mediumURL))
                                 {
-                                    mediumURL = FetchCategoryImageRunnable.NO_IMAGE;
+                                    mediumURL = FetchImageRunnable.NO_IMAGE;
                                 }
                             }
                         }

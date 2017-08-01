@@ -30,6 +30,7 @@
     <string name="border_contentDescription">blue horizontal border</string>
     <string name="logo_contentDescription">Morning Sign Out logo</string>
     <string name="splash_contentDescription">Splash screen with Morning Sign Out Logo</string>
+    <string name="row_contentDescription">Image from an article</string>
     <string name="title_slide_menu">Categories menu</string>
     <string name="title_activity_category">CategoryActivity</string>
     <string name="article_image">Article Image</string>

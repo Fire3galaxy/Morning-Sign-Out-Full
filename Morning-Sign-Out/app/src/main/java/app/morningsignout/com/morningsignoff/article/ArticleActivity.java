@@ -4,8 +4,6 @@ import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
-import android.app.SearchManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,12 +20,10 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -38,7 +34,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -50,10 +45,8 @@ import com.google.android.gms.ads.AdView;
 
 import app.morningsignout.com.morningsignoff.category.CategoryActivity;
 import app.morningsignout.com.morningsignoff.R;
-import app.morningsignout.com.morningsignoff.search_results.SearchResultsActivity;
 import app.morningsignout.com.morningsignoff.disqus.DisqusMainActivity;
-import app.morningsignout.com.morningsignoff.network.Parser;
-import app.morningsignout.com.morningsignoff.network.URLToMobileArticle;
+import app.morningsignout.com.morningsignoff.util.PhoneOrientation;
 
 // Activity class created in FetchListArticleTask when user clicks on an article from the ListView
 public class ArticleActivity extends ActionBarActivity {
@@ -95,7 +88,7 @@ public class ArticleActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article);
 
-        isPortrait = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
+        isPortrait = PhoneOrientation.isPortrait(this);
 
         // ACTION BAR
         //      ImageButton is Morning Sign Out logo, which sends user back to home screen (see XML)

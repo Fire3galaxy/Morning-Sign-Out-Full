@@ -110,10 +110,11 @@ public class SearchFragment extends Fragment {
         Point size = new Point();
         display.getSize(size);
         int width = size.x;
-        if (width <= 320) {
+        if (width <= 320)
             cacheSize = maxMemory / 3;
-        } else
+        else
             cacheSize = maxMemory / 8;
+
         memoryCache = new LruCache<String, Bitmap>(cacheSize) {
             @Override
             protected int sizeOf(String key, Bitmap bitmap) {
@@ -124,9 +125,7 @@ public class SearchFragment extends Fragment {
     }
 
     // Not sure why this is nullable. Doesn't seem to cause any harm, but I'll keep an eye on this.
-//    @Nullable
     @Override
-//    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         instance = this;
@@ -151,7 +150,6 @@ public class SearchFragment extends Fragment {
         // Creates and loads new adapter or sets position of existing gridView
         if(searchAdapter == null) {
             searchAdapter = new SearchAdapter(getActivity(), inflater);
-            searchAdapter.setAdapterView(gridViewWithHeaderAndFooter); // this may be unnecessary for now
             gridViewWithHeaderAndFooter.setAdapter(searchAdapter);
             isLoadingArticles.set(true);
             new FetchListSearchTask(this, 1, true, isRefresh).execute(search);

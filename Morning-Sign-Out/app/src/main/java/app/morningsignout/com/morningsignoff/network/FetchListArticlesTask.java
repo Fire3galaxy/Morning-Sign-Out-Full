@@ -25,6 +25,7 @@ import org.json.JSONObject;
 import app.morningsignout.com.morningsignoff.article.Article;
 import app.morningsignout.com.morningsignoff.category.CategoryAdapter;
 import app.morningsignout.com.morningsignoff.category.CategoryFragment;
+import app.morningsignout.com.morningsignoff.image_loading.FetchImageRunnable;
 
 import static android.view.View.GONE;
 
@@ -222,8 +223,8 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                     String link = currPost.optString("url");
                     articlesList.get(index).setLink(link);
 
-                    String mediumURL = FetchCategoryImageRunnable.NO_IMAGE;
-                    String fullURL = FetchCategoryImageRunnable.NO_IMAGE;
+                    String mediumURL = FetchImageRunnable.NO_IMAGE;
+                    String fullURL = FetchImageRunnable.NO_IMAGE;
                     // create JSONObj of images
                     if (currPost.has("thumbnail_images")){
 
@@ -235,7 +236,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                                 mediumURL = currPost.optString("thumbnail");
                                 if (!URLUtil.isValidUrl(mediumURL))
                                 {
-                                    mediumURL = FetchCategoryImageRunnable.NO_IMAGE;
+                                    mediumURL = FetchImageRunnable.NO_IMAGE;
                                 }
                             }
                         }

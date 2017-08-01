@@ -1,4 +1,4 @@
-package app.morningsignout.com.morningsignoff.network;
+package app.morningsignout.com.morningsignoff.image_loading;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,38 +8,37 @@ import java.lang.Thread;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.Set;
-import java.util.TreeSet;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Build;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.ImageView;
 
 import app.morningsignout.com.morningsignoff.category.CategoryAdapter;
-import app.morningsignout.com.morningsignoff.category.CategoryBitmapPool;
 import app.morningsignout.com.morningsignoff.R;
+import app.morningsignout.com.morningsignoff.network.CategoryImageSenderObject;
 
 /**
  * Created by Daniel on 2/11/2017. A Runnable task that will run in the background and fetch images
  * a la Instagram I hope.
  */
 
-public class FetchCategoryImageRunnable implements Runnable {
+public class FetchImageRunnable implements Runnable {
     public static String NO_IMAGE = "No image";
 
     Thread currentThread;
-    public String imageUrl;
+    String imageUrl;
     private int viewWidth, viewHeight;
     private WeakReference<ImageView> imageViewRef;
+    private int managerMessage;
 
-    public FetchCategoryImageRunnable(String imageUrl, ImageView imageView) {
-        this.viewWidth = CategoryAdapter.REQ_IMG_WIDTH;
-        this.viewHeight = CategoryAdapter.REQ_IMG_HEIGHT;
+    public FetchImageRunnable(String imageUrl, ImageView imageView, int viewWidth, int viewHeight, int message) {
         this.imageUrl = imageUrl;
         this.imageViewRef = new WeakReference<>(imageView);
+        this.viewWidth = viewWidth;
+        this.viewHeight = viewHeight;
+        this.managerMessage = message;
     }
 
     @Override
@@ -59,9 +58,9 @@ public class FetchCategoryImageRunnable implements Runnable {
 
         CategoryImageSenderObject objectToSend =
                 new CategoryImageSenderObject(imageUrl, imageViewRef.get(), downloadedImage, this);
-        FetchCategoryImageManager.instance.myHandler
-                .obtainMessage(FetchCategoryImageManager.SENT_PICTURE, objectToSend)
-                .sendToTarget();
+        Handler handler = FetchImageManager.getHandler();
+        if (handler != null)
+            handler.obtainMessage(managerMessage, objectToSend).sendToTarget();
     }
 
     // input an imageViewReference URL, get its bitmap
@@ -103,7 +102,7 @@ public class FetchCategoryImageRunnable implements Runnable {
                 downloadOptions.inJustDecodeBounds = false;
                 downloadOptions.inSampleSize = inSampleSize;
                 downloadOptions.inMutable = true;
-                Bitmap bitmapToUse = CategoryBitmapPool.instance.getBitmap(downloadOptions);
+                Bitmap bitmapToUse = UnusedBitmapPool.getBitmap(downloadOptions);
 
                 // Use bitmap pool's given bitmap if it exists
                 if (bitmapToUse != null)
@@ -113,7 +112,6 @@ public class FetchCategoryImageRunnable implements Runnable {
                 if (Thread.interrupted()) {
                     if (bitmapToUse != null) {
                         bitmapToUse.recycle();
-                        bitmapToUse = null;
                     }
                     return null;
                 }
@@ -152,25 +150,5 @@ public class FetchCategoryImageRunnable implements Runnable {
         }
 
         return inSampleSize;
-    }
-
-    // Bitmap memory optimization:
-    // https://developer.android.com/topic/performance/graphics/manage-memory.html#inBitmap
-    private boolean canUseInBitmap(Bitmap bitmapToUse, BitmapFactory.Options targetOptions) {
-        if (bitmapToUse == null) return false;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            // From Android 4.4 (KitKat) onward we can re-use if the byte size of
-            // the new bitmap is smaller than the reusable bitmap candidate
-            // allocation byte count.
-            int width = targetOptions.outWidth / targetOptions.inSampleSize;
-            int height = targetOptions.outHeight / targetOptions.inSampleSize;
-            int byteCount = width * height * 4; // ARGB_8888
-
-            return byteCount <= bitmapToUse.getAllocationByteCount();
-        }
-
-        // FIXME: only considering KitKat+ right now
-        return false;
     }
 }

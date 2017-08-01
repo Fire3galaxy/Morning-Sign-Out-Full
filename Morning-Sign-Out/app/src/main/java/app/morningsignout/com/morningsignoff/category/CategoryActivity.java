@@ -1,41 +1,31 @@
 package app.morningsignout.com.morningsignoff.category;
 
-import android.animation.Animator;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.ImageView;
-import android.animation.Animator.AnimatorListener;
 
 import java.util.ArrayList;
-import java.lang.InterruptedException;
-import java.util.Map;
 
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.search_results.SearchResultsActivity;
 import app.morningsignout.com.morningsignoff.meet_the_team.MeetTheTeamActivity;
-import app.morningsignout.com.morningsignoff.network.FetchCategoryImageRunnable;
 
 // Category page categoryActivity
 public class CategoryActivity extends AppCompatActivity {

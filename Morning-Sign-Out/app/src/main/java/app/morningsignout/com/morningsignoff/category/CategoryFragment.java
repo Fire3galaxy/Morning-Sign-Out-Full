@@ -34,6 +34,7 @@ import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.article.Article;
 import app.morningsignout.com.morningsignoff.article.ArticleActivity;
 import app.morningsignout.com.morningsignoff.network.FetchListArticlesTask;
+import app.morningsignout.com.morningsignoff.util.PhoneOrientation;
 import in.srain.cube.views.GridViewWithHeaderAndFooter;
 
 public class CategoryFragment extends Fragment {
@@ -68,12 +69,6 @@ public class CategoryFragment extends Fragment {
         index = gridViewWithHeaderAndFooter.getFirstVisiblePosition();
         super.onDetach();
     }
-
-//    @Override
-//    public void onDestroyView() {
-//        super.onDestroyView();
-//        instance = null;
-//    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -115,7 +110,7 @@ public class CategoryFragment extends Fragment {
     }
 
     private void setUpGridView(GridViewWithHeaderAndFooter grid){
-        if (CategoryAdapter.isLandscape(getContext())) {
+        if (PhoneOrientation.isLandscape(getContext())) {
             grid.setNumColumns(2);
             grid.setPadding(5,10,5,10);
         }
@@ -146,7 +141,6 @@ public class CategoryFragment extends Fragment {
         // Creates and loads new adapter or sets position of existing gridView
         if(categoryAdapter == null) {
             categoryAdapter = new CategoryAdapter(getActivity(), inflater);
-            categoryAdapter.setAdapterView(gridViewWithHeaderAndFooter);
             gridViewWithHeaderAndFooter.setAdapter(categoryAdapter);
             isLoadingArticles.set(true);
             new FetchListArticlesTask(this, 1, true, isRefresh).execute(category_url); // First round of articles
@@ -193,10 +187,6 @@ public class CategoryFragment extends Fragment {
 
         // To load more articles when the bottom of the page is reached
         gridViewWithHeaderAndFooter.setOnScrollListener(new AbsListView.OnScrollListener() {
-            // Last seen by this listener, not by the program.
-            // So, say, the program has seen page 1 already, but this value is 0 still
-//            int lastSeenPageNum = 0;
-
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 int lastVisibleItem = firstVisibleItem + visibleItemCount;
@@ -208,7 +198,6 @@ public class CategoryFragment extends Fragment {
                     int pageNum = adapter.getPageNum();
                     // Only make one request per page request
                     if (totalItemCount != 0 /*&& lastSeenPageNum != pageNum*/ && isLoadingArticles.weakCompareAndSet(false, true)) {
-//                        lastSeenPageNum = pageNum;
                         new FetchListArticlesTask(CategoryFragment.this, pageNum + 1, false, false).execute(category_url);
                     }
                 }
