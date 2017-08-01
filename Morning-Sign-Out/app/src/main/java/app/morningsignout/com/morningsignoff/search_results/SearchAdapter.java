@@ -33,7 +33,7 @@ public class SearchAdapter extends ArticleListAdapter {
 
     // constructor
     SearchAdapter(Activity activity, LayoutInflater inflater) {
-        super(activity, inflater);
+        super(inflater);
 
         // Get width/height of the images we download for use in FetchImageRunnable
         // (hardcoded height of imageview in single_row_search)
@@ -79,13 +79,13 @@ public class SearchAdapter extends ArticleListAdapter {
         // add image stuff here
         // I know it says categoryURL, but that's where image is stored for now.
         // TODO: change when appropriate for different image quality.
-        final Bitmap b = SearchFragment.getBitmapFromMemCache(rowTemp.getCategoryURL());
+        final Bitmap b = SearchFragment.getBitmapFromMemCache(rowTemp.getMediumURL());
 
         // Load imageViewReference into row element
         if (b == null) {
             // task is interrupted or does not exist for imageView
             if (FetchImageManager
-                    .cancelPotentialWork(rowTemp.getCategoryURL(), viewHolder.image)) {
+                    .cancelPotentialWork(rowTemp.getMediumURL(), viewHolder.image)) {
                 // Recycle old bitmap if NOT in LruCache
                 // tag: Set in FetchCategoryImageManager or else branch below here if bitmap was in
                 //      the cache
@@ -104,7 +104,7 @@ public class SearchAdapter extends ArticleListAdapter {
                 }
 
                 FetchImageRunnable task = new FetchImageRunnable(
-                        rowTemp.getCategoryURL(),
+                        rowTemp.getMediumURL(),
                         viewHolder.image,
                         REQ_IMG_WIDTH,
                         REQ_IMG_HEIGHT,
@@ -116,7 +116,7 @@ public class SearchAdapter extends ArticleListAdapter {
             }
         } else {
             viewHolder.image.setImageBitmap(b);
-            viewHolder.image.setTag(rowTemp.getCategoryURL());
+            viewHolder.image.setTag(rowTemp.getMediumURL());
         }
 
         return row;

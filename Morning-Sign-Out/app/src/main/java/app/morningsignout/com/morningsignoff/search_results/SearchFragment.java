@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.util.LruCache;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -25,7 +24,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.WrapperListAdapter;
 
-import org.w3c.dom.Text;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -58,7 +56,6 @@ public class SearchFragment extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout; // used to handle refreshing on swipe
     private ProgressBar progressBar; // does what it's named
     private TextView refreshTextView; // refers to the text that shows when refreshing
-    private ImageView splashScreenView; // refers to splash screen
     private ProgressBar footerProgressBar; // refers to footer progress bar
     private GridViewWithHeaderAndFooter gridViewWithHeaderAndFooter; // gridview
 
@@ -136,12 +133,10 @@ public class SearchFragment extends Fragment {
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefresh_search);
         progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar_search);
         refreshTextView = (TextView) rootView.findViewById(R.id.textView_searchRefresh);
-        splashScreenView = (ImageView) rootView.findViewById(R.id.imageView_splash_search);
-        footerProgressBar = getFooterProgressBarXml(); // FIXME
+        footerProgressBar = getFooterProgressBarXml();
         gridViewWithHeaderAndFooter = (GridViewWithHeaderAndFooter) rootView.findViewById(R.id.gridView_search);
         boolean isRefresh = getArguments().getBoolean(SEARCH_REFRESH, false);
 
-        // Custom adapter? SearchAdapter?
         headerView.setText(search); //header may be unnecessary
         swipeRefreshLayout.setColorSchemeColors(Color.argb(255,0x81,0xbf,0xff), Color.WHITE);
         setUpGridView(gridViewWithHeaderAndFooter);
@@ -184,7 +179,7 @@ public class SearchFragment extends Fragment {
                 // Load content
                 articleActivity.putExtra(ArticleActivity.CONTENT, rowTemp.getContent());
                 // Load header image
-                articleActivity.putExtra(ArticleActivity.IMAGE_URL, rowTemp.getImageURL());
+                articleActivity.putExtra(ArticleActivity.IMAGE_URL, rowTemp.getFullURL());
 
                 // Hmm, do we really want to start an entirely new activity? Maybe. Hopefully can handle
                 // this, and if you press back, you end up back in the search results.

@@ -1,9 +1,5 @@
 package app.morningsignout.com.morningsignoff.image_loading;
 
-import android.app.Activity;
-import android.content.res.Resources;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.widget.BaseAdapter;
 
@@ -25,7 +21,7 @@ public abstract class ArticleListAdapter extends BaseAdapter {
     private Set<String> uniqueArticleNames; // FIXME: This was a temp fix a long time ago for repeats that somehow got in the list
     private int pageNum;
 
-    public ArticleListAdapter(Activity activity, LayoutInflater inflater) {
+    public ArticleListAdapter(LayoutInflater inflater) {
         this.articles = new ArrayList<>();
         this.uniqueArticleNames = new HashSet<>();
         this.inflater = inflater;
@@ -71,7 +67,7 @@ public abstract class ArticleListAdapter extends BaseAdapter {
 
                 // Hack-ish way of preventing the list from being populated with doubles
                 // which happens if request occurs multiple times...
-                if (!uniqueArticleNames.contains(article) && moreArticles.get(i).getImageURL() != null)
+                if (!uniqueArticleNames.contains(article) && moreArticles.get(i).getFullURL() != null)
                     articles.add(moreArticles.get(i));
                 uniqueArticleNames.add(article);
             }

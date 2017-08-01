@@ -179,7 +179,7 @@ public class CategoryFragment extends Fragment {
                 articleActivity.putExtra(ArticleActivity.CONTENT, rowTemp.getContent());
 
                 // IMAGE_URL holds the link to the article's header image
-                articleActivity.putExtra(ArticleActivity.IMAGE_URL, rowTemp.getImageURL());
+                articleActivity.putExtra(ArticleActivity.IMAGE_URL, rowTemp.getFullURL());
 
                 gridViewWithHeaderAndFooter.getContext().startActivity(articleActivity);
             }
@@ -297,14 +297,5 @@ public class CategoryFragment extends Fragment {
 
     public GridViewWithHeaderAndFooter getGridViewWithHeaderAndFooter() {
         return gridViewWithHeaderAndFooter;
-    }
-
-    public void debugCache() {
-        Map<String, Bitmap> cacheSnapshot = memoryCache.snapshot();
-        if (cacheSnapshot.isEmpty())
-            Log.d(TAG, "No entries");
-        else
-            for (Map.Entry<String, Bitmap> e : cacheSnapshot.entrySet())
-                Log.d(TAG, Integer.toString(e.getValue().hashCode()) + ": " + e.getKey() + ", " + e.getKey().length());
     }
 }

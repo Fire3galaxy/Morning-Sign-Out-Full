@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import app.morningsignout.com.morningsignoff.category.CategoryFragment;
-import app.morningsignout.com.morningsignoff.network.CategoryImageSenderObject;
 import app.morningsignout.com.morningsignoff.search_results.SearchFragment;
 
 /**
@@ -33,8 +32,8 @@ public class FetchImageManager {
         myHandler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(Message inputMessage) {
-                CategoryImageSenderObject sentObject =
-                        (CategoryImageSenderObject) inputMessage.obj;
+                ImageSenderObject sentObject =
+                        (ImageSenderObject) inputMessage.obj;
 
                 final FetchImageRunnable task = getFetchCategoryImageTask(sentObject.imageView);
                 if (sentObject.task.equals(task)                    // A newer thread is getting image for this view

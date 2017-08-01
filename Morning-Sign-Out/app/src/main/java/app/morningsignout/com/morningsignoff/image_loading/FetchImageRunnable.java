@@ -15,9 +15,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.ImageView;
 
-import app.morningsignout.com.morningsignoff.category.CategoryAdapter;
 import app.morningsignout.com.morningsignoff.R;
-import app.morningsignout.com.morningsignoff.network.CategoryImageSenderObject;
 
 /**
  * Created by Daniel on 2/11/2017. A Runnable task that will run in the background and fetch images
@@ -56,8 +54,8 @@ public class FetchImageRunnable implements Runnable {
             downloadedImage = BitmapFactory.decodeResource(
                     imageViewRef.get().getResources(), R.drawable.no_image);
 
-        CategoryImageSenderObject objectToSend =
-                new CategoryImageSenderObject(imageUrl, imageViewRef.get(), downloadedImage, this);
+        ImageSenderObject objectToSend =
+                new ImageSenderObject(imageUrl, imageViewRef.get(), downloadedImage, this);
         Handler handler = FetchImageManager.getHandler();
         if (handler != null)
             handler.obtainMessage(managerMessage, objectToSend).sendToTarget();

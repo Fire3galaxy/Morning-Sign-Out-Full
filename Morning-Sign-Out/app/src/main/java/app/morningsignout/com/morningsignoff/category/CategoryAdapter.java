@@ -31,7 +31,7 @@ public class CategoryAdapter extends ArticleListAdapter {
     private final int VIEW_HEIGHT_DP = 220; // From single_row_category's imageview
 
     CategoryAdapter(Activity activity, LayoutInflater inflater) {
-        super(activity, inflater);
+        super(inflater);
 
         // Get width/height of the images we download for use in FetchImageRunnable
         // (hardcoded height of imageview in single_row_category)
@@ -74,13 +74,13 @@ public class CategoryAdapter extends ArticleListAdapter {
         viewHolder.author.setText(rowTemp.getAuthor());
 
         // Set the bitmap image
-        final Bitmap b = CategoryFragment.getBitmapFromMemCache(rowTemp.getCategoryURL());
+        final Bitmap b = CategoryFragment.getBitmapFromMemCache(rowTemp.getMediumURL());
 
         // Load imageViewReference into row element
         if (b == null) {
             // task is interrupted or does not exist for imageView
             if (FetchImageManager
-                    .cancelPotentialWork(rowTemp.getCategoryURL(), viewHolder.image)) {
+                    .cancelPotentialWork(rowTemp.getMediumURL(), viewHolder.image)) {
                 // Recycle old bitmap if NOT IN LRUCACHE
                 // tag: Set in FetchCategoryImageManager or else branch below here if bitmap was in
                 //      the cache
@@ -99,7 +99,7 @@ public class CategoryAdapter extends ArticleListAdapter {
                 }
 
                 FetchImageRunnable task = new FetchImageRunnable(
-                        rowTemp.getCategoryURL(),
+                        rowTemp.getMediumURL(),
                         viewHolder.image,
                         REQ_IMG_WIDTH,
                         REQ_IMG_HEIGHT,
@@ -111,7 +111,7 @@ public class CategoryAdapter extends ArticleListAdapter {
             }
         } else {    // set saved imageViewReference
             viewHolder.image.setImageBitmap(b);
-            viewHolder.image.setTag(rowTemp.getCategoryURL());
+            viewHolder.image.setTag(rowTemp.getMediumURL());
         }
 
         return row;

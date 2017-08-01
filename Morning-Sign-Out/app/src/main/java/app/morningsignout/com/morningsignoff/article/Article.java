@@ -13,18 +13,17 @@ public class Article {
     private String excerpt;
     private Set<String> tags = new HashSet<String>();
 
-    public String getImageURL() {
+    public String getFullURL() {
         return imageURL;
     }
-    public void setImageURL(String imageURL) {
+    public void setFullURL(String imageURL) {
         this.imageURL = imageURL;
     }
 
-    // If we decide not to use medium url, we can change it here
-    public String getCategoryURL() {
+    public String getMediumURL() {
         return mediumURL;
     }
-    public void setCategoryURL(String mediumURL) {
+    public void setMediumURL(String mediumURL) {
         this.mediumURL = mediumURL;
     }
 
