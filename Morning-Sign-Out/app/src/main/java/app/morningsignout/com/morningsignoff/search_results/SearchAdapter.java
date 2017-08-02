@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +30,7 @@ import app.morningsignout.com.morningsignoff.util.PhoneOrientation;
 public class SearchAdapter extends ArticleListAdapter {
     // Holds the results from display metrics
     private static int REQ_IMG_WIDTH = 0, REQ_IMG_HEIGHT = 0;
-    private final int VIEW_HEIGHT_DP = 86;  // Update this if xml layout single_row_search is updated
+    private final int VIEW_HEIGHT_DP = 100;  // Update this if xml layout single_row_search is updated
 
     private FragmentWithCache fwc;
 
@@ -63,6 +64,7 @@ public class SearchAdapter extends ArticleListAdapter {
             // Get the author, imageViewReference and title of the row item
             viewHolder.title = (TextView) row.findViewById(R.id.textViewTitle_search);
             viewHolder.image = (ImageView) row.findViewById(R.id.imageView_search);
+            viewHolder.author = (TextView) row.findViewById(R.id.textViewAuthor_search);
             viewHolder.excerpt = (TextView) row.findViewById(R.id.textViewExcerpt_search);
             row.setTag(viewHolder);
         }
@@ -74,13 +76,11 @@ public class SearchAdapter extends ArticleListAdapter {
         Article rowTemp = articles.get(i);
 
         // Set the values of the rowItem
-        if(PhoneOrientation.isLandscape(row.getContext()))
-            viewHolder.title.setLines(3);
         viewHolder.title.setText(rowTemp.getTitle());
-        viewHolder.excerpt.setText(rowTemp.getExcerpt());
+        viewHolder.author.setText(fwc.getResources().getString(R.string.search_author, rowTemp.getAuthor()));
+        viewHolder.excerpt.setText(removeEllipse(rowTemp.getExcerpt()));
 
         // add image stuff here
-        // I know it says categoryURL, but that's where image is stored for now.
         // TODO: change when appropriate for different image quality.
         final Bitmap b = fwc.getBitmapFromMemCache(rowTemp.getMediumURL());
 
@@ -124,5 +124,9 @@ public class SearchAdapter extends ArticleListAdapter {
         }
 
         return row;
+    }
+
+    private String removeEllipse(String s) {
+        return s.substring(0, s.length() - 4); // " [...]" (but the ellipse is 1 character
     }
 }

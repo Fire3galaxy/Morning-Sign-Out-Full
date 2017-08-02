@@ -37,6 +37,7 @@
     <string name="category_icon">Category icon</string>
 
     <string name="search_hint">Search Morning Sign Out</string>
+    <string name="search_author">by %1$s</string>
 
     <string name="meet_the_team">Meet the Team</string>
     <string name="mso_staff">MSO Staff</string>
