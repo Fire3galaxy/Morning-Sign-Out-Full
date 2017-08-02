@@ -104,8 +104,9 @@ public class SearchAdapter extends ArticleListAdapter {
                 }
 
                 FetchImageRunnable task = new FetchImageRunnable(
-                        rowTemp.getMediumURL(),
+
                         viewHolder.image,
+                        rowTemp.getMediumURL(),
                         REQ_IMG_WIDTH,
                         REQ_IMG_HEIGHT,
                         FetchImageManager.SENT_PICTURE_SEARCH);

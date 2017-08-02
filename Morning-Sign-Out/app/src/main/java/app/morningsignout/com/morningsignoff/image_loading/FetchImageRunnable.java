@@ -16,6 +16,7 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import app.morningsignout.com.morningsignoff.R;
+import app.morningsignout.com.morningsignoff.util.FragmentWithCache;
 
 /**
  * Created by Daniel on 2/11/2017. A Runnable task that will run in the background and fetch images
@@ -26,14 +27,16 @@ public class FetchImageRunnable implements Runnable {
     public static String NO_IMAGE = "No image";
 
     Thread currentThread;
+    FragmentWithCache fwc;
+    ImageView imageView;
     String imageUrl;
     private int viewWidth, viewHeight;
-    private WeakReference<ImageView> imageViewRef;
     private int managerMessage;
 
-    public FetchImageRunnable(String imageUrl, ImageView imageView, int viewWidth, int viewHeight, int message) {
+    public FetchImageRunnable(FragmentWithCache fwc, ImageView imageView, String imageUrl, int viewWidth, int viewHeight, int message) {
+        this.fwc = fwc;
+        this.imageView = imageView;
         this.imageUrl = imageUrl;
-        this.imageViewRef = new WeakReference<>(imageView);
         this.viewWidth = viewWidth;
         this.viewHeight = viewHeight;
         this.managerMessage = message;
@@ -50,12 +53,12 @@ public class FetchImageRunnable implements Runnable {
         Bitmap downloadedImage = null;
         if (!imageUrl.equals(NO_IMAGE))
             downloadedImage = downloadBitmap();
-        else if (imageViewRef.get() != null)
+        else
             downloadedImage = BitmapFactory.decodeResource(
-                    imageViewRef.get().getResources(), R.drawable.no_image);
+                    imageView.getResources(), R.drawable.no_image);
 
         ImageSenderObject objectToSend =
-                new ImageSenderObject(imageUrl, imageViewRef.get(), downloadedImage, this);
+                new ImageSenderObject(fwc, imageView, downloadedImage, this, imageUrl);
         Handler handler = FetchImageManager.getHandler();
         if (handler != null)
             handler.obtainMessage(managerMessage, objectToSend).sendToTarget();

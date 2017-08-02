@@ -39,11 +39,8 @@ public class FetchImageManager {
                 if (sentObject.task.equals(task)                    // A newer thread is getting image for this view
                         && !task.currentThread.isInterrupted()      // Thread interrupt = don't use bitmap
                         && sentObject.downloadedImage != null) {    // No internet = no bitmap
-                    if (inputMessage.what == SENT_PICTURE_CATEGORY)
-                        CategoryFragment.addBitmapToMemoryCache(sentObject.imageUrl, sentObject.downloadedImage);
-                    else
-                        SearchFragment.addBitmapToMemoryCache(sentObject.imageUrl, sentObject.downloadedImage);
 
+                    sentObject.fwc.addBitmapToMemoryCache(sentObject.imageUrl, sentObject.downloadedImage);
                     sentObject.imageView.setTag(sentObject.imageUrl); // Checked in CategoryAdapter
                     sentObject.imageView.setImageBitmap(sentObject.downloadedImage);
                 }
