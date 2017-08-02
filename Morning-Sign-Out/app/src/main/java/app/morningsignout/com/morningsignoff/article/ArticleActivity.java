@@ -327,7 +327,7 @@ public class ArticleActivity extends ActionBarActivity {
                 if (webView != null && webView.canGoBack())    // Go back in webView history
                     webView.goBack();
                 else                     // Return to front page (without recreating parent)
-                    finish();
+                    onBackPressed();
                 return true;
         }
         return super.onOptionsItemSelected(item);

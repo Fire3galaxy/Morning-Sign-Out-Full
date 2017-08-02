@@ -34,7 +34,6 @@ public class CategoryActivity extends AppCompatActivity {
     private ActionBarDrawerToggle mDrawerToggle;
     private SearchView searchView;
 
-    private String mTitle;              // Current Title
     private String[] categories_urls,   // category strings for url usage
             categories_titles;          // ... for Title usage
     private int position;               // position in category array
@@ -117,27 +116,23 @@ public class CategoryActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_category, menu);
 
-        // FIXME: While search is unavalaible
-//        getMenuInflater().inflate(R.menu.menu_justlogo, menu);
-
-//        /* Search results in new SearchResultsActivity, clicked article passed back to articleActivity
-//           Associate searchable configuration with the SearchView */
+        /* Search results in new SearchResultsActivity, clicked article passed back to articleActivity
+           Associate searchable configuration with the SearchView */
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-//
+
         ComponentName componentName = new ComponentName(this, SearchResultsActivity.class);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
         return true;
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        if (!searchView.isIconified())  // Check if searchView is expanded
-//            searchView.setIconified(true);
-//        else
-//            super.onBackPressed();
-//    }
-
+    @Override
+    public void onBackPressed() {
+        if (!searchView.isIconified())  // Check if searchView is expanded
+            searchView.setIconified(true);
+        else
+            super.onBackPressed();
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -151,11 +146,6 @@ public class CategoryActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         return id == R.id.title || super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void setTitle(CharSequence title) {
-        mTitle = title.toString();
     }
 
     @Override
@@ -240,12 +230,5 @@ public class CategoryActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .remove(splashFragment)
                 .commit();
-    }
-
-    public void debugAllBitmapSources(View v) {
-//        String TAG = "CategoryActivity";
-//        CategoryFragment.instance.debugCache();
-//        CategoryBitmapPool.debugPool();
-//        FetchCategoryImageRunnable.debugAllHashes();
     }
 }

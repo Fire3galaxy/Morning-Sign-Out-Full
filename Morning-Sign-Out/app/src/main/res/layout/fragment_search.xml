@@ -13,8 +13,7 @@
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh_search"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/textView_searchHeader">
+        android:layout_height="match_parent">
         <in.srain.cube.views.GridViewWithHeaderAndFooter
             android:id="@+id/gridView_search"
             android:layout_width="match_parent"
@@ -25,7 +24,7 @@
             android:numColumns="1"
             android:divider="#00ffffff"
             android:dividerHeight="10dp"
-            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
             android:horizontalSpacing="5dp"
             android:verticalSpacing="15dp"
             android:listSelector="@android:color/transparent"
@@ -47,28 +46,13 @@
         android:drawableTop="@drawable/ic_action_about"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView_searchHeader"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:gravity="center"
         android:maxWidth="180dp"
         android:paddingTop="8dp"
         android:text="If articles do not load, drag down to refresh"
         android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <TextView
-        android:id="@+id/textView_searchHeader"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:gravity="center_horizontal"
-        android:textStyle="italic|bold"
-        android:typeface="normal"
-        android:textSize="22sp"
-        android:textColor="@android:color/black"
-        />
 
     <ImageView
         android:id="@+id/imageView_splash_search"

@@ -75,21 +75,10 @@ public class SearchFragment extends FragmentWithCache {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
-        if (getArguments() != null) {
+        if (getArguments() != null)
             search = getArguments().getString(SEARCH_PARAM);
-        }
 
         isLoadingArticles = new AtomicBoolean(false);
-    }
-
-    private void setUpGridView(GridViewWithHeaderAndFooter grid) {
-//        if (SearchAdapter.isLandscape(getContext())) {
-//            grid.setNumColumns(2);
-//            grid.setPadding(5,10,5,10);
-//        } else
-//        {
-            grid.setNumColumns(1); // for now let's just try only the one column
-//        }
     }
 
     @Override
@@ -98,7 +87,6 @@ public class SearchFragment extends FragmentWithCache {
         View rootView = inflater.inflate(R.layout.fragment_search, container, false);
 
         // Grab all the views and layouts from the layout file
-        TextView headerView = (TextView) rootView.findViewById(R.id.textView_searchHeader); // how about we set this to the search params
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefresh_search);
         progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar_search);
         refreshTextView = (TextView) rootView.findViewById(R.id.textView_searchRefresh);
@@ -106,9 +94,8 @@ public class SearchFragment extends FragmentWithCache {
         gridViewWithHeaderAndFooter = (GridViewWithHeaderAndFooter) rootView.findViewById(R.id.gridView_search);
         boolean isRefresh = getArguments().getBoolean(SEARCH_REFRESH, false);
 
-        headerView.setText(search); //header may be unnecessary
-        swipeRefreshLayout.setColorSchemeColors(Color.argb(255,0x81,0xbf,0xff), Color.WHITE);
-        setUpGridView(gridViewWithHeaderAndFooter);
+        swipeRefreshLayout.setColorSchemeResources(R.color.mso_blue, R.color.background_white);
+        gridViewWithHeaderAndFooter.setNumColumns(1);
         gridViewWithHeaderAndFooter.addFooterView(footerProgressBar);
 
         // Creates and loads new adapter or sets position of existing gridView
@@ -165,21 +152,14 @@ public class SearchFragment extends FragmentWithCache {
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 int lastVisibleItem = firstVisibleItem + visibleItemCount;
-//                Log.d("SearchFragment","onscroll @ lastvisibleitem: " + lastVisibleItem + ", totalitemcount: " + totalItemCount);
                 // At last item
                 if (lastVisibleItem >= totalItemCount) {
                     WrapperListAdapter wrappedAdapter = (WrapperListAdapter) gridViewWithHeaderAndFooter.getAdapter();
                     SearchAdapter adapter = (SearchAdapter) wrappedAdapter.getWrappedAdapter();
-//                    Log.d("SearchFragment","onscroll - first if");
                     int pageNum = adapter.getPageNum();
-                    Log.d("SearchFragment","pageNum: " + pageNum);
                     // Only make one request per page request
-                    if (totalItemCount != 0 /*&& lastSeenPageNum != pageNum*/ && isLoadingArticles.weakCompareAndSet(false, true)) {
-//                        lastSeenPageNum = pageNum;
-                        Log.d("SearchFragment","start loading more");
+                    if (totalItemCount != 0 && isLoadingArticles.weakCompareAndSet(false, true))
                         new FetchListSearchTask(SearchFragment.this, pageNum + 1, false, false).execute(search);
-                        Log.d("SearchFragment", "Making new request");
-                    }
                 }
             }
 
@@ -213,8 +193,8 @@ public class SearchFragment extends FragmentWithCache {
         return rootView;
     }
 
-    // Not sure exactly what this does. Seems like it finds the fragment, or creates a new one if
-    //      not already existing. Fail-safe?
+    // On orientation change, recovers the old fragment rather than creating a new one (to save
+    // things like scroll state, loaded rows, etc.)
     public static SearchFragment findOrCreateRetainFragment(FragmentManager fm) {
         SearchFragment fragment = (SearchFragment) fm.findFragmentByTag(TAG);
         if (fragment == null)
