@@ -13,6 +13,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -128,10 +129,12 @@ public class CategoryActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (!searchView.isIconified())  // Check if searchView is expanded
+        if (!searchView.isIconified()) {
+            searchView.setQuery("", false);
             searchView.setIconified(true);
-        else
+        } else {
             super.onBackPressed();
+        }
     }
 
     @Override
