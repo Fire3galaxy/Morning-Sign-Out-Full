@@ -1,6 +1,8 @@
 package app.morningsignout.com.morningsignoff.image_loading;
 
 import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import java.util.ArrayList;
@@ -75,4 +77,6 @@ public abstract class ArticleListAdapter extends BaseAdapter {
             notifyDataSetChanged();
         }
     }
+
+    public abstract View getView(int position, View convertView, ViewGroup parent);
 }

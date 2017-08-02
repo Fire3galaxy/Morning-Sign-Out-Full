@@ -1,6 +1,5 @@
 package app.morningsignout.com.morningsignoff.category;
 
-import android.app.Activity;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -108,7 +107,7 @@ public class CategoryAdapter extends ArticleListAdapter {
                         rowTemp.getMediumURL(),
                         REQ_IMG_WIDTH,
                         REQ_IMG_HEIGHT,
-                        FetchImageManager.SENT_PICTURE_CATEGORY);
+                        FetchImageManager.SENT_PICTURE);
                 ImageTaskDrawable taskWrapper = new ImageTaskDrawable(task);
 
                 viewHolder.image.setImageDrawable(taskWrapper);

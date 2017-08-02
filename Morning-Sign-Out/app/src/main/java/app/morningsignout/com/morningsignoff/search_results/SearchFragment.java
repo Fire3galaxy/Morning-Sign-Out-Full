@@ -34,20 +34,18 @@ import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.article.Article;
 import app.morningsignout.com.morningsignoff.article.ArticleActivity;
 import app.morningsignout.com.morningsignoff.network.FetchListSearchTask;
+import app.morningsignout.com.morningsignoff.util.FragmentWithCache;
 import in.srain.cube.views.GridViewWithHeaderAndFooter;
 
 /**
  * Created by shinr on 6/5/2017.
  */
 
-public class SearchFragment extends Fragment {
+public class SearchFragment extends FragmentWithCache {
     // these are the "key" strings for getArguments() and setArguments() and so on.
     final static String SEARCH_PARAM = "SEARCH_PARAM"; // have SearchResultsActivity set this so we can put this as header
     final static String SEARCH_REFRESH = "SEARCH_REFRESH"; // shouldn't this be a boolean? e: no, this is a tag.
     final static String TAG = "SearchFragment";
-
-    // instance
-    public static SearchFragment instance = null;
 
     // local copies of metadata
     String search = ""; // holds the search argument
@@ -82,7 +80,6 @@ public class SearchFragment extends Fragment {
         }
 
         isLoadingArticles = new AtomicBoolean(false);
-        setUpCache();
     }
 
     private void setUpGridView(GridViewWithHeaderAndFooter grid) {
@@ -95,37 +92,9 @@ public class SearchFragment extends Fragment {
 //        }
     }
 
-    private void setUpCache() {
-        /*  Thanks to http://developer.android.com/training/displaying-bitmaps/cache-bitmap.html
-        * for caching code */
-        // max memory of hdpi ~32 MB
-        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
-        // memory for images ~4.5 MB = 7-8 images
-        final int cacheSize;
-
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        int width = size.x;
-        if (width <= 320)
-            cacheSize = maxMemory / 3;
-        else
-            cacheSize = maxMemory / 8;
-
-        memoryCache = new LruCache<String, Bitmap>(cacheSize) {
-            @Override
-            protected int sizeOf(String key, Bitmap bitmap) {
-                // The cache size will be measured in kilobytes rather than the number of items.
-                return bitmap.getByteCount() / 1024;
-            }
-        };
-    }
-
-    // Not sure why this is nullable. Doesn't seem to cause any harm, but I'll keep an eye on this.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        instance = this;
         View rootView = inflater.inflate(R.layout.fragment_search, container, false);
 
         // Grab all the views and layouts from the layout file
@@ -144,7 +113,7 @@ public class SearchFragment extends Fragment {
 
         // Creates and loads new adapter or sets position of existing gridView
         if(searchAdapter == null) {
-            searchAdapter = new SearchAdapter(getActivity(), inflater);
+            searchAdapter = new SearchAdapter(this, inflater);
             gridViewWithHeaderAndFooter.setAdapter(searchAdapter);
             isLoadingArticles.set(true);
             new FetchListSearchTask(this, 1, true, isRefresh).execute(search);
@@ -224,7 +193,6 @@ public class SearchFragment extends Fragment {
            @Override
             public void onRefresh() {
                if (!gridViewWithHeaderAndFooter.getAdapter().isEmpty() || !isLoadingArticles.get()) {
-
                    // seems like this series of lines is what creates an instance of this fragment.
                    // Reload search fragment
                    SearchFragment fragment =
@@ -243,20 +211,6 @@ public class SearchFragment extends Fragment {
         });
 
         return rootView;
-    }
-
-    // FIXME: Debug the crashing issues next time before trying an external cache
-    public static boolean addBitmapToMemoryCache(String key, Bitmap bitmap) {
-        if (getBitmapFromMemCache(key) == null) {
-            instance.memoryCache.put(key,bitmap);
-            return true;
-        }
-
-        return false;
-    }
-
-    public static Bitmap getBitmapFromMemCache(String key) {
-        return (instance != null) ? instance.memoryCache.get(key) : null;
     }
 
     // Not sure exactly what this does. Seems like it finds the fragment, or creates a new one if
@@ -299,6 +253,7 @@ public class SearchFragment extends Fragment {
 
     public ProgressBar getFooterProgressBar() { return footerProgressBar; }
 
-    public GridViewWithHeaderAndFooter getGridViewWithHeaderAndFooter()
-    { return gridViewWithHeaderAndFooter; }
+    public GridViewWithHeaderAndFooter getGridViewWithHeaderAndFooter() {
+        return gridViewWithHeaderAndFooter;
+    }
 }

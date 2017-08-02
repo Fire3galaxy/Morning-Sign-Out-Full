@@ -19,7 +19,7 @@ import app.morningsignout.com.morningsignoff.search_results.SearchFragment;
 
 public class FetchImageManager {
     private static final FetchImageManager instance = new FetchImageManager();
-    public static int SENT_PICTURE_CATEGORY = 1, SENT_PICTURE_SEARCH = 2;
+    public static int SENT_PICTURE = 1;
 
     private Handler myHandler;
     private ThreadPoolExecutor imagesThreadPool;

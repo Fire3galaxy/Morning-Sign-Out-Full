@@ -1,6 +1,5 @@
 package app.morningsignout.com.morningsignoff.search_results;
 
-import android.app.Activity;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -20,6 +19,7 @@ import app.morningsignout.com.morningsignoff.image_loading.UnusedBitmapPool;
 import app.morningsignout.com.morningsignoff.image_loading.ImageTaskDrawable;
 import app.morningsignout.com.morningsignoff.image_loading.FetchImageManager;
 import app.morningsignout.com.morningsignoff.image_loading.FetchImageRunnable;
+import app.morningsignout.com.morningsignoff.util.FragmentWithCache;
 import app.morningsignout.com.morningsignoff.util.PhoneOrientation;
 
 /**
@@ -31,15 +31,18 @@ public class SearchAdapter extends ArticleListAdapter {
     private static int REQ_IMG_WIDTH = 0, REQ_IMG_HEIGHT = 0;
     private final int VIEW_HEIGHT_DP = 86;  // Update this if xml layout single_row_search is updated
 
+    private FragmentWithCache fwc;
+
     // constructor
-    SearchAdapter(Activity activity, LayoutInflater inflater) {
+    SearchAdapter(FragmentWithCache fwc, LayoutInflater inflater) {
         super(inflater);
+        this.fwc = fwc;
 
         // Get width/height of the images we download for use in FetchImageRunnable
         // (hardcoded height of imageview in single_row_search)
         DisplayMetrics metrics = new DisplayMetrics();
-        activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        Resources r = activity.getResources();
+        fwc.getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        Resources r = fwc.getActivity().getResources();
 
         REQ_IMG_WIDTH = metrics.widthPixels;
         REQ_IMG_HEIGHT = (int) TypedValue.applyDimension(
@@ -79,7 +82,7 @@ public class SearchAdapter extends ArticleListAdapter {
         // add image stuff here
         // I know it says categoryURL, but that's where image is stored for now.
         // TODO: change when appropriate for different image quality.
-        final Bitmap b = SearchFragment.getBitmapFromMemCache(rowTemp.getMediumURL());
+        final Bitmap b = fwc.getBitmapFromMemCache(rowTemp.getMediumURL());
 
         // Load imageViewReference into row element
         if (b == null) {
@@ -90,7 +93,7 @@ public class SearchAdapter extends ArticleListAdapter {
                 // tag: Set in FetchCategoryImageManager or else branch below here if bitmap was in
                 //      the cache
                 String oldImageUrl = (String) viewHolder.image.getTag();
-                if (oldImageUrl != null && SearchFragment.getBitmapFromMemCache(oldImageUrl) == null) {
+                if (oldImageUrl != null && fwc.getBitmapFromMemCache(oldImageUrl) == null) {
                     Drawable d = viewHolder.image.getDrawable();
 
                     if (d != null && d instanceof BitmapDrawable) {
@@ -104,12 +107,12 @@ public class SearchAdapter extends ArticleListAdapter {
                 }
 
                 FetchImageRunnable task = new FetchImageRunnable(
-
+                        fwc,
                         viewHolder.image,
                         rowTemp.getMediumURL(),
                         REQ_IMG_WIDTH,
                         REQ_IMG_HEIGHT,
-                        FetchImageManager.SENT_PICTURE_SEARCH);
+                        FetchImageManager.SENT_PICTURE);
                 ImageTaskDrawable taskWrapper = new ImageTaskDrawable(task);
 
                 viewHolder.image.setImageDrawable(taskWrapper);
