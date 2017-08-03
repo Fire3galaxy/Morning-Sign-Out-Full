@@ -59,10 +59,7 @@ public class SearchFragment extends FragmentWithCache implements ProgressIndicat
     private GridViewWithHeaderAndFooter gridViewWithHeaderAndFooter; // gridview
 
     private SearchAdapter searchAdapter; // custom adapter for our listview
-    private AtomicBoolean isLoadingArticles;
     protected static Integer index = null; // marks index of current selection when orientation changes
-
-    public AtomicBoolean getIsLoadingArticles() { return isLoadingArticles; }
 
     @Override
     public void onDetach() {
@@ -78,8 +75,6 @@ public class SearchFragment extends FragmentWithCache implements ProgressIndicat
 
         if (getArguments() != null)
             search = getArguments().getString(SEARCH_PARAM);
-
-        isLoadingArticles = new AtomicBoolean(false);
     }
 
     @Override
@@ -93,7 +88,6 @@ public class SearchFragment extends FragmentWithCache implements ProgressIndicat
         refreshTextView = (TextView) rootView.findViewById(R.id.textView_searchRefresh);
         footerProgressBar = getFooterProgressBarXml();
         gridViewWithHeaderAndFooter = (GridViewWithHeaderAndFooter) rootView.findViewById(R.id.gridView_search);
-        boolean isRefresh = getArguments().getBoolean(SEARCH_REFRESH, false);
 
         swipeRefreshLayout.setColorSchemeResources(R.color.mso_blue, R.color.background_white);
         gridViewWithHeaderAndFooter.setNumColumns(1);
@@ -103,8 +97,8 @@ public class SearchFragment extends FragmentWithCache implements ProgressIndicat
         if(searchAdapter == null) {
             searchAdapter = new SearchAdapter(this, inflater);
             gridViewWithHeaderAndFooter.setAdapter(searchAdapter);
-            isLoadingArticles.set(true);
-            new FetchListSearchTask(this, 1, true, isRefresh).execute(search);
+            new FetchListSearchTask(this.getContext(), this, Type.Loading, searchAdapter, 1)
+                    .execute(search);
         } else {
             refreshTextView.setVisibility(View.GONE);
             searchAdapter.notifyDataSetChanged();
@@ -153,13 +147,15 @@ public class SearchFragment extends FragmentWithCache implements ProgressIndicat
 
                 // At last item
                 if (lastVisibleItem == totalItemCount - 1) {
-                    WrapperListAdapter wrappedAdapter = (WrapperListAdapter) gridViewWithHeaderAndFooter.getAdapter();
-                    SearchAdapter adapter = (SearchAdapter) wrappedAdapter.getWrappedAdapter();
-                    int pageNum = adapter.getPageNum();
+                    int pageNum = searchAdapter.getPageNum();
 
                     // Only make one request per page request
-                    if (isLoadingArticles.weakCompareAndSet(false, true))
-                        new FetchListSearchTask(SearchFragment.this, pageNum + 1, false, false).execute(search);
+                    new FetchListSearchTask(SearchFragment.this.getContext(),
+                            SearchFragment.this,
+                            Type.LoadingMore,
+                            searchAdapter,
+                            pageNum + 1)
+                            .execute(search);
                 }
             }
 
@@ -172,7 +168,7 @@ public class SearchFragment extends FragmentWithCache implements ProgressIndicat
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
            @Override
             public void onRefresh() {
-               if (!gridViewWithHeaderAndFooter.getAdapter().isEmpty() || !isLoadingArticles.get()) {
+               if (!gridViewWithHeaderAndFooter.getAdapter().isEmpty() && !FetchListSearchTask.activeTaskLock) {
                    // seems like this series of lines is what creates an instance of this fragment.
                    // Reload search fragment
                    SearchFragment fragment =
@@ -231,17 +227,6 @@ public class SearchFragment extends FragmentWithCache implements ProgressIndicat
 
         // -create progressBar and add to listView
         return new ProgressBar(getActivity(), attrs);
-    }
-    public SwipeRefreshLayout getSwipeRefreshLayout() { return swipeRefreshLayout; }
-
-    public ProgressBar getProgressBar() { return progressBar; }
-
-    public TextView getRefreshTextView() { return refreshTextView; }
-
-    public ProgressBar getFooterProgressBar() { return footerProgressBar; }
-
-    public GridViewWithHeaderAndFooter getGridViewWithHeaderAndFooter() {
-        return gridViewWithHeaderAndFooter;
     }
 
     @Override

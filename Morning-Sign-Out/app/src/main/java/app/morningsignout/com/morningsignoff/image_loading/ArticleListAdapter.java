@@ -1,5 +1,6 @@
 package app.morningsignout.com.morningsignoff.image_loading;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,6 +63,7 @@ public abstract class ArticleListAdapter extends BaseAdapter {
     public void loadMoreItems(List<Article> moreArticles, int pageNum){
         // if prevent the late page from loading twice
         if(moreArticles != null && this.pageNum != pageNum){
+            Log.d("Adapter", "more articles added");
             this.pageNum = pageNum;
 
             for (int i = 0; i < moreArticles.size(); ++i) {

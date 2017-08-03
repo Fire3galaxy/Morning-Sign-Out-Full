@@ -102,168 +102,166 @@ public class FetchJSON {
         String jsonStr = builder.toString(); // Converts response to String.
         int postCount = 0; // Keeps track of how many posts were returned by the query.
 
-        if (jsonStr != null) {
-            try { // note: the prefix "opt" indicates optional, such that the method won't fail
-                  //                                            if something unexpected happens.
+        try { // note: the prefix "opt" indicates optional, such that the method won't fail
+              //                                            if something unexpected happens.
 
-                // Get JSON object. This contains the entire response.
-                JSONObject jsonObject = new JSONObject(jsonStr);
-                // Get post count.
-                postCount = jsonObject.optInt("count");
-                // Generate an array of returned posts
-                JSONArray posts = jsonObject.optJSONArray("posts");
+            // Get JSON object. This contains the entire response.
+            JSONObject jsonObject = new JSONObject(jsonStr);
+            // Get post count.
+            postCount = jsonObject.optInt("count");
+            // Generate an array of returned posts
+            JSONArray posts = jsonObject.optJSONArray("posts");
 
-                // Loop through the posts, generate Articles for each, and populate articlesList.
-                for (int index = 0; index < postCount; index++) {
-                    // The current post. Start the process. New Article.
-                    JSONObject currPost = posts.optJSONObject(index);
-                    articleList.add(new Article());
+            // Loop through the posts, generate Articles for each, and populate articlesList.
+            for (int index = 0; index < postCount; index++) {
+                // The current post. Start the process. New Article.
+                JSONObject currPost = posts.optJSONObject(index);
+                articleList.add(new Article());
 
-                    // Title.
-                    String title = stripHtml(currPost.optString("title"));
-                    articleList.get(index).setTitle(title);
+                // Title.
+                String title = stripHtml(currPost.optString("title"));
+                articleList.get(index).setTitle(title);
 
-                    // Link.
-                    String link = currPost.optString("url");
-                    articleList.get(index).setLink(link);
+                // Link.
+                String link = currPost.optString("url");
+                articleList.get(index).setLink(link);
 
-                    // Images.
-                    String mediumURL = FetchImageRunnable.NO_IMAGE;
-                    String fullURL = FetchImageRunnable.NO_IMAGE;
-                    // create JSONObj of images
-                    if (currPost.has("thumbnail_images")){
+                // Images.
+                String mediumURL = FetchImageRunnable.NO_IMAGE;
+                String fullURL = FetchImageRunnable.NO_IMAGE;
+                // create JSONObj of images
+                if (currPost.has("thumbnail_images")){
 
-                        JSONObject imageObj = currPost.optJSONObject("thumbnail_images");
-                        // ImageURL (full)
-                        if (imageObj == null)
-                        {
-                            if (currPost.has("thumbnail")) {
-                                mediumURL = currPost.optString("thumbnail");
-                                if (!URLUtil.isValidUrl(mediumURL))
-                                {
-                                    mediumURL = FetchImageRunnable.NO_IMAGE;
-                                }
-                            }
-                        }
-                        else if (imageObj.has("medium"))
-                        {
-                            mediumURL = imageObj.optJSONObject("medium").optString("url");
-                        }
-                        else if (imageObj.has("medium_large"))
-                        {
-                            mediumURL = imageObj.optJSONObject("medium_large").optString("url");
-                        }
-                        else if (imageObj.has("large"))
-                        {
-                            mediumURL = imageObj.optJSONObject("large").optString("url");
-                        }
-                        else if (imageObj.has("full"))
-                        {
-                            mediumURL = imageObj.optJSONObject("full").optString("url");
-                        }
-                        else {
-                            if(imageObj.length() != 0)
+                    JSONObject imageObj = currPost.optJSONObject("thumbnail_images");
+                    // ImageURL (full)
+                    if (imageObj == null)
+                    {
+                        if (currPost.has("thumbnail")) {
+                            mediumURL = currPost.optString("thumbnail");
+                            if (!URLUtil.isValidUrl(mediumURL))
                             {
-                                // check for a list of available thumbnail images
-                                List<String> imgList = new ArrayList<String>();
-                                Iterator<?> keys = imageObj.keys();
-                                while (keys.hasNext()) {
-                                    String key = (String) keys.next();
-                                    imgList.add(key);
-                                }
-                                String randomImage = imgList.get(0); // let's just grab the first image we find
-                                mediumURL = imageObj.optJSONObject(randomImage).optString("url");
+                                mediumURL = FetchImageRunnable.NO_IMAGE;
                             }
-                            else
-                            {
-                                Log.e("FetchListArticlesTask","JSON: "+ title + ": no images found!");
-                            }
-                        }
-
-                        // Full size URL
-                        if (imageObj.has("full"))
-                        {
-                            fullURL = imageObj.optJSONObject("full").optString("url");
                         }
                     }
-                    else if (currPost.has("thumbnail"))
+                    else if (imageObj.has("medium"))
                     {
-                        mediumURL = currPost.optString("thumbnail");
+                        mediumURL = imageObj.optJSONObject("medium").optString("url");
                     }
-                    else
+                    else if (imageObj.has("medium_large"))
                     {
-                        Log.e("FetchListArticlesTask","JSON: "+ title + ": no images found!");
+                        mediumURL = imageObj.optJSONObject("medium_large").optString("url");
                     }
-
-
-                    articleList.get(index).setMediumURL(mediumURL);
-                    articleList.get(index).setFullURL(fullURL);
-
-                    // TODO: implement thumbnails for better performance
-                    String medURL = "";
-
-                    // Author
-                    JSONObject authorObject = currPost.optJSONObject("author");
-                    String author = Parser.replaceUnicode(authorObject.optString("name"));
-                    articleList.get(index).setAuthor(author);
-
-                    // Content
-                    articleList.get(index).setContent(currPost.optString("content"));
-
-                    // Excerpt
-                    articleList.get(index).setExcerpt(stripHtml(currPost.optString("excerpt")));
-
-                    // FIXME: no tags found
-                    // Tags.
-                    JSONArray tags = currPost.optJSONArray("tags");
-                    if (currPost.has("tags"))
+                    else if (imageObj.has("large"))
                     {
-                        int tagCount = tags.length();
-//                        Log.d("FetchJSON","tags found: " + tagCount);
-                        for (int tagIndex = 0; tagIndex < tagCount; tagIndex++)
+                        mediumURL = imageObj.optJSONObject("large").optString("url");
+                    }
+                    else if (imageObj.has("full"))
+                    {
+                        mediumURL = imageObj.optJSONObject("full").optString("url");
+                    }
+                    else {
+                        if(imageObj.length() != 0)
                         {
-                            JSONObject tagObject = null;
-                            if (tags.optJSONObject(tagIndex) != null)
-                            {
-                                String single_tag = "";
-                                tagObject = tags.getJSONObject(tagIndex);
-                                if (tagObject.has("title"))
-                                {
-                                    single_tag = tagObject.optString("title");
-//                                    Log.d("FetchJSON","tag_title: " + single_tag);
-                                }
-                                else if (tagObject.has("slug")) // if tag has no title, try slug
-                                {
-                                    single_tag = tagObject.optString("slug");
-//                                    Log.d("FetchJSON","tag_slug: " + single_tag);
-                                } // else do nothing.
-
-                                if (single_tag != null && !single_tag.isEmpty())
-                                {
-//                                    Log.d("FetchJSON","post: " + title + " tag: "+ single_tag);
-                                    articleList.get(index).setTags(single_tag); // push a tag onto list
-                                }
+                            // check for a list of available thumbnail images
+                            List<String> imgList = new ArrayList<String>();
+                            Iterator<?> keys = imageObj.keys();
+                            while (keys.hasNext()) {
+                                String key = (String) keys.next();
+                                imgList.add(key);
                             }
-                            else {
-                                Log.d("FetchJSON","post " + title + " has no tags");
-                            }
+                            String randomImage = imgList.get(0); // let's just grab the first image we find
+                            mediumURL = imageObj.optJSONObject(randomImage).optString("url");
                         }
-                    } else
+                        else
+                        {
+                            Log.e("FetchListArticlesTask","JSON: "+ title + ": no images found!");
+                        }
+                    }
+
+                    // Full size URL
+                    if (imageObj.has("full"))
                     {
-                        Log.d("FetchJSON","no tags");
+                        fullURL = imageObj.optJSONObject("full").optString("url");
                     }
                 }
-            } catch (JSONException je) {
-                Log.e("FetchJSON", je.getMessage());
-                je.printStackTrace();
+                else if (currPost.has("thumbnail"))
+                {
+                    mediumURL = currPost.optString("thumbnail");
+                }
+                else
+                {
+                    Log.e("FetchListArticlesTask","JSON: "+ title + ": no images found!");
+                }
+
+
+                articleList.get(index).setMediumURL(mediumURL);
+                articleList.get(index).setFullURL(fullURL);
+
+                // TODO: implement thumbnails for better performance
+                String medURL = "";
+
+                // Author
+                JSONObject authorObject = currPost.optJSONObject("author");
+                String author = Parser.replaceUnicode(authorObject.optString("name"));
+                articleList.get(index).setAuthor(author);
+
+                // Content
+                articleList.get(index).setContent(currPost.optString("content"));
+
+                // Excerpt
+                articleList.get(index).setExcerpt(stripHtml(currPost.optString("excerpt")));
+
+                // FIXME: no tags found
+                // Tags.
+                JSONArray tags = currPost.optJSONArray("tags");
+                if (currPost.has("tags"))
+                {
+                    int tagCount = tags.length();
+//                        Log.d("FetchJSON","tags found: " + tagCount);
+                    for (int tagIndex = 0; tagIndex < tagCount; tagIndex++)
+                    {
+                        JSONObject tagObject = null;
+                        if (tags.optJSONObject(tagIndex) != null)
+                        {
+                            String single_tag = "";
+                            tagObject = tags.getJSONObject(tagIndex);
+                            if (tagObject.has("title"))
+                            {
+                                single_tag = tagObject.optString("title");
+//                                    Log.d("FetchJSON","tag_title: " + single_tag);
+                            }
+                            else if (tagObject.has("slug")) // if tag has no title, try slug
+                            {
+                                single_tag = tagObject.optString("slug");
+//                                    Log.d("FetchJSON","tag_slug: " + single_tag);
+                            } // else do nothing.
+
+                            if (single_tag != null && !single_tag.isEmpty())
+                            {
+//                                    Log.d("FetchJSON","post: " + title + " tag: "+ single_tag);
+                                articleList.get(index).setTags(single_tag); // push a tag onto list
+                            }
+                        }
+                        else {
+                            Log.d("FetchJSON","post " + title + " has no tags");
+                        }
+                    }
+                } else
+                {
+                    Log.d("FetchJSON","no tags");
+                }
             }
+        } catch (JSONException je) {
+            Log.e("FetchJSON", je.getMessage());
+            je.printStackTrace();
         }
 
         // if no articles found, return nothing
         return articleList.isEmpty() ? null : articleList;
     }
 
-    public static String stripHtml(String html) {
+    private static String stripHtml(String html) {
         return Jsoup.parse(html).text();
     }
 }
