@@ -35,13 +35,14 @@ import app.morningsignout.com.morningsignoff.article.Article;
 import app.morningsignout.com.morningsignoff.article.ArticleActivity;
 import app.morningsignout.com.morningsignoff.network.FetchListSearchTask;
 import app.morningsignout.com.morningsignoff.util.FragmentWithCache;
+import app.morningsignout.com.morningsignoff.util.ProgressIndicator;
 import in.srain.cube.views.GridViewWithHeaderAndFooter;
 
 /**
  * Created by shinr on 6/5/2017.
  */
 
-public class SearchFragment extends FragmentWithCache {
+public class SearchFragment extends FragmentWithCache implements ProgressIndicator {
     // these are the "key" strings for getArguments() and setArguments() and so on.
     final static String SEARCH_PARAM = "SEARCH_PARAM"; // have SearchResultsActivity set this so we can put this as header
     final static String SEARCH_REFRESH = "SEARCH_REFRESH"; // shouldn't this be a boolean? e: no, this is a tag.
@@ -57,15 +58,15 @@ public class SearchFragment extends FragmentWithCache {
     private ProgressBar footerProgressBar; // refers to footer progress bar
     private GridViewWithHeaderAndFooter gridViewWithHeaderAndFooter; // gridview
 
-    private SearchAdapter searchAdapter; // custom adapter for our "listview"
-    private LruCache<String, Bitmap> memoryCache; // sets up a cache for images
+    private SearchAdapter searchAdapter; // custom adapter for our listview
     private AtomicBoolean isLoadingArticles;
-    protected static Integer index = null; // marks index of current selection (I think?)
+    protected static Integer index = null; // marks index of current selection when orientation changes
 
     public AtomicBoolean getIsLoadingArticles() { return isLoadingArticles; }
 
     @Override
     public void onDetach() {
+        // Save index to set gridview back to this on orientation change
         index = gridViewWithHeaderAndFooter.getFirstVisiblePosition();
         super.onDetach();
     }
@@ -137,28 +138,27 @@ public class SearchFragment extends FragmentWithCache {
                 // Load header image
                 articleActivity.putExtra(ArticleActivity.IMAGE_URL, rowTemp.getFullURL());
 
-                // Hmm, do we really want to start an entirely new activity? Maybe. Hopefully can handle
-                // this, and if you press back, you end up back in the search results.
                 gridViewWithHeaderAndFooter.getContext().startActivity(articleActivity);
             }
         });
 
         // To load more articles when the bottom of the page is reached
+        // The progress bar footer counts in the visible item count, even though it may be View.GONE
+        // Hence, RIGHT at the bottom, the visible item count increases by one.
+        // Loading new articles should occur right when the progress bar is visible
         gridViewWithHeaderAndFooter.setOnScrollListener(new AbsListView.OnScrollListener() {
-            // Last seen by this listener, not by the program.
-            // So, say, the program has seen page 1 already, but this value is 0 still
-//            int lastSeenPageNum = 0;
-
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                int lastVisibleItem = firstVisibleItem + visibleItemCount;
+                int lastVisibleItem = firstVisibleItem + visibleItemCount - 1;
+
                 // At last item
-                if (lastVisibleItem >= totalItemCount) {
+                if (lastVisibleItem == totalItemCount - 1) {
                     WrapperListAdapter wrappedAdapter = (WrapperListAdapter) gridViewWithHeaderAndFooter.getAdapter();
                     SearchAdapter adapter = (SearchAdapter) wrappedAdapter.getWrappedAdapter();
                     int pageNum = adapter.getPageNum();
+
                     // Only make one request per page request
-                    if (totalItemCount != 0 && isLoadingArticles.weakCompareAndSet(false, true))
+                    if (isLoadingArticles.weakCompareAndSet(false, true))
                         new FetchListSearchTask(SearchFragment.this, pageNum + 1, false, false).execute(search);
                 }
             }
@@ -198,10 +198,17 @@ public class SearchFragment extends FragmentWithCache {
     public static SearchFragment findOrCreateRetainFragment(FragmentManager fm) {
         SearchFragment fragment = (SearchFragment) fm.findFragmentByTag(TAG);
         if (fragment == null)
-        {
             return new SearchFragment();
-        }
         return fragment;
+    }
+
+    void onNewSearch(String query) {
+        Log.d("SearchFragment", query);
+        if (query != null && !query.isEmpty()) {
+            search = query;
+            searchAdapter.DebugClear();
+//            new FetchListSearchTask(this, 1, true, true).execute(query);
+        }
     }
 
     // Helper functions, used in the Fetch/Async task
@@ -235,5 +242,37 @@ public class SearchFragment extends FragmentWithCache {
 
     public GridViewWithHeaderAndFooter getGridViewWithHeaderAndFooter() {
         return gridViewWithHeaderAndFooter;
+    }
+
+    @Override
+    public void loadingStart() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void loadingEnd() {
+        progressBar.setVisibility(View.GONE);
+        refreshTextView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void refreshStart() {
+        swipeRefreshLayout.setRefreshing(true);
+    }
+
+    @Override
+    public void refreshEnd() {
+        swipeRefreshLayout.setRefreshing(false);
+        refreshTextView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void loadingMoreStart() {
+        footerProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void loadingMoreEnd() {
+        footerProgressBar.setVisibility(View.GONE);
     }
 }

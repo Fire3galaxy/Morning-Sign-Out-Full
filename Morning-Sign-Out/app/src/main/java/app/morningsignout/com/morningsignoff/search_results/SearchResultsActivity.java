@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
@@ -35,19 +36,19 @@ import app.morningsignout.com.morningsignoff.category.SplashFragment;
 import app.morningsignout.com.morningsignoff.network.URLToMobileArticle;
 
 public class SearchResultsActivity extends AppCompatActivity {
+    SearchFragment fragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-        super.getSupportActionBar().setDisplayHomeAsUpEnabled(true); //made back arrow in top left corner
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true); //made back arrow in top left corner
+        getSupportActionBar().setTitle("");
 
         // New search, added by shinray
         // Fragments added to activity
         if (savedInstanceState == null) {
-            SearchFragment fragment = SearchFragment.findOrCreateRetainFragment(getSupportFragmentManager());
-
-            // create a Bundle to pass strings into the fragment
+            fragment = SearchFragment.findOrCreateRetainFragment(getSupportFragmentManager());
             Bundle args = new Bundle();
 
             // set SEARCH_PARAM in the fragment to the query
@@ -91,9 +92,15 @@ public class SearchResultsActivity extends AppCompatActivity {
     @Override
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        Log.d("SearchResultsActivity", "new intent");
+
+        if (fragment == null) {
+            List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
+            if (!fragmentList.isEmpty())
+                fragment = (SearchFragment) fragmentList.get(0);
+        }
+        fragment.onNewSearch(intent.getStringExtra(SearchManager.QUERY));
     }
-//
+
 //    private void handleSearch(Intent intent) {
 //        if (intent == null) return;
 //

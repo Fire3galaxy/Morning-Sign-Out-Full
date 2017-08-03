@@ -129,4 +129,9 @@ public class SearchAdapter extends ArticleListAdapter {
     private String removeEllipse(String s) {
         return s.substring(0, s.length() - 4); // " [...]" (but the ellipse is 1 character
     }
+
+    void DebugClear() {
+        articles.clear();
+        notifyDataSetChanged();
+    }
 }
