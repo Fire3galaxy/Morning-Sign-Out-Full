@@ -42,19 +42,18 @@ public class MeetTheTeamJSONAdapter extends ArrayAdapter<MeetTheTeamAuthor> impl
             String ch = author.getName().substring(0,1);
             ch = ch.toUpperCase(Locale.US);
 
-            // HashMap will prevent duplicates
-            mapIndex.put(ch, i);
+            // Make sure HashMap doesn't have duplicates, else fastscroll works weirdly in long lists
+            if (!mapIndex.containsKey(ch)) {
+                mapIndex.put(ch, i);
+            }
         }
 
         Set<String> sectionLetters = mapIndex.keySet();
 
         // create a list from the set to sort
         ArrayList<String> sectionList = new ArrayList<String>(sectionLetters);
-
         Collections.sort(sectionList);
-
         sections = new String[sectionList.size()];
-
         sectionList.toArray(sections);
     }
 
