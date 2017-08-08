@@ -29,6 +29,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.WrapperListAdapter;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -162,6 +165,11 @@ public class CategoryFragment extends Fragment {
             if (index != null)
                 gridViewWithHeaderAndFooter.setSelection(index);
         }
+
+        // Load AdMob banner ad
+        AdView mAdView = (AdView) rootView.findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         // Setup the click listener for the listView
         gridViewWithHeaderAndFooter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
