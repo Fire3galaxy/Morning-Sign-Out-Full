@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 class AdapterObject {
     TextView title;
-    TextView author; // FIXME: add this into layout
+    TextView author;
     TextView excerpt;
     ImageView image;
 }

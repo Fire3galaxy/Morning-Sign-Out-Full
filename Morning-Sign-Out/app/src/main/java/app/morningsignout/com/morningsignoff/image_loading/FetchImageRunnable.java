@@ -27,19 +27,17 @@ public class FetchImageRunnable implements Runnable {
     public static String NO_IMAGE = "No image";
 
     Thread currentThread;
-    FragmentWithCache fwc;
-    ImageView imageView;
+    private FragmentWithCache fwc;
+    private ImageView imageView;
     String imageUrl;
     private int viewWidth, viewHeight;
-    private int managerMessage;
 
-    public FetchImageRunnable(FragmentWithCache fwc, ImageView imageView, String imageUrl, int viewWidth, int viewHeight, int message) {
+    public FetchImageRunnable(FragmentWithCache fwc, ImageView imageView, String imageUrl, int viewWidth, int viewHeight) {
         this.fwc = fwc;
         this.imageView = imageView;
         this.imageUrl = imageUrl;
         this.viewWidth = viewWidth;
         this.viewHeight = viewHeight;
-        this.managerMessage = message;
     }
 
     @Override
@@ -50,7 +48,7 @@ public class FetchImageRunnable implements Runnable {
         if (Thread.interrupted())
             return;
 
-        Bitmap downloadedImage = null;
+        Bitmap downloadedImage;
         if (!imageUrl.equals(NO_IMAGE))
             downloadedImage = downloadBitmap();
         else
@@ -61,7 +59,7 @@ public class FetchImageRunnable implements Runnable {
                 new ImageSenderObject(fwc, imageView, downloadedImage, this, imageUrl);
         Handler handler = FetchImageManager.getHandler();
         if (handler != null)
-            handler.obtainMessage(managerMessage, objectToSend).sendToTarget();
+            handler.obtainMessage(FetchImageManager.SENT_PICTURE, objectToSend).sendToTarget();
     }
 
     // input an imageViewReference URL, get its bitmap

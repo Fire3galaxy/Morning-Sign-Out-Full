@@ -27,10 +27,12 @@ import app.morningsignout.com.morningsignoff.util.PhoneOrientation;
  * Created by shinr on 6/1/2017.
  */
 
-public class SearchAdapter extends ArticleListAdapter {
+class SearchAdapter extends ArticleListAdapter {
     // Holds the results from display metrics
     private static int REQ_IMG_WIDTH = 0, REQ_IMG_HEIGHT = 0;
-    private final int VIEW_HEIGHT_DP = 100;  // Update this if xml layout single_row_search is updated
+
+    // Update this if xml layout single_row_search is updated
+    private static final int VIEW_HEIGHT_DP = 100;
 
     private FragmentWithCache fwc;
 
@@ -111,8 +113,7 @@ public class SearchAdapter extends ArticleListAdapter {
                         viewHolder.image,
                         rowTemp.getMediumURL(),
                         REQ_IMG_WIDTH,
-                        REQ_IMG_HEIGHT,
-                        FetchImageManager.SENT_PICTURE);
+                        REQ_IMG_HEIGHT);
                 ImageTaskDrawable taskWrapper = new ImageTaskDrawable(task);
 
                 viewHolder.image.setImageDrawable(taskWrapper);
@@ -128,10 +129,5 @@ public class SearchAdapter extends ArticleListAdapter {
 
     private String removeEllipse(String s) {
         return s.substring(0, s.length() - 4); // " [...]" (but the ellipse is 1 character
-    }
-
-    void DebugClear() {
-        articles.clear();
-        notifyDataSetChanged();
     }
 }

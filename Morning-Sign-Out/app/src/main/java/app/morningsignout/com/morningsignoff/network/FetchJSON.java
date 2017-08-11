@@ -138,9 +138,11 @@ public class FetchJSON {
                     {
                         if (currPost.has("thumbnail")) {
                             mediumURL = currPost.optString("thumbnail");
+                            fullURL = mediumURL;
                             if (!URLUtil.isValidUrl(mediumURL))
                             {
                                 mediumURL = FetchImageRunnable.NO_IMAGE;
+                                fullURL = FetchImageRunnable.NO_IMAGE;
                             }
                         }
                     }
@@ -179,8 +181,9 @@ public class FetchJSON {
                         }
                     }
 
-                    // Full size URL
-                    if (imageObj.has("full"))
+                    // Full size URL (Not as big a priority to fill this as mediumURL for now,
+                    // so just check if "full" exists)
+                    if (imageObj != null && imageObj.has("full"))
                     {
                         fullURL = imageObj.optJSONObject("full").optString("url");
                     }
@@ -188,6 +191,7 @@ public class FetchJSON {
                 else if (currPost.has("thumbnail"))
                 {
                     mediumURL = currPost.optString("thumbnail");
+                    fullURL = mediumURL;
                 }
                 else
                 {
@@ -199,7 +203,6 @@ public class FetchJSON {
                 articleList.get(index).setFullURL(fullURL);
 
                 // TODO: implement thumbnails for better performance
-                String medURL = "";
 
                 // Author
                 JSONObject authorObject = currPost.optJSONObject("author");

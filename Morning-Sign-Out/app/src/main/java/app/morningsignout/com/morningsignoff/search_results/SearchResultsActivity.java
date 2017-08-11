@@ -100,26 +100,5 @@ public class SearchResultsActivity extends AppCompatActivity {
         }
         fragment.onNewSearch(intent.getStringExtra(SearchManager.QUERY));
     }
-
-//    private void handleSearch(Intent intent) {
-//        if (intent == null) return;
-//
-//        // Create search url and load webView
-//        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-//            String query = intent.getStringExtra(SearchManager.QUERY);
-//            setTitle(query); // In actionbar
-//            String searchURI = getURI(query);
-//
-//            // Open webView with search results of query
-//            if (searchURI != null) {
-//                searchWebViewClient.setQuery(query);
-//                webView.loadUrl(searchURI);
-//            } else {
-//                Log.e("Search", "Error: Failed Search (null string)");
-//            }
-//        }
-//
-//        else Log.e("Search", "Error: Failed Search (intent not for search)");
-//    }
 }
 

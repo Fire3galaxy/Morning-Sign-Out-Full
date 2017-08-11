@@ -80,5 +80,12 @@ public abstract class ArticleListAdapter extends BaseAdapter {
         }
     }
 
+    public void loadNewItems(List<Article> replacementArticles) {
+        pageNum = 0;
+        articles = new ArrayList<>(replacementArticles);
+        uniqueArticleNames.clear();
+        notifyDataSetChanged();
+    }
+
     public abstract View getView(int position, View convertView, ViewGroup parent);
 }

@@ -154,8 +154,7 @@ public class SearchFragment extends FragmentWithCache implements ProgressIndicat
                             SearchFragment.this,
                             Type.LoadingMore,
                             searchAdapter,
-                            pageNum + 1)
-                            .execute(search);
+                            pageNum + 1).execute(search);
                 }
             }
 
@@ -202,8 +201,7 @@ public class SearchFragment extends FragmentWithCache implements ProgressIndicat
         Log.d("SearchFragment", query);
         if (query != null && !query.isEmpty()) {
             search = query;
-            searchAdapter.DebugClear();
-//            new FetchListSearchTask(this, 1, true, true).execute(query);
+            new FetchListSearchTask(getContext(), this, Type.Refresh, searchAdapter, 0).execute(query);
         }
     }
 

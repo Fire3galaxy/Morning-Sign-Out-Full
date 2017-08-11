@@ -106,8 +106,7 @@ public class CategoryAdapter extends ArticleListAdapter {
                         viewHolder.image,
                         rowTemp.getMediumURL(),
                         REQ_IMG_WIDTH,
-                        REQ_IMG_HEIGHT,
-                        FetchImageManager.SENT_PICTURE);
+                        REQ_IMG_HEIGHT);
                 ImageTaskDrawable taskWrapper = new ImageTaskDrawable(task);
 
                 viewHolder.image.setImageDrawable(taskWrapper);
