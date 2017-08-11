@@ -14,6 +14,7 @@
     <string name="action_login">Log in </string>
     <string name="action_logout">Log out</string>
     <string name="action_refresh">Refresh</string>
+    <string name="action_blank">Blank</string>
 
     <string name="disqus_login">Log In - Disqus</string>
     <string name="disqus_reply">Reply</string>
@@ -46,20 +47,21 @@
     <string name="button_mttPrev">Prev</string>
     <string name="button_mttNext">Next</string>
 
+    <string name="error_fail_to_connect">We had trouble trying to connect</string>
     <string name="error">Something went wrong. Please report this bug to the developers in the play
         store comment section.</string>
     <string name="error_no_internet_1">We cannot connect to</string>
     <string name="error_no_internet_2">right now. Please check your internet connection!</string>
     <string name="error_refresh_button">Refresh</string>
 
-    <string-array name ="descriptions">
+    <string-array name="descriptions">
         <item>description 1</item>
         <item>description 2</item>
         <item>description 3</item>
         <item>description 4</item>
     </string-array>
 
-    <string-array name ="categories">
+    <string-array name="categories">
         <item>Latest</item> <!--No latest page on MSO now-->
         <!--<item>Featured</item>-->
         <item>Research</item>
@@ -68,7 +70,7 @@
         <item>Public Health</item>
         <item>Healthcare</item>
         <item>About MSO</item>
-        <!--<item>Meet the Team</item>--> <!--Non functional for now-->
+        <item>Meet the Team</item>
     </string-array>
 
     <array name="categories_icons">
@@ -80,10 +82,10 @@
         <item>@drawable/category_public_health</item>
         <item>@drawable/category_healthcare</item>
         <item>@drawable/category_about</item>
-        <!--<item>@drawable/category_meettheteam</item>-->
+        <item>@drawable/category_meettheteam</item>
     </array>
 
-    <string-array name ="categories_for_url">
+    <string-array name="categories_for_url">
         <item>latest</item>
         <!--<item>featured</item>-->
         <item>research</item>
@@ -130,4 +132,32 @@
     <string name="footer_content">As with a sign out, we hope to turn science and medicine into
         something understandable for our readers, with enough critical information that leaves them
         more knowledgeable than before.</string>
+
+    <!-- Meet the team header view for the list view -->
+    <!--<string name="meet_the_team_header_intro">-->
+        <!--<p><center><i>Meet our <b>Writing Team!</b></i></center></p>-->
+    <!--</string>-->
+    <!--<string name="meet_the_team_header_body1">-->
+        <!--<p><b>We have an amazing team of writers composed almost entirely of students from the University-->
+        <!--of California system. These students work hard to gather research, write informative-->
+        <!--articles, and boil it down into the simple-to-read format that you can expect from Morning-->
+        <!--Sign Out, the biomedical magazine that anyone can read!</b></p>-->
+        <!--<p></p><p></p>-->
+    <!--</string>-->
+    <!--<string name="meet_the_team_header_body2">-->
+        <!--<p><b>To quickly find a particular author, place your finger along the rightmost edge of the-->
+        <!--screen and scroll from there. Authors are arranged by first name.</b></p>-->
+    <!--</string>-->
+
+    <string name="meet_the_team_header_intro">Meet our Writing Team!</string>
+    <string name="meet_the_team_header_body1">
+        We have an amazing team of writers composed almost entirely of students from the University
+        of California system. These students work hard to gather research, write informative
+        articles, and boil it down into the simple-to-read format that you can expect from Morning
+        Sign Out, the biomedical magazine that anyone can read!
+    </string>
+    <string name="meet_the_team_header_body2">
+        To quickly find a particular author, place your finger along the rightmost edge of the
+        screen and scroll from there. Authors are arranged by first name.
+    </string>
 </resources>

@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--Padding is hardcoded value just to center imagebutton (drawerlayout issue)-->
 <ImageButton xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content" android:layout_height="match_parent"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
     android:contentDescription="@string/title_contentDescription"
     android:src="@drawable/mso_square_white"
     android:scaleType="centerInside"
     android:background="@android:color/transparent"
-    android:padding="@dimen/title_padding"
-    android:layout_centerInParent="true"
+    android:paddingRight="24dp"
+    android:paddingEnd="24dp"
     android:onClick="returnToParent"
     android:id="@+id/homeButton"/>

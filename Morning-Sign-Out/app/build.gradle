@@ -21,12 +21,13 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+    //    compile files('libs/commons-io-2.5.jar')
     compile 'com.android.support:appcompat-v7:25.1.0'
-//    compile files('libs/commons-io-2.5.jar')
     compile 'org.jsoup:jsoup:1.10.2'
     compile 'in.srain.cube:grid-view-with-header-footer:1.0.12'
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'com.google.android.gms:play-services-ads:10.0.1'
     compile 'com.android.support:customtabs:25.3.1'
-
+    compile 'com.android.support.constraint:constraint-layout:+'
+    compile 'com.squareup.okhttp3:okhttp:3.8.0'
 }

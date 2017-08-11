@@ -33,8 +33,8 @@ import java.lang.InterruptedException;
 import java.util.Map;
 
 import app.morningsignout.com.morningsignoff.R;
+import app.morningsignout.com.morningsignoff.meet_the_team.MeetTheTeamJSONActivity;
 import app.morningsignout.com.morningsignoff.search_results.SearchResultsActivity;
-import app.morningsignout.com.morningsignoff.meet_the_team.MeetTheTeamActivity;
 import app.morningsignout.com.morningsignoff.network.FetchCategoryImageRunnable;
 
 // Category page categoryActivity
@@ -91,18 +91,7 @@ public class CategoryActivity extends AppCompatActivity {
         setDrawerListenerToActionBarToggle();
 
         // Adding MSO Logo to center of action bar
-        if (getSupportActionBar() != null)
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-        ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null);
-        ib.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectItem(0);
-            }
-        });
-        ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);
-        this.getSupportActionBar().setCustomView(ib, params);
-        this.getSupportActionBar().setDisplayShowCustomEnabled(true);
+        setupActionBar();
 
 
         // Fragments added to activity
@@ -226,7 +215,7 @@ public class CategoryActivity extends AppCompatActivity {
             startActivity(AboutMSOActivity);
         } else if (position == categories_urls.length + 1) {
             // categories_urls.length + 1 -> Meet the Team
-            Intent intent = new Intent(this, MeetTheTeamActivity.class);
+            Intent intent = new Intent(this, MeetTheTeamJSONActivity.class);
             startActivity(intent);
         }
 
@@ -257,5 +246,21 @@ public class CategoryActivity extends AppCompatActivity {
 //        CategoryFragment.instance.debugCache();
 //        CategoryBitmapPool.debugPool();
 //        FetchCategoryImageRunnable.debugAllHashes();
+    }
+
+    public void setupActionBar() {
+        if (getSupportActionBar() != null) {
+            ImageView ib = (ImageView) getLayoutInflater().inflate(R.layout.title_main, null);
+            this.getSupportActionBar().setCustomView(ib);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowCustomEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            ib.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    selectItem(0);
+                }
+            });
+        }
     }
 }
