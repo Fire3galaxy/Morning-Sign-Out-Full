@@ -34,17 +34,27 @@ public class FetchListSearchTask extends AsyncTask<String, Void, List<Article>> 
     private ArticleListAdapter adapter;
     private int requestedPageNum;
 
+    // Flags to determine what to do if articles list returned is null
+    // FIXME: other causes may exist, like an exception or disconnect in FetchJSON.getResultsJSON()
+    // FIXME: think about it and add more actions in onPostExecute
+    private boolean isDisconnectedFlag;
+    private OnSearchErrorListener errorListener;
+    private SearchError errorObject;
+
     public static boolean activeTaskLock = false;
 
     public FetchListSearchTask(Context context,
                                ProgressIndicator progressIndicator,
                                ProgressIndicator.Type type,
                                ArticleListAdapter adapter,
-                               int requestedPageNum) {
+                               int requestedPageNum,
+                               OnSearchErrorListener errorListener) {
         this.context = context;
         this.progReactor = new ProgressReactor(progressIndicator, type);
         this.adapter = adapter;
         this.requestedPageNum = requestedPageNum;
+        this.errorListener = errorListener;
+        this.errorObject = new SearchError();
     }
 
     @Override
@@ -73,7 +83,10 @@ public class FetchListSearchTask extends AsyncTask<String, Void, List<Article>> 
 
     @Override
     protected List<Article> doInBackground(String... params) {
-        if (!isCancelled() && params.length == 1 && CheckConnection.isConnected(context)) {
+        isDisconnectedFlag = !CheckConnection.isConnected(context);
+        errorObject.query = params[0];
+        errorObject.pageNum = requestedPageNum;
+        if (!isCancelled() && params.length == 1 && !isDisconnectedFlag) {
             try {
                 Log.d("Task", "Checkpoint 2: A request is made " + requestedPageNum + "," + this.hashCode());
 
@@ -101,12 +114,25 @@ public class FetchListSearchTask extends AsyncTask<String, Void, List<Article>> 
             else
                 adapter.loadNewItems(articles);
         }
-        else if (adapter.isEmpty())
-            Toast.makeText(context, "We had trouble trying to connect", Toast.LENGTH_SHORT).show();
+        else {
+            if (isDisconnectedFlag)
+                Toast.makeText(context, "We had trouble trying to connect", Toast.LENGTH_SHORT).show();
+            if (errorListener != null)
+                errorListener.onSearchError(errorObject);
+        }
 
         activeTaskLock = false;
     }
 
     @Override
     protected void onCancelled(List<Article> articles) {}
+
+    public interface OnSearchErrorListener {
+        void onSearchError(SearchError error);
+    }
+
+    public class SearchError {
+        public String query;
+        public int pageNum;
+    }
 }

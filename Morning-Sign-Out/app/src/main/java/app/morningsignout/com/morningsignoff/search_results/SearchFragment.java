@@ -42,7 +42,8 @@ import in.srain.cube.views.GridViewWithHeaderAndFooter;
  * Created by shinr on 6/5/2017.
  */
 
-public class SearchFragment extends FragmentWithCache implements ProgressIndicator {
+public class SearchFragment extends FragmentWithCache
+        implements ProgressIndicator, FetchListSearchTask.OnSearchErrorListener {
     // these are the "key" strings for getArguments() and setArguments() and so on.
     final static String SEARCH_PARAM = "SEARCH_PARAM"; // have SearchResultsActivity set this so we can put this as header
     final static String SEARCH_REFRESH = "SEARCH_REFRESH"; // shouldn't this be a boolean? e: no, this is a tag.
@@ -59,6 +60,7 @@ public class SearchFragment extends FragmentWithCache implements ProgressIndicat
     private GridViewWithHeaderAndFooter gridViewWithHeaderAndFooter; // gridview
 
     private SearchAdapter searchAdapter; // custom adapter for our listview
+    private FetchListSearchTask.SearchError searchErrorObject = null;
     protected static Integer index = null; // marks index of current selection when orientation changes
 
     @Override
@@ -97,7 +99,7 @@ public class SearchFragment extends FragmentWithCache implements ProgressIndicat
         if(searchAdapter == null) {
             searchAdapter = new SearchAdapter(this, inflater);
             gridViewWithHeaderAndFooter.setAdapter(searchAdapter);
-            new FetchListSearchTask(this.getContext(), this, Type.Loading, searchAdapter, 1)
+            new FetchListSearchTask(this.getContext(), this, Type.Loading, searchAdapter, 1, this)
                     .execute(search);
         } else {
             refreshTextView.setVisibility(View.GONE);
@@ -141,21 +143,20 @@ public class SearchFragment extends FragmentWithCache implements ProgressIndicat
         // Hence, RIGHT at the bottom, the visible item count increases by one.
         // Loading new articles should occur right at the bottom, where the progress bar is.
         gridViewWithHeaderAndFooter.setOnScrollListener(new AbsListView.OnScrollListener() {
-
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 int lastVisibleItem = firstVisibleItem + visibleItemCount - 1;
+                int pageNum = searchAdapter.getPageNum();
 
                 // At last item (should be progress bar)
-                if (lastVisibleItem == totalItemCount - 1) {
-                    int pageNum = searchAdapter.getPageNum();
-
+                if (lastVisibleItem == totalItemCount - 1 && !doesMatchSearchError(pageNum + 1)) {
                     // Only make one request per page request
                     new FetchListSearchTask(SearchFragment.this.getContext(),
                             SearchFragment.this,
                             Type.LoadingMore,
                             searchAdapter,
-                            pageNum + 1).execute(search);
+                            pageNum + 1,
+                            SearchFragment.this).execute(search);
                 }
             }
 
@@ -201,8 +202,10 @@ public class SearchFragment extends FragmentWithCache implements ProgressIndicat
     void onNewSearch(String query) {
         Log.d("SearchFragment", query);
         if (query != null && !query.isEmpty()) {
+            clearSearchError();
+            new FetchListSearchTask(getContext(), this, Type.Refresh, searchAdapter, 1, this)
+                    .execute(query);
             search = query;
-            new FetchListSearchTask(getContext(), this, Type.Refresh, searchAdapter, 1).execute(query);
         }
     }
 
@@ -259,5 +262,20 @@ public class SearchFragment extends FragmentWithCache implements ProgressIndicat
     @Override
     public void loadingMoreEnd() {
         footerProgressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onSearchError(FetchListSearchTask.SearchError error) {
+        searchErrorObject = error;
+    }
+
+    private boolean doesMatchSearchError(int requestedPageNum) {
+        return searchErrorObject != null
+                && searchErrorObject.query.equals(search)
+                && searchErrorObject.pageNum == requestedPageNum;
+    }
+
+    private void clearSearchError() {
+        searchErrorObject = null;
     }
 }
