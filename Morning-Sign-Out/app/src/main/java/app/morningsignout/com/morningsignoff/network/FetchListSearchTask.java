@@ -48,8 +48,6 @@ public class FetchListSearchTask extends AsyncTask<String, Void, List<Article>> 
 
     @Override
     protected void onPreExecute() {
-        Log.d("Task", "Checkpoint 0: " + this.hashCode());
-
         // This "lock" should prevent multiple tasks from running at the same time. It is only ever
         // assigned to in the UI thread, so the earliest created task will lock the task first.
         if (activeTaskLock) {
@@ -76,8 +74,6 @@ public class FetchListSearchTask extends AsyncTask<String, Void, List<Article>> 
     protected List<Article> doInBackground(String... params) {
         if (!isCancelled() && CheckConnection.isConnected(context)) {
             try {
-                /* FIXME: if you shake the listview around the bottom, you get an infinite loop of
-                 * FIXME: tasks. Figure out why, so you just get one. */
                 Log.d("Task", "Checkpoint 2: A request is made " + requestedPageNum + "," + this.hashCode());
                 return FetchJSON.getResultsJSON(FetchJSON.SearchType.JSEARCH, params[0], requestedPageNum);
             } catch (Exception e) {
@@ -108,7 +104,5 @@ public class FetchListSearchTask extends AsyncTask<String, Void, List<Article>> 
     }
 
     @Override
-    protected void onCancelled(List<Article> articles) {
-        activeTaskLock = false;
-    }
+    protected void onCancelled(List<Article> articles) {}
 }
