@@ -72,8 +72,7 @@ public class SearchResultsActivity extends AppCompatActivity {
         ComponentName componentName = new ComponentName(this, SearchResultsActivity.class);
         SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
 
-        searchView.setIconified(false);
-        searchView.clearFocus();
+        searchView.setIconifiedByDefault(false);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
         return true;
     }

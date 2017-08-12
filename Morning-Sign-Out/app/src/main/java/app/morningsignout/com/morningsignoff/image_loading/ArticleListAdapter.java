@@ -22,6 +22,9 @@ public abstract class ArticleListAdapter extends BaseAdapter {
 
     protected ArrayList<Article> articles;
     private Set<String> uniqueArticleNames; // FIXME: This was a temp fix a long time ago for repeats that somehow got in the list
+
+    // For future reference, page number json requests START AT 1. The constructor here has pageNum
+    // set to 0 and expects it to be incremented by a future request.
     private int pageNum;
 
     public ArticleListAdapter(LayoutInflater inflater) {
@@ -61,9 +64,9 @@ public abstract class ArticleListAdapter extends BaseAdapter {
     // This function is called along with .notifyDataSetChanged() in Asynctask's onScrollListener function
     // when the viewers scroll to the bottom of the articles
     public void loadMoreItems(List<Article> moreArticles, int pageNum){
-        // if prevent the late page from loading twice
+        // it prevents the same page from loading twice
         if(moreArticles != null && this.pageNum != pageNum){
-            Log.d("Adapter", "more articles added");
+            Log.d("Adapter", "more articles added " + pageNum);
             this.pageNum = pageNum;
 
             for (int i = 0; i < moreArticles.size(); ++i) {
@@ -81,7 +84,8 @@ public abstract class ArticleListAdapter extends BaseAdapter {
     }
 
     public void loadNewItems(List<Article> replacementArticles) {
-        pageNum = 0;
+        Log.d("Adapter", "articles added " + 1);
+        pageNum = 1;
         articles = new ArrayList<>(replacementArticles);
         uniqueArticleNames.clear();
         notifyDataSetChanged();

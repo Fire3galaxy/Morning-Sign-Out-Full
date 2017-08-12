@@ -16,12 +16,12 @@ import app.morningsignout.com.morningsignoff.util.ProgressReactor;
  * Created by shinray on 5/20/2017.
  * Daniel: Only use this task to fetch the "next page" or a new "first page" of a list of articles
  * Next page: requestedPageNum == adapter.getPageNum() + 1
- * First page: requestedPageNum == 0
+ * First page: requestedPageNum == 1
  *
  * Context is for checking network connection and toasting.
- * ProgressReactor is a class that handles the progressBar-related views during the task. It's up
+ * ProgressIndicator is a class that handles the progressBar-related views during the task. It's up
  *   to you to define the functions and values of ProgressReactor in the necessary activity.
- * ProgressReactor.Type defines what kind of view loading animations you expect (there are several
+ * ProgressIndicator.Type defines what kind of view loading animations you expect (there are several
  *   in this app...)
  * Adapter is for adding new articles
  * PageNum is to validate that the task is allowed to add new articles to the adapter.
@@ -48,22 +48,27 @@ public class FetchListSearchTask extends AsyncTask<String, Void, List<Article>> 
 
     @Override
     protected void onPreExecute() {
+        Log.d("Task", "Checkpoint 0: " + this.hashCode());
+
         // This "lock" should prevent multiple tasks from running at the same time. It is only ever
         // assigned to in the UI thread, so the earliest created task will lock the task first.
         if (activeTaskLock) {
-            cancel(true);   // Should not start doInBackground(), should not continue task
+            Log.d("Task", "Cancel here!" + this.hashCode());
+            cancel(false);   // Should not start doInBackground(), should not continue task
             return;
         }
 
         // If the page num is not one of these two, the task should cancel.
-        boolean isFirstPage = (requestedPageNum == 0);
+        boolean isFirstPage = (requestedPageNum == 1);
         boolean isNextPage = (adapter.getPageNum() + 1 == requestedPageNum);
         if (!(isFirstPage || isNextPage)) {
+            Log.d("Task", "Cancel there!" + this.hashCode());
             cancel(true);
             return;
         }
 
         activeTaskLock = true;
+        Log.d("Task", "Checkpoint 1: \"lock " + requestedPageNum + "\"" + this.hashCode());
         progReactor.reactToProgress(true);
     }
 
@@ -71,7 +76,9 @@ public class FetchListSearchTask extends AsyncTask<String, Void, List<Article>> 
     protected List<Article> doInBackground(String... params) {
         if (!isCancelled() && CheckConnection.isConnected(context)) {
             try {
-                Log.d("Task", "A request is made " + requestedPageNum);
+                /* FIXME: if you shake the listview around the bottom, you get an infinite loop of
+                 * FIXME: tasks. Figure out why, so you just get one. */
+                Log.d("Task", "Checkpoint 2: A request is made " + requestedPageNum + "," + this.hashCode());
                 return FetchJSON.getResultsJSON(FetchJSON.SearchType.JSEARCH, params[0], requestedPageNum);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -89,7 +96,7 @@ public class FetchListSearchTask extends AsyncTask<String, Void, List<Article>> 
 
         // If result is not null, load items into adapter based on requested page number
         if (articles != null) {
-            if (requestedPageNum != 0)
+            if (requestedPageNum != 1)
                 adapter.loadMoreItems(articles, requestedPageNum);
             else
                 adapter.loadNewItems(articles);

@@ -59,6 +59,12 @@ public class SearchFragment extends FragmentWithCache implements ProgressIndicat
     private GridViewWithHeaderAndFooter gridViewWithHeaderAndFooter; // gridview
 
     private SearchAdapter searchAdapter; // custom adapter for our listview
+
+    // Note: There is a period of time in between <FetchListSearchTask finishing> and
+    // <New articles load views>. In that period of time, the progressbar is still visible
+    // and more requests for the page just requested can be made again and again from the
+    // gridview onScrollListener. This variable stops that, only allowing 1 request per page number.
+    private static int lastRequestedPageNum;
     protected static Integer index = null; // marks index of current selection when orientation changes
 
     @Override
@@ -97,6 +103,7 @@ public class SearchFragment extends FragmentWithCache implements ProgressIndicat
         if(searchAdapter == null) {
             searchAdapter = new SearchAdapter(this, inflater);
             gridViewWithHeaderAndFooter.setAdapter(searchAdapter);
+            lastRequestedPageNum = 1;
             new FetchListSearchTask(this.getContext(), this, Type.Loading, searchAdapter, 1)
                     .execute(search);
         } else {
@@ -139,22 +146,26 @@ public class SearchFragment extends FragmentWithCache implements ProgressIndicat
         // To load more articles when the bottom of the page is reached
         // The progress bar footer counts in the visible item count, even though it may be View.GONE
         // Hence, RIGHT at the bottom, the visible item count increases by one.
-        // Loading new articles should occur right when the progress bar is visible
+        // Loading new articles should occur right at the bottom, where the progress bar is.
         gridViewWithHeaderAndFooter.setOnScrollListener(new AbsListView.OnScrollListener() {
+
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 int lastVisibleItem = firstVisibleItem + visibleItemCount - 1;
+                int pageNum = searchAdapter.getPageNum();
 
-                // At last item
-                if (lastVisibleItem == totalItemCount - 1) {
-                    int pageNum = searchAdapter.getPageNum();
+                // At last item (should be progress bar)
+                if (lastVisibleItem == totalItemCount - 1 && lastRequestedPageNum != pageNum + 1) {
+
+//                    lastTotalItemCount = totalItemCount;
+                    lastRequestedPageNum = pageNum + 1;
 
                     // Only make one request per page request
                     new FetchListSearchTask(SearchFragment.this.getContext(),
                             SearchFragment.this,
                             Type.LoadingMore,
                             searchAdapter,
-                            pageNum + 1).execute(search);
+                            lastRequestedPageNum).execute(search);
                 }
             }
 
@@ -201,7 +212,8 @@ public class SearchFragment extends FragmentWithCache implements ProgressIndicat
         Log.d("SearchFragment", query);
         if (query != null && !query.isEmpty()) {
             search = query;
-            new FetchListSearchTask(getContext(), this, Type.Refresh, searchAdapter, 0).execute(query);
+            lastRequestedPageNum = 1;
+            new FetchListSearchTask(getContext(), this, Type.Refresh, searchAdapter, 1).execute(query);
         }
     }
 
@@ -241,6 +253,7 @@ public class SearchFragment extends FragmentWithCache implements ProgressIndicat
     @Override
     public void refreshStart() {
         swipeRefreshLayout.setRefreshing(true);
+        gridViewWithHeaderAndFooter.setSelection(0);
     }
 
     @Override
