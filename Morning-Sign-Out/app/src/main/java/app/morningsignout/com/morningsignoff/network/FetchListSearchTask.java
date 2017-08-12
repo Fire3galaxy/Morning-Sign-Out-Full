@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.net.URLEncoder;
 import java.util.List;
 
 import app.morningsignout.com.morningsignoff.article.Article;
@@ -72,10 +73,13 @@ public class FetchListSearchTask extends AsyncTask<String, Void, List<Article>> 
 
     @Override
     protected List<Article> doInBackground(String... params) {
-        if (!isCancelled() && CheckConnection.isConnected(context)) {
+        if (!isCancelled() && params.length == 1 && CheckConnection.isConnected(context)) {
             try {
                 Log.d("Task", "Checkpoint 2: A request is made " + requestedPageNum + "," + this.hashCode());
-                return FetchJSON.getResultsJSON(FetchJSON.SearchType.JSEARCH, params[0], requestedPageNum);
+
+                return FetchJSON.getResultsJSON(FetchJSON.SearchType.JSEARCH,
+                        URLEncoder.encode(params[0].trim(), "UTF-8"),
+                        requestedPageNum);
             } catch (Exception e) {
                 e.printStackTrace();
             }
