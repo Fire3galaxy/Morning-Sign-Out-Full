@@ -3,17 +3,11 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <WebView
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:id="@+id/container_search"
+        android:orientation="vertical" android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/webView_search"
-        android:layout_gravity="center"/>
+        android:clickable="true">
+    </LinearLayout>
 
-    <ProgressBar
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/progressBar_search"
-        android:visibility="gone"
-        android:layout_gravity="center" />
 </FrameLayout>

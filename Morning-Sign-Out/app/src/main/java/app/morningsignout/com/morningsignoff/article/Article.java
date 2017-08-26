@@ -1,5 +1,8 @@
 package app.morningsignout.com.morningsignoff.article;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class Article {
     private String title;
     private String link;
@@ -7,20 +10,20 @@ public class Article {
     private String mediumURL;
     private String author;
     private String content;
-    private String dsq_thread_id;
+    private String excerpt;
+    private Set<String> tags = new HashSet<String>();
 
-    public String getImageURL() {
+    public String getFullImageURL() {
         return imageURL;
     }
-    public void setImageURL(String imageURL) {
+    public void setFullImageURL(String imageURL) {
         this.imageURL = imageURL;
     }
 
-    // If we decide not to use medium url, we can change it here
-    public String getCategoryURL() {
+    public String getMediumImageURL() {
         return mediumURL;
     }
-    public void setCategoryURL(String mediumURL) {
+    public void setMediumImageURL(String mediumURL) {
         this.mediumURL = mediumURL;
     }
 
@@ -52,21 +55,9 @@ public class Article {
         this.content = content;
     }
 
-    public String getDsqThreadId() {
-        return dsq_thread_id;
-    }
+    public String getExcerpt() { return excerpt; }
+    public void setExcerpt(String excerpt) { this.excerpt = excerpt; }
 
-    public void setDsqThreadId(String dsq_thread_id) {
-        this.dsq_thread_id = dsq_thread_id;
-    }
-
-    // From the link
-    public String getSlug() {
-        if (link == null)
-            return null;
-
-        // 26 -> Length of "http://morningsignout.com/", which is constant
-        // length - 1 -> remove an extra '/' at the end
-        return link.substring(26, link.length() - 1);
-    }
+    public Set<String> getTags() { return tags; }
+    public void setTags(String tag) { this.tags.add(tag); }
 }

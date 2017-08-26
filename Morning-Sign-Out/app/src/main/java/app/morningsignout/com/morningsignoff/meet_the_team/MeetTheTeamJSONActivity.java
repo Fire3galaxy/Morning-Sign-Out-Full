@@ -2,9 +2,11 @@ package app.morningsignout.com.morningsignoff.meet_the_team;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -36,6 +38,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import app.morningsignout.com.morningsignoff.R;
+import app.morningsignout.com.morningsignoff.category.CategoryFragment;
 import app.morningsignout.com.morningsignoff.network.Parser;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -77,20 +80,16 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
                 // Subtracting 3 from the position as there are 3 header views (to fix the offset)
                 String url = "http://morningsignout.com/author/" + authorList.get(position - 3).getSlug();
 
-                WebView webView = new WebView(view.getContext());
-                webView.setWebViewClient(new WebViewClient());
+                // Open author page in Chrome tab
+                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                Resources res = MeetTheTeamJSONActivity.this.getResources();
+                builder.setToolbarColor(res.getColor(R.color.mso_blue));
 
-                // Load the url
-                webView.loadUrl(url);
-
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse(url));
-
-                startActivity(intent);
+                CustomTabsIntent customTabsIntent = builder.build();
+                customTabsIntent.launchUrl(MeetTheTeamJSONActivity.this, Uri.parse(url));
             }
         });
 

@@ -1,4 +1,4 @@
-package app.morningsignout.com.morningsignoff.category;
+package app.morningsignout.com.morningsignoff.image_loading;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,16 +10,16 @@ import java.util.LinkedList;
 /**
  * Created by Daniel on 2/25/2017.
  */
-public class CategoryBitmapPool {
-    static public CategoryBitmapPool instance = new CategoryBitmapPool();
+public class UnusedBitmapPool {
+    private static final UnusedBitmapPool instance = new UnusedBitmapPool();
 
     private LinkedList<Bitmap> bitmaps;
 
-    private CategoryBitmapPool() {
-        bitmaps = new LinkedList<Bitmap>();
+    private UnusedBitmapPool() {
+        bitmaps = new LinkedList<>();
     }
 
-    public static Bitmap getBitmap(BitmapFactory.Options targetOptions) {
+    static Bitmap getBitmap(BitmapFactory.Options targetOptions) {
         synchronized(instance) {
             return (instance.bitmaps.isEmpty()) ? null : instance.findSuitableBitmap(targetOptions);
         }

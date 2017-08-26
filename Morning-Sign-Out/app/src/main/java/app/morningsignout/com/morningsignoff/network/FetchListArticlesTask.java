@@ -26,6 +26,7 @@ import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.article.Article;
 import app.morningsignout.com.morningsignoff.category.CategoryAdapter;
 import app.morningsignout.com.morningsignoff.category.CategoryFragment;
+import app.morningsignout.com.morningsignoff.image_loading.FetchImageRunnable;
 
 // This class is called in Category Activity to fetch articles online and feed it to CategoryAdapter
 // do in background gets the article objects from morningsignout, and converts imageURL to bitmap
@@ -49,6 +50,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         this.fragmentRef = new WeakReference<>(fragment);   // ensure fragment still exists
         this.pageNum = pageNum;         // page of mso page called for task
         this.isFirstLoad = isFirstLoad;
+        this.isRefresh = isRefresh;
         this.isCancelled = false;
     }
 
@@ -87,7 +89,15 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         // is valid request (next page only, not repeat or excess page)
         if (adapterPageNum == pageNum - 1) {
             try {
-                return getArticlesJSON(params[0],pageNum);
+                // Special case: "featured" is outdated, replaced with "latest" (SearchType = JLATEST)
+                //              params[0] is no longer necessary, hopefully it doesn't break anything
+                if (params[0].equals("latest")) {
+                    return FetchJSON.getResultsJSON(FetchJSON.SearchType.JLATEST, params[0], pageNum);
+//                    return getArticlesJSON(params[0], pageNum);
+                } else {
+                    return FetchJSON.getResultsJSON(FetchJSON.SearchType.JCATLIST, params[0], pageNum);
+//                    return getArticlesJSON(params[0], pageNum);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -215,9 +225,8 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                     String link = currPost.optString("url");
                     articlesList.get(index).setLink(link);
 
-                    // Medium and Full Image
-                    String mediumURL = FetchCategoryImageRunnable.NO_IMAGE;
-                    String fullURL = FetchCategoryImageRunnable.NO_IMAGE;
+                    String mediumURL = FetchImageRunnable.NO_IMAGE;
+                    String fullURL = FetchImageRunnable.NO_IMAGE;
                     // create JSONObj of images
                     if (currPost.has("thumbnail_images")){
 
@@ -229,7 +238,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                                 mediumURL = currPost.optString("thumbnail");
                                 if (!URLUtil.isValidUrl(mediumURL))
                                 {
-                                    mediumURL = FetchCategoryImageRunnable.NO_IMAGE;
+                                    mediumURL = FetchImageRunnable.NO_IMAGE;
                                 }
                             }
                         }
@@ -283,8 +292,9 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                         Log.e("FetchListArticlesTask","JSON: "+ title + ": no images found!");
                     }
 
-                    articlesList.get(index).setCategoryURL(mediumURL);  // Lower res, the one we use
-                    articlesList.get(index).setImageURL(fullURL);       // Max res, not used yet
+
+                    articlesList.get(index).setMediumImageURL(mediumURL);
+                    articlesList.get(index).setFullImageURL(fullURL);
 
                     // TODO: implement thumbnails for better performance
                     //String medURL = "";

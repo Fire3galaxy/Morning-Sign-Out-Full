@@ -1,15 +1,12 @@
 package app.morningsignout.com.morningsignoff.category;
 
-import android.animation.Animator;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -18,24 +15,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.ImageView;
-import android.animation.Animator.AnimatorListener;
+import android.widget.ListView;
 
 import java.util.ArrayList;
-import java.lang.InterruptedException;
-import java.util.Map;
 
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.meet_the_team.MeetTheTeamJSONActivity;
 import app.morningsignout.com.morningsignoff.search_results.SearchResultsActivity;
-import app.morningsignout.com.morningsignoff.network.FetchCategoryImageRunnable;
 
 // Category page categoryActivity
 public class CategoryActivity extends AppCompatActivity {
@@ -44,7 +36,6 @@ public class CategoryActivity extends AppCompatActivity {
     private ActionBarDrawerToggle mDrawerToggle;
     private SearchView searchView;
 
-    private String mTitle;              // Current Title
     private String[] categories_urls,   // category strings for url usage
             categories_titles;          // ... for Title usage
     private int position;               // position in category array
@@ -114,29 +105,27 @@ public class CategoryActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_category, menu);
+        getMenuInflater().inflate(R.menu.menu_category, menu);
 
-        // FIXME: While search is unavalaible
-        getMenuInflater().inflate(R.menu.menu_justlogo, menu);
+        /* Search results in new SearchResultsActivity, clicked article passed back to articleActivity
+           Associate searchable configuration with the SearchView */
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
 
-//        /* Search results in new SearchResultsActivity, clicked article passed back to articleActivity
-//           Associate searchable configuration with the SearchView */
-//        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-//        searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-//
-//        ComponentName componentName = new ComponentName(this, SearchResultsActivity.class);
-//        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
+        ComponentName componentName = new ComponentName(this, SearchResultsActivity.class);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
         return true;
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        if (!searchView.isIconified())  // Check if searchView is expanded
-//            searchView.setIconified(true);
-//        else
-//            super.onBackPressed();
-//    }
-
+    @Override
+    public void onBackPressed() {
+        if (!searchView.isIconified()) {
+            searchView.setQuery("", false);
+            searchView.setIconified(true);
+        } else {
+            super.onBackPressed();
+        }
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -150,11 +139,6 @@ public class CategoryActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         return id == R.id.title || super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void setTitle(CharSequence title) {
-        mTitle = title.toString();
     }
 
     @Override
@@ -239,13 +223,6 @@ public class CategoryActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .remove(splashFragment)
                 .commit();
-    }
-
-    public void debugAllBitmapSources(View v) {
-//        String TAG = "CategoryActivity";
-//        CategoryFragment.instance.debugCache();
-//        CategoryBitmapPool.debugPool();
-//        FetchCategoryImageRunnable.debugAllHashes();
     }
 
     public void setupActionBar() {

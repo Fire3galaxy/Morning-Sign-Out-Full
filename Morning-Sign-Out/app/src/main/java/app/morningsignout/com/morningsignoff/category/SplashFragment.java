@@ -38,8 +38,12 @@ public class SplashFragment extends Fragment {
                 CategoryActivity activity = (CategoryActivity) getActivity();
 
                 rootView.setVisibility(View.GONE);
-                activity.removeSplashFragment(SplashFragment.this);
-                activity.endSplash();
+                // This can happen if the orientation changes before the splash fragment is gone
+                // FIXME: In this event, does that mean this fragment is ok? Should I remove or destroy it?
+                if (activity != null) {
+                    activity.removeSplashFragment(SplashFragment.this);
+                    activity.endSplash();
+                }
             }
         });
     }

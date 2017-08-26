@@ -2,8 +2,8 @@ package app.morningsignout.com.morningsignoff.category;
 
 import android.widget.*;
 
-public class AdapterObject {
-    public TextView title;
-    public TextView author;
-    public ImageView image;
+class AdapterObject {
+    TextView title;
+    TextView author;
+    ImageView image;
 }
