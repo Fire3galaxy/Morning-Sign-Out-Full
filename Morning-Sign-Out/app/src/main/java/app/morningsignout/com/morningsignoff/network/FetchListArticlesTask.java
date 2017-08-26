@@ -291,8 +291,8 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                     }
 
 
-                    articlesList.get(index).setMediumURL(mediumURL);
-                    articlesList.get(index).setFullURL(fullURL);
+                    articlesList.get(index).setMediumImageURL(mediumURL);
+                    articlesList.get(index).setFullImageURL(fullURL);
 
                     // TODO: implement thumbnails for better performance
                     String medURL = "";

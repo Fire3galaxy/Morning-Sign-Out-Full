@@ -1,7 +1,6 @@
 package app.morningsignout.com.morningsignoff.category;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -144,7 +143,7 @@ public class CategoryFragment extends FragmentWithCache {
                 articleActivity.putExtra(ArticleActivity.CONTENT, rowTemp.getContent());
 
                 // IMAGE_URL holds the link to the article's header image
-                articleActivity.putExtra(ArticleActivity.IMAGE_URL, rowTemp.getFullURL());
+                articleActivity.putExtra(ArticleActivity.IMAGE_URL, rowTemp.getFullImageURL());
 
                 gridViewWithHeaderAndFooter.getContext().startActivity(articleActivity);
             }

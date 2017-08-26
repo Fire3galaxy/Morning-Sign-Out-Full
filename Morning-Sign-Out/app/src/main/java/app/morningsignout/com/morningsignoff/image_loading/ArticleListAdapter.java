@@ -7,9 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import app.morningsignout.com.morningsignoff.article.Article;
 
@@ -19,9 +17,7 @@ import app.morningsignout.com.morningsignoff.article.Article;
 
 public abstract class ArticleListAdapter extends BaseAdapter {
     protected LayoutInflater inflater;
-
     protected ArrayList<Article> articles;
-    private Set<String> uniqueArticleNames; // FIXME: This was a temp fix a long time ago for repeats that somehow got in the list
 
     // For future reference, page number json requests START AT 1. The constructor here has pageNum
     // set to 0 and expects it to be incremented by a future request.
@@ -29,7 +25,6 @@ public abstract class ArticleListAdapter extends BaseAdapter {
 
     public ArticleListAdapter(LayoutInflater inflater) {
         this.articles = new ArrayList<>();
-        this.uniqueArticleNames = new HashSet<>();
         this.inflater = inflater;
         pageNum = 0;
     }
@@ -69,15 +64,8 @@ public abstract class ArticleListAdapter extends BaseAdapter {
             Log.d("Adapter", "more articles added " + pageNum);
             this.pageNum = pageNum;
 
-            for (int i = 0; i < moreArticles.size(); ++i) {
-                String article = moreArticles.get(i).getTitle();
-
-                // Hack-ish way of preventing the list from being populated with doubles
-                // which happens if request occurs multiple times...
-                if (!uniqueArticleNames.contains(article) && moreArticles.get(i).getFullURL() != null)
-                    articles.add(moreArticles.get(i));
-                uniqueArticleNames.add(article);
-            }
+            for (int i = 0; i < moreArticles.size(); ++i)
+                articles.add(moreArticles.get(i));
 
             notifyDataSetChanged();
         }
@@ -87,7 +75,6 @@ public abstract class ArticleListAdapter extends BaseAdapter {
         Log.d("Adapter", "articles added " + 1);
         pageNum = 1;
         articles = new ArrayList<>(replacementArticles);
-        uniqueArticleNames.clear();
         notifyDataSetChanged();
     }
 

@@ -101,7 +101,7 @@ public class FetchListSearchTask extends AsyncTask<String, Void, List<Article>> 
         return null;
     }
 
-    // Articles retrived online are being sent here, and we pass the info to the CategoryAdapter
+    // Articles retrieved online are being sent here, and we pass the info to the CategoryAdapter
     protected void onPostExecute(final List<Article> articles) {
         // Loading should only show on first loading list
         // hide progressbar, refresh message, and refresh icon (if loading is successful)
@@ -115,8 +115,18 @@ public class FetchListSearchTask extends AsyncTask<String, Void, List<Article>> 
                 adapter.loadNewItems(articles);
         }
         else {
-            if (isDisconnectedFlag)
+            // Articles is null because no internet
+            if (isDisconnectedFlag) {
                 Toast.makeText(context, "We had trouble trying to connect", Toast.LENGTH_SHORT).show();
+            }
+            // Articles is null because no results in search.
+            // If the search was for a first page, then the adapter should have "no items" for results
+            else if (requestedPageNum == 1) {
+                Toast.makeText(context,
+                        "No results for \"" + errorObject.query + "\"",
+                        Toast.LENGTH_LONG).show();
+            }
+
             if (errorListener != null)
                 errorListener.onSearchError(errorObject);
         }

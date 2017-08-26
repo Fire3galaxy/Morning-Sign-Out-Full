@@ -2,24 +2,17 @@ package app.morningsignout.com.morningsignoff.search_results;
 
 //import android.app.Fragment; //https://stackoverflow.com/questions/9586218/fragmentactivity-cannot-cast-from-fragment-to-derived-class
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.Point;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.util.LruCache;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Xml;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.WrapperListAdapter;
@@ -28,7 +21,6 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.article.Article;
@@ -132,7 +124,7 @@ public class SearchFragment extends FragmentWithCache
                 // Load content
                 articleActivity.putExtra(ArticleActivity.CONTENT, rowTemp.getContent());
                 // Load header image
-                articleActivity.putExtra(ArticleActivity.IMAGE_URL, rowTemp.getFullURL());
+                articleActivity.putExtra(ArticleActivity.IMAGE_URL, rowTemp.getFullImageURL());
 
                 gridViewWithHeaderAndFooter.getContext().startActivity(articleActivity);
             }

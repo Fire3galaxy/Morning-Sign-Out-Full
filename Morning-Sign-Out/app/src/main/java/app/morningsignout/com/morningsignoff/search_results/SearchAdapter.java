@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +20,6 @@ import app.morningsignout.com.morningsignoff.image_loading.ImageTaskDrawable;
 import app.morningsignout.com.morningsignoff.image_loading.FetchImageManager;
 import app.morningsignout.com.morningsignoff.image_loading.FetchImageRunnable;
 import app.morningsignout.com.morningsignoff.util.FragmentWithCache;
-import app.morningsignout.com.morningsignoff.util.PhoneOrientation;
 
 /**
  * Created by shinr on 6/1/2017.
@@ -29,7 +27,7 @@ import app.morningsignout.com.morningsignoff.util.PhoneOrientation;
 
 class SearchAdapter extends ArticleListAdapter {
     // Holds the results from display metrics
-    private static int REQ_IMG_WIDTH = 0, REQ_IMG_HEIGHT = 0;
+    private static int REQ_IMG_SIDE_LENGTH_PX = 0;
 
     // Update this if xml layout single_row_search is updated
     private static final int VIEW_HEIGHT_DP = 100;
@@ -46,9 +44,7 @@ class SearchAdapter extends ArticleListAdapter {
         DisplayMetrics metrics = new DisplayMetrics();
         fwc.getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
         Resources r = fwc.getActivity().getResources();
-
-        REQ_IMG_WIDTH = metrics.widthPixels;
-        REQ_IMG_HEIGHT = (int) TypedValue.applyDimension(
+        REQ_IMG_SIDE_LENGTH_PX = (int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP, VIEW_HEIGHT_DP, r.getDisplayMetrics());
     }
 
@@ -84,13 +80,13 @@ class SearchAdapter extends ArticleListAdapter {
 
         // add image stuff here
         // TODO: change when appropriate for different image quality.
-        final Bitmap b = fwc.getBitmapFromMemCache(rowTemp.getMediumURL());
+        final Bitmap b = fwc.getBitmapFromMemCache(rowTemp.getMediumImageURL());
 
         // Load imageViewReference into row element
         if (b == null) {
             // task is interrupted or does not exist for imageView
             if (FetchImageManager
-                    .cancelPotentialWork(rowTemp.getMediumURL(), viewHolder.image)) {
+                    .cancelPotentialWork(rowTemp.getMediumImageURL(), viewHolder.image)) {
                 // Recycle old bitmap if NOT in LruCache
                 // tag: Set in FetchCategoryImageManager or else branch below here if bitmap was in
                 //      the cache
@@ -111,9 +107,9 @@ class SearchAdapter extends ArticleListAdapter {
                 FetchImageRunnable task = new FetchImageRunnable(
                         fwc,
                         viewHolder.image,
-                        rowTemp.getMediumURL(),
-                        REQ_IMG_WIDTH,
-                        REQ_IMG_HEIGHT);
+                        rowTemp.getMediumImageURL(),
+                        REQ_IMG_SIDE_LENGTH_PX,
+                        REQ_IMG_SIDE_LENGTH_PX);
                 ImageTaskDrawable taskWrapper = new ImageTaskDrawable(task);
 
                 viewHolder.image.setImageDrawable(taskWrapper);
@@ -121,7 +117,7 @@ class SearchAdapter extends ArticleListAdapter {
             }
         } else {
             viewHolder.image.setImageBitmap(b);
-            viewHolder.image.setTag(rowTemp.getMediumURL());
+            viewHolder.image.setTag(rowTemp.getMediumImageURL());
         }
 
         return row;

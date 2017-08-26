@@ -77,13 +77,13 @@ public class CategoryAdapter extends ArticleListAdapter {
         viewHolder.author.setText(rowTemp.getAuthor());
 
         // Set the bitmap image
-        final Bitmap b = fwc.getBitmapFromMemCache(rowTemp.getMediumURL());
+        final Bitmap b = fwc.getBitmapFromMemCache(rowTemp.getMediumImageURL());
 
         // Load imageViewReference into row element
         if (b == null) {
             // task is interrupted or does not exist for imageView
             if (FetchImageManager
-                    .cancelPotentialWork(rowTemp.getMediumURL(), viewHolder.image)) {
+                    .cancelPotentialWork(rowTemp.getMediumImageURL(), viewHolder.image)) {
                 // Recycle old bitmap if NOT IN LRUCACHE
                 // tag: Set in FetchCategoryImageManager or else branch below here if bitmap was in
                 //      the cache
@@ -104,7 +104,7 @@ public class CategoryAdapter extends ArticleListAdapter {
                 FetchImageRunnable task = new FetchImageRunnable(
                         fwc,
                         viewHolder.image,
-                        rowTemp.getMediumURL(),
+                        rowTemp.getMediumImageURL(),
                         REQ_IMG_WIDTH,
                         REQ_IMG_HEIGHT);
                 ImageTaskDrawable taskWrapper = new ImageTaskDrawable(task);
@@ -114,7 +114,7 @@ public class CategoryAdapter extends ArticleListAdapter {
             }
         } else {    // set saved imageViewReference
             viewHolder.image.setImageBitmap(b);
-            viewHolder.image.setTag(rowTemp.getMediumURL());
+            viewHolder.image.setTag(rowTemp.getMediumImageURL());
         }
 
         return row;

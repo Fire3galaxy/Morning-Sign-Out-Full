@@ -199,8 +199,8 @@ public class FetchJSON {
                 }
 
 
-                articleList.get(index).setMediumURL(mediumURL);
-                articleList.get(index).setFullURL(fullURL);
+                articleList.get(index).setMediumImageURL(mediumURL);
+                articleList.get(index).setFullImageURL(fullURL);
 
                 // TODO: implement thumbnails for better performance
 

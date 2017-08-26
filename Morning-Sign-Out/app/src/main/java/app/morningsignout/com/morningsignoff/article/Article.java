@@ -13,17 +13,17 @@ public class Article {
     private String excerpt;
     private Set<String> tags = new HashSet<String>();
 
-    public String getFullURL() {
+    public String getFullImageURL() {
         return imageURL;
     }
-    public void setFullURL(String imageURL) {
+    public void setFullImageURL(String imageURL) {
         this.imageURL = imageURL;
     }
 
-    public String getMediumURL() {
+    public String getMediumImageURL() {
         return mediumURL;
     }
-    public void setMediumURL(String mediumURL) {
+    public void setMediumImageURL(String mediumURL) {
         this.mediumURL = mediumURL;
     }
 
