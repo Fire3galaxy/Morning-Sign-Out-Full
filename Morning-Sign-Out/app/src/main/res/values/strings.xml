@@ -5,27 +5,8 @@
     <string name="banner_ad_unit_id">ca-app-pub-5416353734203696/5885880964</string>
 
     <!--Menu, actionbar, or bottom bar of articles-->
-    <string name="action_style">Style!</string>
     <string name="action_search">Search</string>
-    <string name="action_scroll">Scroll to top or to previous position</string>
-    <string name="action_comment">Comment</string>
-    <string name="action_share">Share article</string>
-    <string name="action_swap">Put the toolbar on the left or right</string>
-    <string name="action_login">Log in </string>
-    <string name="action_logout">Log out</string>
-    <string name="action_refresh">Refresh</string>
     <string name="action_blank">Blank</string>
-
-    <string name="disqus_login">Log In - Disqus</string>
-    <string name="disqus_reply">Reply</string>
-    <string name="disqus_seeUser">See User</string>
-    <string name="disqus_delete">Delete</string>
-    <string name="disqus_post">Post</string>
-    <string name="disqus_dialog1">Comment </string>
-    <string name="disqus_dialog2">Reply to </string>
-    <string name="comment_hint">Type comment here.</string>
-    <string name="comment_label">Post</string>
-    <string name="title_commentXDescription">close comments</string>
 
     <string name="title_contentDescription">app home button</string>
     <string name="border_contentDescription">blue horizontal border</string>
@@ -34,34 +15,16 @@
     <string name="row_contentDescription">Image from an article</string>
     <string name="title_slide_menu">Categories menu</string>
     <string name="title_activity_category">CategoryActivity</string>
-    <string name="article_image">Article Image</string>
     <string name="category_icon">Category icon</string>
 
     <string name="search_hint">Search Morning Sign Out</string>
     <string name="search_author">by %1$s</string>
 
     <string name="meet_the_team">Meet the Team</string>
-    <string name="mso_staff">MSO Staff</string>
-    <string name="mtt_row_content_description">Morning Sign Out Staff Department</string>
-    <string name="mtt_search_hint">Search for a person</string>
 
     <string name="category_refresh">If articles do not load, drag down to refresh</string>
-    <string name="button_mttPrev">Prev</string>
-    <string name="button_mttNext">Next</string>
 
     <string name="error_fail_to_connect">We had trouble trying to connect</string>
-    <string name="error">Something went wrong. Please report this bug to the developers in the play
-        store comment section.</string>
-    <string name="error_no_internet_1">We cannot connect to</string>
-    <string name="error_no_internet_2">right now. Please check your internet connection!</string>
-    <string name="error_refresh_button">Refresh</string>
-
-    <string-array name="descriptions">
-        <item>description 1</item>
-        <item>description 2</item>
-        <item>description 3</item>
-        <item>description 4</item>
-    </string-array>
 
     <string-array name="categories">
         <item>Latest</item> <!--No latest page on MSO now-->
@@ -97,17 +60,8 @@
         <item>healthcare</item>
     </string-array>
 
-    <string-array name="disqus_options">
-        <item>Reply</item>
-        <item>See User</item>
-        <item>Delete</item>
-    </string-array>
-
-    <string name="description_error_no_internet">Cannot connect to internet</string>
-
     <string name="about_us">About Us</string>
     <string name="why_mso">Why "Morning Sign Out"?</string>
-    <string name="sign_out">Sign Out</string>
     <string name="sign_out_content">
         <![CDATA[
         <b>Sign Out</b> – the process in healthcare where patients are handed over to the
@@ -119,7 +73,6 @@
         the whole story can be well understood, and so good decisions can be made.</p>
           ]]>
     </string>
-    <string name="morning">Morning</string>
     <string name="morning_content">
          <![CDATA[
         <b>Morning</b> sign outs are particularly interesting. All of the categoryActivity, labs,
