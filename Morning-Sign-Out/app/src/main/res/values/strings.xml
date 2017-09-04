@@ -1,65 +1,30 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--App stuff as a whole or outdated stuff-->
     <string name="app_name">Morning Sign Out</string>
     <string name="banner_ad_unit_id">ca-app-pub-5416353734203696/5885880964</string>
 
-    <!--Menu, actionbar, or bottom bar of articles-->
+    <!--Not in an activity/In several activities-->
+    <!--Menu strings-->
     <string name="action_search">Search</string>
     <string name="action_blank">Blank</string>
 
+    <!--Content descriptions for images-->
     <string name="title_contentDescription">app home button</string>
-    <string name="border_contentDescription">blue horizontal border</string>
-    <string name="logo_contentDescription">Morning Sign Out logo</string>
-    <string name="splash_contentDescription">Splash screen with Morning Sign Out Logo</string>
     <string name="row_contentDescription">Image from an article</string>
+
+    <!--Other strings-->
+    <string name="category_refresh">If articles do not load, drag down to refresh</string>
+    <string name="error_fail_to_connect">We had trouble trying to connect</string>
+
+    <!--CategoryActivity.java-->
+    <string name="splash_contentDescription">Splash screen with Morning Sign Out Logo</string>
     <string name="title_slide_menu">Categories menu</string>
     <string name="title_activity_category">CategoryActivity</string>
     <string name="category_icon">Category icon</string>
 
-    <string name="search_hint">Search Morning Sign Out</string>
-    <string name="search_author">by %1$s</string>
-
-    <string name="meet_the_team">Meet the Team</string>
-
-    <string name="category_refresh">If articles do not load, drag down to refresh</string>
-
-    <string name="error_fail_to_connect">We had trouble trying to connect</string>
-
-    <string-array name="categories">
-        <item>Latest</item> <!--No latest page on MSO now-->
-        <!--<item>Featured</item>-->
-        <item>Research</item>
-        <item>Wellness</item>
-        <item>Medicine</item>
-        <item>Public Health</item>
-        <item>Healthcare</item>
-        <item>About MSO</item>
-        <item>Meet the Team</item>
-    </string-array>
-
-    <array name="categories_icons">
-        <item>@drawable/category_latest</item>
-        <!--<item>@drawable/category_featured</item>-->
-        <item>@drawable/category_research</item>
-        <item>@drawable/category_wellness</item>
-        <item>@drawable/category_medicine</item>
-        <item>@drawable/category_public_health</item>
-        <item>@drawable/category_healthcare</item>
-        <item>@drawable/category_about</item>
-        <item>@drawable/category_meettheteam</item>
-    </array>
-
-    <string-array name="categories_for_url">
-        <item>latest</item>
-        <!--<item>featured</item>-->
-        <item>research</item>
-        <item>wellness</item>
-        <item>medicine</item>
-        <item>public-health</item>
-        <item>healthcare</item>
-    </string-array>
-
+    <!--AboutMSOActivity.java-->
+    <string name="border_contentDescription">blue horizontal border</string>
+    <string name="logo_contentDescription">Morning Sign Out logo</string>
     <string name="about_us">About Us</string>
     <string name="why_mso">Why "Morning Sign Out"?</string>
     <string name="sign_out_content">
@@ -88,22 +53,12 @@
         something understandable for our readers, with enough critical information that leaves them
         more knowledgeable than before.</string>
 
-    <!-- Meet the team header view for the list view -->
-    <!--<string name="meet_the_team_header_intro">-->
-        <!--<p><center><i>Meet our <b>Writing Team!</b></i></center></p>-->
-    <!--</string>-->
-    <!--<string name="meet_the_team_header_body1">-->
-        <!--<p><b>We have an amazing team of writers composed almost entirely of students from the University-->
-        <!--of California system. These students work hard to gather research, write informative-->
-        <!--articles, and boil it down into the simple-to-read format that you can expect from Morning-->
-        <!--Sign Out, the biomedical magazine that anyone can read!</b></p>-->
-        <!--<p></p><p></p>-->
-    <!--</string>-->
-    <!--<string name="meet_the_team_header_body2">-->
-        <!--<p><b>To quickly find a particular author, place your finger along the rightmost edge of the-->
-        <!--screen and scroll from there. Authors are arranged by first name.</b></p>-->
-    <!--</string>-->
+    <!--SearchResultsActivity.java-->
+    <string name="search_hint">Search Morning Sign Out</string>
+    <string name="search_author">by %1$s</string>
 
+    <!-- MeetTheTeamJSONActivity.java-->
+    <string name="meet_the_team">Meet the Team</string>
     <string name="meet_the_team_header_intro">Meet our Writing Team!</string>
     <string name="meet_the_team_header_body1">
         We have an amazing team of writers composed almost entirely of students from the University
