@@ -110,7 +110,7 @@ public class CategoryFragment extends FragmentWithCache {
         boolean isRefresh = getArguments().getBoolean(EXTRA_REFRESH, false);
 
         headerView.setText(category);
-        swipeRefreshLayout.setColorSchemeResources(R.color.mso_blue, R.color.background_white);
+        swipeRefreshLayout.setColorSchemeResources(R.color.mso_blue, android.R.color.white);
         setUpGridView(gridViewWithHeaderAndFooter);
         gridViewWithHeaderAndFooter.addFooterView(footerProgressBar);
 

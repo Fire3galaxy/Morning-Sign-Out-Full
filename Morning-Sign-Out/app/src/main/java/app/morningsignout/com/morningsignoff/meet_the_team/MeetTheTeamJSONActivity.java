@@ -1,23 +1,17 @@
 package app.morningsignout.com.morningsignoff.meet_the_team;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Xml;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -38,7 +32,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import app.morningsignout.com.morningsignoff.R;
-import app.morningsignout.com.morningsignoff.category.CategoryFragment;
 import app.morningsignout.com.morningsignoff.network.Parser;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -49,7 +42,6 @@ import okhttp3.Response;
  */
 
 public class MeetTheTeamJSONActivity extends AppCompatActivity {
-    private MeetTheTeamJSONAdapter meetTheTeamJSONAdapter;
     private Context context;
     private ListView listView;
     private ArrayList<MeetTheTeamAuthor> authorList;

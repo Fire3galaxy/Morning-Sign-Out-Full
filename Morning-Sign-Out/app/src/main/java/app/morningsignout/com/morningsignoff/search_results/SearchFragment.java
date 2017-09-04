@@ -86,7 +86,7 @@ public class SearchFragment extends FragmentWithCache
         footerProgressBar = getFooterProgressBarXml();
         gridViewWithHeaderAndFooter = (GridViewWithHeaderAndFooter) rootView.findViewById(R.id.gridView_search);
 
-        swipeRefreshLayout.setColorSchemeResources(R.color.mso_blue, R.color.background_white);
+        swipeRefreshLayout.setColorSchemeResources(R.color.mso_blue, android.R.color.white);
         gridViewWithHeaderAndFooter.setNumColumns(1);
         gridViewWithHeaderAndFooter.addFooterView(footerProgressBar);
 
