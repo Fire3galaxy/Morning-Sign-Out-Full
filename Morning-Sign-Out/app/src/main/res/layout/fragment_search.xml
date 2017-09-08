@@ -1,5 +1,4 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/container_searchFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
@@ -55,7 +54,6 @@
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <ImageView
-        android:id="@+id/imageView_splash_search"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/hi_res_splash"

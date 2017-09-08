@@ -2,8 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="56dp"
-    android:orientation="horizontal"
-    android:id="@+id/drawer_item">
+    android:orientation="horizontal">
 
     <ImageView
         android:id="@+id/icon"

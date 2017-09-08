@@ -33,6 +33,7 @@ import java.util.List;
 
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.network.Parser;
+import app.morningsignout.com.morningsignoff.util.ActionBarSetup;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -52,7 +53,7 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meet_the_team_json);
-        setupActionBar();
+        ActionBarSetup.setupActionBar(this);
 
         spinner = (ProgressBar) findViewById(R.id.meet_the_team_progress_bar);
         spinner.setVisibility(View.VISIBLE);
@@ -93,17 +94,6 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_justlogo, menu);
         return true;
-    }
-
-    public void returnToParent(View view) {
-        NavUtils.navigateUpFromSameTask(this);
-    }
-
-    public void setupActionBar() {
-        ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null);
-        this.getSupportActionBar().setCustomView(ib);
-        super.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        super.getSupportActionBar().setDisplayShowCustomEnabled(true);
     }
 
     private TextView getTextHeaderView(HeaderViews viewNum) {

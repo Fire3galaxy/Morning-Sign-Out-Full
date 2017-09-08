@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.meet_the_team.MeetTheTeamJSONActivity;
 import app.morningsignout.com.morningsignoff.search_results.SearchResultsActivity;
+import app.morningsignout.com.morningsignoff.util.ActionBarSetup;
 
 // Category page categoryActivity
 public class CategoryActivity extends AppCompatActivity {
@@ -81,9 +82,15 @@ public class CategoryActivity extends AppCompatActivity {
         // Set up button to open/close drawer and change title of current categoryActivity
         setDrawerListenerToActionBarToggle();
 
-        // Adding MSO Logo to center of action bar
-        setupActionBar();
-
+        // Adding MSO Logo to center of action bar, Making it a "home" button
+        ActionBarSetup.setupActionBar(this);
+        ImageButton logoButton = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null);
+        logoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectItem(0);
+            }
+        });
 
         // Fragments added to activity
         if (savedInstanceState == null) {
@@ -223,21 +230,5 @@ public class CategoryActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .remove(splashFragment)
                 .commit();
-    }
-
-    public void setupActionBar() {
-        if (getSupportActionBar() != null) {
-            ImageView ib = (ImageView) getLayoutInflater().inflate(R.layout.title_main, null);
-            this.getSupportActionBar().setCustomView(ib);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowCustomEnabled(true);
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-            ib.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    selectItem(0);
-                }
-            });
-        }
     }
 }

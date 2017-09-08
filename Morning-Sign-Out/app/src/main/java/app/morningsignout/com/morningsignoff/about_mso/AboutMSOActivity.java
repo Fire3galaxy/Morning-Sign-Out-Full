@@ -1,29 +1,24 @@
 package app.morningsignout.com.morningsignoff.about_mso;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
-import android.util.Log;
-import android.view.Gravity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.text.Html;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.TextView;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 
 import app.morningsignout.com.morningsignoff.R;
+import app.morningsignout.com.morningsignoff.util.ActionBarSetup;
 
 
-public class AboutMSOActivity extends ActionBarActivity {
+public class AboutMSOActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.about_mso);
-        setupActionBar();
+        ActionBarSetup.setupActionBar(this);
 
         // setting TextViews to the spannable strings
         TextView p1 = (TextView)findViewById(R.id.textView_aboutUsDesc1);
@@ -39,30 +34,4 @@ public class AboutMSOActivity extends ActionBarActivity {
         getMenuInflater().inflate(R.menu.menu_justlogo, menu);
         return true;
     }
-
-    public void returnToParent(View view) {
-        NavUtils.navigateUpFromSameTask(this);
-    }
-
-    public void setupActionBar() {
-        ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null);
-        this.getSupportActionBar().setCustomView(ib);
-        super.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        super.getSupportActionBar().setDisplayShowCustomEnabled(true);
-    }
-
-    /*@Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement;
-        //if (id == R.id.action_settings) {
-           //return true;
-       // }
-
-        return super.onOptionsItemSelected(item);
-    }*/
 }

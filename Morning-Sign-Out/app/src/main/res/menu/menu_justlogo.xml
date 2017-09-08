@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <!-- Invisible button for just spacing purposes, centering the MSO button -->
-    <item android:id="@+id/action_blank"
+    <item
         android:title="@string/action_blank"
         android:icon="@android:color/transparent"
         android:enabled="false"

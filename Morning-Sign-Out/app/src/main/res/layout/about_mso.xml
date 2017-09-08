@@ -16,7 +16,6 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="116dp"
-            android:id="@+id/imageView_aboutUsLogo"
             android:src="@drawable/mso_logo"
             android:contentDescription="@string/logo_contentDescription"
             android:layout_gravity="center" />
@@ -25,7 +24,6 @@
             android:text="@string/about_us"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/textView_aboutUsTitle"
             android:typeface="serif"
             android:textSize="@dimen/abc_text_size_headline_material"
             android:textStyle="bold"
@@ -35,7 +33,6 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:id="@+id/imageView_aboutUsBorder"
             android:src="@drawable/mso_border"
             android:contentDescription="@string/border_contentDescription"
             android:layout_marginTop="-15dp"
@@ -47,7 +44,6 @@
             android:text="@string/why_mso"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/textView_aboutUsQuestion"
             android:typeface="serif"
             android:textSize="@dimen/abc_text_size_title_material"
             android:textStyle="bold"
@@ -77,7 +73,6 @@
             android:text="@string/footer_content"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/textView_aboutUsDesc3"
             android:typeface="serif"
             android:textStyle="bold"
             android:layout_gravity="center_horizontal"
