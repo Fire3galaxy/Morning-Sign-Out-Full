@@ -9,18 +9,13 @@ import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -82,10 +77,9 @@ public class CategoryActivity extends AppCompatActivity {
         // Set up button to open/close drawer and change title of current categoryActivity
         setDrawerListenerToActionBarToggle();
 
-        // Adding MSO Logo to center of action bar, Making it a "home" button
-        ActionBarSetup.setupActionBar(this);
-        ImageButton logoButton = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null);
-        logoButton.setOnClickListener(new View.OnClickListener() {
+        // Adding MSO Logo to center of action bar,
+        // Making logo button a "home" button by returning to Latest category
+        new ActionBarSetup(this).setupActionBar().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 selectItem(0);

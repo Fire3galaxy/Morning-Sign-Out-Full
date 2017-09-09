@@ -1,11 +1,10 @@
 package app.morningsignout.com.morningsignoff.about_mso;
 
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.text.Html;
-import android.view.View;
 import android.widget.TextView;
 
 import app.morningsignout.com.morningsignoff.R;
@@ -18,14 +17,21 @@ public class AboutMSOActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.about_mso);
-        ActionBarSetup.setupActionBar(this);
+        new ActionBarSetup(this).setupActionBar().setUpToParentListener();
 
         // setting TextViews to the spannable strings
         TextView p1 = (TextView)findViewById(R.id.textView_aboutUsDesc1);
         TextView p2 = (TextView)findViewById(R.id.textView_aboutUsDesc2);
 
-        p1.setText(Html.fromHtml(getString(R.string.sign_out_content)));
-        p2.setText(Html.fromHtml(getString(R.string.morning_content)));
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            //noinspection deprecation
+            p1.setText(Html.fromHtml(getString(R.string.sign_out_content)));
+            //noinspection deprecation
+            p2.setText(Html.fromHtml(getString(R.string.morning_content)));
+        } else {
+            p1.setText(Html.fromHtml(getString(R.string.sign_out_content), Html.FROM_HTML_MODE_LEGACY));
+            p2.setText(Html.fromHtml(getString(R.string.morning_content), Html.FROM_HTML_MODE_LEGACY));
+        }
     }
 
     @Override

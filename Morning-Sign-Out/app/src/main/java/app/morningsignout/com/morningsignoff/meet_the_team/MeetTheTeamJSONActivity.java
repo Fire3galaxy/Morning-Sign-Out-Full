@@ -5,7 +5,6 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.customtabs.CustomTabsIntent;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,7 +12,6 @@ import android.util.Xml;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -53,7 +51,7 @@ public class MeetTheTeamJSONActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meet_the_team_json);
-        ActionBarSetup.setupActionBar(this);
+        new ActionBarSetup(this).setupActionBar().setUpToParentListener();
 
         spinner = (ProgressBar) findViewById(R.id.meet_the_team_progress_bar);
         spinner.setVisibility(View.VISIBLE);

@@ -8,5 +8,4 @@
     android:scaleType="centerInside"
     android:background="@android:color/transparent"
     android:paddingRight="24dp"
-    android:paddingEnd="24dp"
-    android:onClick="returnToParent" />
+    android:paddingEnd="24dp" />
