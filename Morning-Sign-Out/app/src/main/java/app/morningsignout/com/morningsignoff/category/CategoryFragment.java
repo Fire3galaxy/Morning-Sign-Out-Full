@@ -38,7 +38,6 @@ import in.srain.cube.views.GridViewWithHeaderAndFooter;
 public class CategoryFragment extends FragmentWithCache
         implements ProgressIndicator, FetchArticleListTask.OnFetchErrorListener {
     final static String EXTRA_TITLE = "EXTRA_TITLE";
-    final static String EXTRA_REFRESH = "EXTRA_REFRESH";
     final static String EXTRA_URL = "EXTRA_URL";
     final static String TAG = "CategoryFragment";
 
@@ -107,16 +106,11 @@ public class CategoryFragment extends FragmentWithCache
             if (category_url.equals("latest"))
                 requestType = FetchJSON.SearchType.JLATEST;
 
-            // Is this a refresh of the category we were on or a new category?
-            Type loadType = Type.Loading;
-            if (getArguments().getBoolean(EXTRA_REFRESH, false))
-                loadType = Type.Refresh;
-
             // Execute a task that fetches the list of articles, adds it to our adapter, and
             // calls the proper loading animations
             new FetchArticleListTask(this.getContext(),
                     this,
-                    loadType,
+                    Type.Loading,
                     categoryAdapter,
                     category_url,
                     requestType,
@@ -194,21 +188,25 @@ public class CategoryFragment extends FragmentWithCache
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (!gridViewWithHeaderAndFooter.getAdapter().isEmpty()) {
-                    // Reload categoryFragment
-                    CategoryFragment fragment =
-                            CategoryFragment.findOrCreateRetainFragment(getActivity().getSupportFragmentManager());
-                    Bundle args = new Bundle();
-                    args.putString(CategoryFragment.EXTRA_TITLE, category);
-                    args.putString(CategoryFragment.EXTRA_URL, category_url);
-                    args.putBoolean(CategoryFragment.EXTRA_REFRESH, true);
-                    fragment.setArguments(args);
+                // This is a refresh. Do not keep the old error so that we can load articles in the
+                // onScrollListener for the GridViewWithHeaderAndFooter.
+                clearFetchError();
 
-                    getActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.container_category, fragment)
-                            .commit();
-                }
-                swipeRefreshLayout.setRefreshing(false);
+                // Which category do we need, latest or something else?
+                FetchJSON.SearchType requestType = FetchJSON.SearchType.JCATLIST;
+                if (category_url.equals("latest"))
+                    requestType = FetchJSON.SearchType.JLATEST;
+
+                // Fetch the first page of articles. The task will know to replace all existing
+                // articles with this first page.
+                new FetchArticleListTask(CategoryFragment.this.getContext(),
+                        CategoryFragment.this,
+                        Type.Refresh,
+                        categoryAdapter,
+                        category_url,
+                        requestType,
+                        1,
+                        CategoryFragment.this).execute();
             }
         });
 

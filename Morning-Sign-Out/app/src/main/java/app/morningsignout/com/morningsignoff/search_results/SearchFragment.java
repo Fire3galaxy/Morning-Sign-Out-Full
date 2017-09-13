@@ -40,11 +40,10 @@ public class SearchFragment extends FragmentWithCache
         implements ProgressIndicator, FetchArticleListTask.OnFetchErrorListener {
     // these are the "key" strings for getArguments() and setArguments() and so on.
     final static String SEARCH_PARAM = "SEARCH_PARAM"; // have SearchResultsActivity set this so we can put this as header
-    final static String SEARCH_REFRESH = "SEARCH_REFRESH"; // shouldn't this be a boolean? e: no, this is a tag.
     final static String TAG = "SearchFragment";
 
     // local copies of metadata
-    String search = ""; // holds the search argument
+    String searchQuery = ""; // holds the search argument
 
     //Helpful stuff.
     private SwipeRefreshLayout swipeRefreshLayout; // used to handle refreshing on swipe
@@ -70,7 +69,7 @@ public class SearchFragment extends FragmentWithCache
         setRetainInstance(true);
 
         if (getArguments() != null)
-            search = getArguments().getString(SEARCH_PARAM);
+            searchQuery = getArguments().getString(SEARCH_PARAM);
     }
 
     @Override
@@ -79,11 +78,11 @@ public class SearchFragment extends FragmentWithCache
         View rootView = inflater.inflate(R.layout.fragment_search, container, false);
 
         // Grab all the views and layouts from the layout file
-        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefresh_search);
-        progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar_search);
-        refreshTextView = (TextView) rootView.findViewById(R.id.textView_searchRefresh);
+        swipeRefreshLayout = rootView.findViewById(R.id.swipeRefresh_search);
+        progressBar = rootView.findViewById(R.id.progressBar_search);
+        refreshTextView = rootView.findViewById(R.id.textView_searchRefresh);
         footerProgressBar = getFooterProgressBarXml();
-        gridViewWithHeaderAndFooter = (GridViewWithHeaderAndFooter) rootView.findViewById(R.id.gridView_search);
+        gridViewWithHeaderAndFooter = rootView.findViewById(R.id.gridView_search);
 
         swipeRefreshLayout.setColorSchemeResources(R.color.mso_blue, android.R.color.white);
         gridViewWithHeaderAndFooter.setNumColumns(1);
@@ -97,7 +96,7 @@ public class SearchFragment extends FragmentWithCache
                     this,
                     Type.Loading,
                     searchAdapter,
-                    search,
+                    searchQuery,
                     FetchJSON.SearchType.JSEARCH,
                     1,
                     this).execute();
@@ -149,7 +148,7 @@ public class SearchFragment extends FragmentWithCache
                             SearchFragment.this,
                             Type.LoadingMore,
                             searchAdapter,
-                            search,
+                            searchQuery,
                             FetchJSON.SearchType.JSEARCH,
                             pageNum + 1,
                             SearchFragment.this).execute();
@@ -165,21 +164,20 @@ public class SearchFragment extends FragmentWithCache
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
            @Override
             public void onRefresh() {
-               if (!gridViewWithHeaderAndFooter.getAdapter().isEmpty() && !FetchArticleListTask.activeTaskLock) {
-                   // seems like this series of lines is what creates an instance of this fragment.
-                   // Reload search fragment
-                   SearchFragment fragment =
-                           SearchFragment.findOrCreateRetainFragment(getActivity().getSupportFragmentManager());
-                   Bundle args = new Bundle();
-                   args.putString(SearchFragment.SEARCH_PARAM, search);
-                   args.putBoolean(SearchFragment.SEARCH_REFRESH, true); // we are refreshing!
-                   fragment.setArguments(args);
+               // This is a refresh. Do not keep the old error so that we can load articles in the
+               // onScrollListener for the GridViewWithHeaderAndFooter.
+               clearSearchError();
 
-                   getActivity().getSupportFragmentManager().beginTransaction()
-                           .replace(R.id.container_search, fragment) // replace with this new frag.
-                           .commit();
-               }
-               swipeRefreshLayout.setRefreshing(false);
+               // Fetch the first page of articles. The task will know to replace all existing
+               // articles with this first page.
+               new FetchArticleListTask(SearchFragment.this.getContext(),
+                       SearchFragment.this,
+                       Type.Refresh,
+                       searchAdapter,
+                       searchQuery,
+                       FetchJSON.SearchType.JSEARCH,
+                       1,
+                       SearchFragment.this).execute();
            }
         });
 
@@ -208,7 +206,7 @@ public class SearchFragment extends FragmentWithCache
                     1,
                     this)
                     .execute();
-            search = query;
+            searchQuery = query;
         }
     }
 
@@ -278,7 +276,7 @@ public class SearchFragment extends FragmentWithCache
     // Future FIXME, I guess.
     private boolean matchesSearchError(int requestedPageNum) {
         return searchErrorObject != null
-                && searchErrorObject.query.equals(search)
+                && searchErrorObject.query.equals(searchQuery)
                 && searchErrorObject.pageNum == requestedPageNum;
     }
 
