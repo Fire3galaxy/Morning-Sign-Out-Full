@@ -16,7 +16,7 @@ public class AboutMSOActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.about_mso);
+        setContentView(R.layout.activity_about_mso);
         new ActionBarSetup(this).setupActionBar().setUpToParentListener();
 
         // setting TextViews to the spannable strings

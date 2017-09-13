@@ -1,7 +1,6 @@
 package app.morningsignout.com.morningsignoff.search_results;
 
 //import android.app.Fragment; //https://stackoverflow.com/questions/9586218/fragmentactivity-cannot-cast-from-fragment-to-derived-class
-import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,8 +26,8 @@ import java.io.IOException;
 
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.article.Article;
-import app.morningsignout.com.morningsignoff.category.CategoryFragment;
-import app.morningsignout.com.morningsignoff.network.FetchListSearchTask;
+import app.morningsignout.com.morningsignoff.network.FetchArticleListTask;
+import app.morningsignout.com.morningsignoff.network.FetchJSON;
 import app.morningsignout.com.morningsignoff.util.FragmentWithCache;
 import app.morningsignout.com.morningsignoff.util.ProgressIndicator;
 import in.srain.cube.views.GridViewWithHeaderAndFooter;
@@ -38,7 +37,7 @@ import in.srain.cube.views.GridViewWithHeaderAndFooter;
  */
 
 public class SearchFragment extends FragmentWithCache
-        implements ProgressIndicator, FetchListSearchTask.OnSearchErrorListener {
+        implements ProgressIndicator, FetchArticleListTask.OnFetchErrorListener {
     // these are the "key" strings for getArguments() and setArguments() and so on.
     final static String SEARCH_PARAM = "SEARCH_PARAM"; // have SearchResultsActivity set this so we can put this as header
     final static String SEARCH_REFRESH = "SEARCH_REFRESH"; // shouldn't this be a boolean? e: no, this is a tag.
@@ -55,7 +54,7 @@ public class SearchFragment extends FragmentWithCache
     private GridViewWithHeaderAndFooter gridViewWithHeaderAndFooter; // gridview
 
     private SearchAdapter searchAdapter; // custom adapter for our listview
-    private FetchListSearchTask.SearchError searchErrorObject = null;
+    private FetchArticleListTask.FetchError searchErrorObject = null;
     protected static Integer index = null; // marks index of current selection when orientation changes
 
     @Override
@@ -94,8 +93,14 @@ public class SearchFragment extends FragmentWithCache
         if(searchAdapter == null) {
             searchAdapter = new SearchAdapter(this, inflater);
             gridViewWithHeaderAndFooter.setAdapter(searchAdapter);
-            new FetchListSearchTask(this.getContext(), this, Type.Loading, searchAdapter, 1, this)
-                    .execute(search);
+            new FetchArticleListTask(this.getContext(),
+                    this,
+                    Type.Loading,
+                    searchAdapter,
+                    search,
+                    FetchJSON.SearchType.JSEARCH,
+                    1,
+                    this).execute();
         } else {
             refreshTextView.setVisibility(View.GONE);
             searchAdapter.notifyDataSetChanged();
@@ -138,14 +143,16 @@ public class SearchFragment extends FragmentWithCache
                 int pageNum = searchAdapter.getPageNum();
 
                 // At last item (should be progress bar)
-                if (lastVisibleItem == totalItemCount - 1 && !doesMatchSearchError(pageNum + 1)) {
+                if (lastVisibleItem == totalItemCount - 1 && !matchesSearchError(pageNum + 1)) {
                     // Only make one request per page request
-                    new FetchListSearchTask(SearchFragment.this.getContext(),
+                    new FetchArticleListTask(SearchFragment.this.getContext(),
                             SearchFragment.this,
                             Type.LoadingMore,
                             searchAdapter,
+                            search,
+                            FetchJSON.SearchType.JSEARCH,
                             pageNum + 1,
-                            SearchFragment.this).execute(search);
+                            SearchFragment.this).execute();
                 }
             }
 
@@ -158,7 +165,7 @@ public class SearchFragment extends FragmentWithCache
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
            @Override
             public void onRefresh() {
-               if (!gridViewWithHeaderAndFooter.getAdapter().isEmpty() && !FetchListSearchTask.activeTaskLock) {
+               if (!gridViewWithHeaderAndFooter.getAdapter().isEmpty() && !FetchArticleListTask.activeTaskLock) {
                    // seems like this series of lines is what creates an instance of this fragment.
                    // Reload search fragment
                    SearchFragment fragment =
@@ -192,8 +199,15 @@ public class SearchFragment extends FragmentWithCache
         Log.d("SearchFragment", query);
         if (query != null && !query.isEmpty()) {
             clearSearchError();
-            new FetchListSearchTask(getContext(), this, Type.Refresh, searchAdapter, 1, this)
-                    .execute(query);
+            new FetchArticleListTask(getContext(),
+                    this,
+                    Type.Refresh,
+                    searchAdapter,
+                    query,
+                    FetchJSON.SearchType.JSEARCH,
+                    1,
+                    this)
+                    .execute();
             search = query;
         }
     }
@@ -254,11 +268,15 @@ public class SearchFragment extends FragmentWithCache
     }
 
     @Override
-    public void onSearchError(FetchListSearchTask.SearchError error) {
+    public void onFetchError(FetchArticleListTask.FetchError error) {
         searchErrorObject = error;
     }
 
-    private boolean doesMatchSearchError(int requestedPageNum) {
+    // This happens if, on this page, on this query, an error happened.
+    // Right now, we just assume it's because there are no more pages of the search result.
+    // But FetchArticleListTask currently has two possible errors: no internet or no results.
+    // Future FIXME, I guess.
+    private boolean matchesSearchError(int requestedPageNum) {
         return searchErrorObject != null
                 && searchErrorObject.query.equals(search)
                 && searchErrorObject.pageNum == requestedPageNum;

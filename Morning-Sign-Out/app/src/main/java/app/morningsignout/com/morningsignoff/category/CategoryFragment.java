@@ -1,16 +1,9 @@
 package app.morningsignout.com.morningsignoff.category;
 
-import android.app.PendingIntent;
-import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.customtabs.CustomTabsIntent;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
@@ -21,8 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.WrapperListAdapter;
@@ -34,38 +25,34 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.article.Article;
-import app.morningsignout.com.morningsignoff.network.FetchListArticlesTask;
+import app.morningsignout.com.morningsignoff.network.FetchJSON;
+import app.morningsignout.com.morningsignoff.network.FetchArticleListTask;
 import app.morningsignout.com.morningsignoff.util.FragmentWithCache;
 import app.morningsignout.com.morningsignoff.util.PhoneOrientation;
+import app.morningsignout.com.morningsignoff.util.ProgressIndicator;
 import in.srain.cube.views.GridViewWithHeaderAndFooter;
 
-public class CategoryFragment extends FragmentWithCache {
+public class CategoryFragment extends FragmentWithCache
+        implements ProgressIndicator, FetchArticleListTask.OnFetchErrorListener {
     final static String EXTRA_TITLE = "EXTRA_TITLE";
     final static String EXTRA_REFRESH = "EXTRA_REFRESH";
     final static String EXTRA_URL = "EXTRA_URL";
     final static String TAG = "CategoryFragment";
 
-    String category = "";
-    String category_url = "";
+    private String category = "";
+    private String category_url = "";
+    private FetchArticleListTask.FetchError fetchErrorObject = null;
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private ProgressBar progressBar;
     private TextView refreshTextView;
-    private ImageView splashScreenView;
     private ProgressBar footerProgressBar;
     private GridViewWithHeaderAndFooter gridViewWithHeaderAndFooter;
-
     private CategoryAdapter categoryAdapter;
-    private AtomicBoolean isLoadingArticles;
     protected static Integer index = null;
-
-    public AtomicBoolean getIsLoadingArticles() {
-        return isLoadingArticles;
-    }
 
     @Override
     public void onDetach() {
@@ -82,8 +69,6 @@ public class CategoryFragment extends FragmentWithCache {
             category = getArguments().getString(EXTRA_TITLE);
             category_url = getArguments().getString(EXTRA_URL);
         }
-
-        isLoadingArticles = new AtomicBoolean(false);
     }
 
     private void setUpGridView(GridViewWithHeaderAndFooter grid){
@@ -100,16 +85,14 @@ public class CategoryFragment extends FragmentWithCache {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_category, container, false);
 
-        TextView headerView = (TextView) rootView.findViewById(R.id.textView_categoryHeader);
-        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefresh_category);
-        progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
-        refreshTextView = (TextView) rootView.findViewById(R.id.textView_categoryRefresh);
-        splashScreenView = (ImageView) rootView.findViewById(R.id.imageView_splash);
+        TextView categoryHeaderView = rootView.findViewById(R.id.textView_categoryHeader);
+        swipeRefreshLayout = rootView.findViewById(R.id.swipeRefresh_category);
+        progressBar = rootView.findViewById(R.id.progressBar);
+        refreshTextView = rootView.findViewById(R.id.textView_categoryRefresh);
         footerProgressBar = getFooterProgressBarXml();
-        gridViewWithHeaderAndFooter = (GridViewWithHeaderAndFooter) rootView.findViewById(R.id.gridView);
-        boolean isRefresh = getArguments().getBoolean(EXTRA_REFRESH, false);
+        gridViewWithHeaderAndFooter = rootView.findViewById(R.id.gridView);
 
-        headerView.setText(category);
+        categoryHeaderView.setText(category);
         swipeRefreshLayout.setColorSchemeResources(R.color.mso_blue, android.R.color.white);
         setUpGridView(gridViewWithHeaderAndFooter);
         gridViewWithHeaderAndFooter.addFooterView(footerProgressBar);
@@ -118,8 +101,27 @@ public class CategoryFragment extends FragmentWithCache {
         if(categoryAdapter == null) {
             categoryAdapter = new CategoryAdapter(this, inflater);
             gridViewWithHeaderAndFooter.setAdapter(categoryAdapter);
-            isLoadingArticles.set(true);
-            new FetchListArticlesTask(this, 1, true, isRefresh).execute(category_url); // First round of articles
+
+            // Do we need the latest category or a different one?
+            FetchJSON.SearchType requestType = FetchJSON.SearchType.JCATLIST;
+            if (category_url.equals("latest"))
+                requestType = FetchJSON.SearchType.JLATEST;
+
+            // Is this a refresh of the category we were on or a new category?
+            Type loadType = Type.Loading;
+            if (getArguments().getBoolean(EXTRA_REFRESH, false))
+                loadType = Type.Refresh;
+
+            // Execute a task that fetches the list of articles, adds it to our adapter, and
+            // calls the proper loading animations
+            new FetchArticleListTask(this.getContext(),
+                    this,
+                    loadType,
+                    categoryAdapter,
+                    category_url,
+                    requestType,
+                    1,
+                    this).execute();
         } else {
             refreshTextView.setVisibility(View.GONE);
             categoryAdapter.notifyDataSetChanged();
@@ -129,7 +131,7 @@ public class CategoryFragment extends FragmentWithCache {
         }
 
         // Load AdMob banner ad
-        AdView mAdView = (AdView) rootView.findViewById(R.id.adView);
+        AdView mAdView = rootView.findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
 
@@ -163,17 +165,24 @@ public class CategoryFragment extends FragmentWithCache {
         gridViewWithHeaderAndFooter.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                int lastVisibleItem = firstVisibleItem + visibleItemCount;
-                // At last item
-                if (lastVisibleItem >= totalItemCount) {
-                    WrapperListAdapter wrappedAdapter = (WrapperListAdapter) gridViewWithHeaderAndFooter.getAdapter();
-                    CategoryAdapter adapter = (CategoryAdapter) wrappedAdapter.getWrappedAdapter();
+                int lastVisibleItem = firstVisibleItem + visibleItemCount - 1;
+                int pageNum = categoryAdapter.getPageNum();
 
-                    int pageNum = adapter.getPageNum();
-                    // Only make one request per page request
-                    if (totalItemCount != 0 && isLoadingArticles.weakCompareAndSet(false, true)) {
-                        new FetchListArticlesTask(CategoryFragment.this, pageNum + 1, false, false).execute(category_url);
-                    }
+                if (lastVisibleItem == totalItemCount - 1 && !matchesFetchError(pageNum + 1)) {
+                    // Which category do we need, latest or something else?
+                    FetchJSON.SearchType requestType = FetchJSON.SearchType.JCATLIST;
+                    if (category_url.equals("latest"))
+                        requestType = FetchJSON.SearchType.JLATEST;
+
+                    // Fetch next page of articles
+                    new FetchArticleListTask(CategoryFragment.this.getContext(),
+                            CategoryFragment.this,
+                            Type.LoadingMore,
+                            categoryAdapter,
+                            category_url,
+                            requestType,
+                            pageNum + 1,
+                            CategoryFragment.this).execute();
                 }
             }
 
@@ -185,7 +194,7 @@ public class CategoryFragment extends FragmentWithCache {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (!gridViewWithHeaderAndFooter.getAdapter().isEmpty() || !isLoadingArticles.get()) {
+                if (!gridViewWithHeaderAndFooter.getAdapter().isEmpty()) {
                     // Reload categoryFragment
                     CategoryFragment fragment =
                             CategoryFragment.findOrCreateRetainFragment(getActivity().getSupportFragmentManager());
@@ -235,27 +244,52 @@ public class CategoryFragment extends FragmentWithCache {
         return new ProgressBar(getActivity(), attrs);
     }
 
-    public SwipeRefreshLayout getSwipeRefreshLayout() {
-        return swipeRefreshLayout;
+    @Override
+    public void loadingStart() {
+        progressBar.setVisibility(View.VISIBLE);
     }
 
-    public ProgressBar getProgressBar() {
-        return progressBar;
+    @Override
+    public void loadingEnd() {
+        progressBar.setVisibility(View.GONE);
+        refreshTextView.setVisibility(View.GONE);
     }
 
-    public TextView getRefreshTextView() {
-        return refreshTextView;
+    @Override
+    public void refreshStart() {
+        swipeRefreshLayout.setRefreshing(true);
     }
 
-    public ImageView getSplashScreenView() {
-        return splashScreenView;
+    @Override
+    public void refreshEnd() {
+        swipeRefreshLayout.setRefreshing(false);
+        refreshTextView.setVisibility(View.GONE);
     }
 
-    public ProgressBar getFooterProgressBar() {
-        return footerProgressBar;
+    @Override
+    public void loadingMoreStart() {
+        footerProgressBar.setVisibility(View.VISIBLE);
     }
 
-    public GridViewWithHeaderAndFooter getGridViewWithHeaderAndFooter() {
-        return gridViewWithHeaderAndFooter;
+    @Override
+    public void loadingMoreEnd() {
+        footerProgressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onFetchError(FetchArticleListTask.FetchError error) {
+        fetchErrorObject = error;
+    }
+
+    // This happens if, on this page, an error happened.
+    // Right now, we just assume it's because there are no more pages for this category.
+    // But FetchArticleListTask currently has two possible errors: no internet or no results.
+    // Future FIXME, I guess. Solution would be to notice if this is internet and to allow a retry.
+    private boolean matchesFetchError(int requestedPageNum) {
+        return fetchErrorObject != null && fetchErrorObject.pageNum == requestedPageNum;
+    }
+
+    private void clearFetchError() {
+        fetchErrorObject = null;
     }
 }

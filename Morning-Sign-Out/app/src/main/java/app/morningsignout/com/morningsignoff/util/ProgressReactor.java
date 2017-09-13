@@ -5,6 +5,7 @@ package app.morningsignout.com.morningsignoff.util;
  */
 
 public class ProgressReactor {
+    public static final boolean START = true, STOP = false;
     private ProgressIndicator indicator;
     private ProgressIndicator.Type type;
 

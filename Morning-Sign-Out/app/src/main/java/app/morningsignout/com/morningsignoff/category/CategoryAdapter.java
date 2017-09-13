@@ -59,9 +59,9 @@ public class CategoryAdapter extends ArticleListAdapter {
             viewHolder = new AdapterObject();
 
             // Get the author, imageViewReference and title of the row item
-            viewHolder.title = (TextView) row.findViewById(R.id.textViewTitle);
-            viewHolder.author = (TextView) row.findViewById(R.id.textViewAuthor);
-            viewHolder.image = (ImageView) row.findViewById(R.id.imageView);
+            viewHolder.title = row.findViewById(R.id.textViewTitle);
+            viewHolder.author = row.findViewById(R.id.textViewAuthor);
+            viewHolder.image = row.findViewById(R.id.imageView);
             row.setTag(viewHolder);
         }
         else {

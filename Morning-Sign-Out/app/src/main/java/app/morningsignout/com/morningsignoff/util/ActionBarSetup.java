@@ -12,7 +12,10 @@ import app.morningsignout.com.morningsignoff.R;
  */
 
 /* For setting up the action bar if it has the mso logo (R.drawable.mso_square_white).
- * Call it like this: new ActionBarSetup(this).setupActionBar().set(UpToParent/OnClick)Listener()
+ * Call it like this:
+ *
+ * new ActionBarSetup(this).setupActionBar().set(UpToParent/OnClick)Listener();
+ *
  * The last function call is optional, but if called, it must be the last function. Hence,
  * it does not return ActionBarSetup.
  */

@@ -162,7 +162,6 @@ public class CategoryActivity extends AppCompatActivity {
     }
 
     void setDrawerListenerToActionBarToggle() {
-
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,
