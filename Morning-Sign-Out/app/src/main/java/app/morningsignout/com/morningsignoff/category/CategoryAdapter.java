@@ -9,8 +9,6 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.article.Article;
@@ -19,7 +17,7 @@ import app.morningsignout.com.morningsignoff.image_loading.FetchImageRunnable;
 import app.morningsignout.com.morningsignoff.image_loading.ArticleListAdapter;
 import app.morningsignout.com.morningsignoff.image_loading.ImageTaskDrawable;
 import app.morningsignout.com.morningsignoff.image_loading.UnusedBitmapPool;
-import app.morningsignout.com.morningsignoff.util.FragmentWithCache;
+import app.morningsignout.com.morningsignoff.image_loading.FragmentWithCache;
 import app.morningsignout.com.morningsignoff.util.PhoneOrientation;
 
 // CategoryAdapter takes in a list of Articles and displays the titles, descriptions, images

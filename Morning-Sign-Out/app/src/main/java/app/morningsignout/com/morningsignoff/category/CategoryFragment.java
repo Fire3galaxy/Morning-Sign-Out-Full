@@ -30,7 +30,7 @@ import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.article.Article;
 import app.morningsignout.com.morningsignoff.network.FetchJSON;
 import app.morningsignout.com.morningsignoff.network.FetchArticleListTask;
-import app.morningsignout.com.morningsignoff.util.FragmentWithCache;
+import app.morningsignout.com.morningsignoff.image_loading.FragmentWithCache;
 import app.morningsignout.com.morningsignoff.util.PhoneOrientation;
 import app.morningsignout.com.morningsignoff.util.ProgressIndicator;
 import in.srain.cube.views.GridViewWithHeaderAndFooter;
@@ -133,18 +133,16 @@ public class CategoryFragment extends FragmentWithCache
         gridViewWithHeaderAndFooter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                WrapperListAdapter wrappedAdapter = (WrapperListAdapter) parent.getAdapter();
-                CategoryAdapter adapter = (CategoryAdapter) wrappedAdapter.getWrappedAdapter();
                 CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
                 int id_int = (int) id;
 
                 // Do nothing if id is invalid
-                if (id_int < 0 || id_int > adapter.getCount())
+                if (id_int < 0 || id_int > categoryAdapter.getCount())
                     return;
 
                 // Create new categoryActivity for the article here
                 // feed the new categoryActivity with the URL of the page
-                Article rowTemp = (Article) adapter.getItem(id_int);
+                Article rowTemp = (Article) categoryAdapter.getItem(id_int);
 
                 // Color of toolbar
                 Resources res = CategoryFragment.this.getResources();
@@ -248,9 +246,10 @@ public class CategoryFragment extends FragmentWithCache
     }
 
     @Override
-    public void loadingEnd() {
+    public void loadingEnd(boolean success) {
         progressBar.setVisibility(View.GONE);
-        refreshTextView.setVisibility(View.GONE);
+        if (success)
+            refreshTextView.setVisibility(View.GONE);
     }
 
     @Override
@@ -259,9 +258,10 @@ public class CategoryFragment extends FragmentWithCache
     }
 
     @Override
-    public void refreshEnd() {
+    public void refreshEnd(boolean success) {
         swipeRefreshLayout.setRefreshing(false);
-        refreshTextView.setVisibility(View.GONE);
+        if (success || !categoryAdapter.isEmpty())
+            refreshTextView.setVisibility(View.GONE);
     }
 
     @Override

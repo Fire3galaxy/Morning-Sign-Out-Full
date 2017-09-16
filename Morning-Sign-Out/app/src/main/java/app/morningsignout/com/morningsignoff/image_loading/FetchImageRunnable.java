@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.lang.IllegalArgumentException;
 import java.lang.Runnable;
 import java.lang.Thread;
-import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -16,7 +15,6 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import app.morningsignout.com.morningsignoff.R;
-import app.morningsignout.com.morningsignoff.util.FragmentWithCache;
 
 /**
  * Created by Daniel on 2/11/2017. A Runnable task that will run in the background and fetch images

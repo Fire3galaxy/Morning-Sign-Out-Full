@@ -28,7 +28,7 @@ import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.article.Article;
 import app.morningsignout.com.morningsignoff.network.FetchArticleListTask;
 import app.morningsignout.com.morningsignoff.network.FetchJSON;
-import app.morningsignout.com.morningsignoff.util.FragmentWithCache;
+import app.morningsignout.com.morningsignoff.image_loading.FragmentWithCache;
 import app.morningsignout.com.morningsignoff.util.ProgressIndicator;
 import in.srain.cube.views.GridViewWithHeaderAndFooter;
 
@@ -238,9 +238,10 @@ public class SearchFragment extends FragmentWithCache
     }
 
     @Override
-    public void loadingEnd() {
+    public void loadingEnd(boolean success) {
         progressBar.setVisibility(View.GONE);
-        refreshTextView.setVisibility(View.GONE);
+        if (success)
+            refreshTextView.setVisibility(View.GONE);
     }
 
     @Override
@@ -250,9 +251,10 @@ public class SearchFragment extends FragmentWithCache
     }
 
     @Override
-    public void refreshEnd() {
+    public void refreshEnd(boolean success) {
         swipeRefreshLayout.setRefreshing(false);
-        refreshTextView.setVisibility(View.GONE);
+        if (success || !searchAdapter.isEmpty())
+            refreshTextView.setVisibility(View.GONE);
     }
 
     @Override

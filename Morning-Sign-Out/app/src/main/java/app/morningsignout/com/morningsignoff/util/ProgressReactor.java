@@ -5,7 +5,7 @@ package app.morningsignout.com.morningsignoff.util;
  */
 
 public class ProgressReactor {
-    public static final boolean START = true, STOP = false;
+    public enum State {START, END};
     private ProgressIndicator indicator;
     private ProgressIndicator.Type type;
 
@@ -14,18 +14,20 @@ public class ProgressReactor {
         this.type = type;
     }
 
-    public void reactToProgress(boolean start) {
+    // State is either Start or End. Success is always false for Start.
+    // Success is true for End if the network request for articles succeeded and false otherwise.
+    public void reactToProgress(State state, boolean success) {
         switch (type) {
             case Loading:
-                if (start) indicator.loadingStart();
-                else indicator.loadingEnd();
+                if (state.equals(State.START)) indicator.loadingStart();
+                else indicator.loadingEnd(success);
                 break;
             case Refresh:
-                if (start) indicator.refreshStart();
-                else indicator.refreshEnd();
+                if (state.equals(State.START)) indicator.refreshStart();
+                else indicator.refreshEnd(success);
                 break;
             case LoadingMore:
-                if (start) indicator.loadingMoreStart();
+                if (state.equals(State.START)) indicator.loadingMoreStart();
                 else indicator.loadingMoreEnd();
                 break;
         }

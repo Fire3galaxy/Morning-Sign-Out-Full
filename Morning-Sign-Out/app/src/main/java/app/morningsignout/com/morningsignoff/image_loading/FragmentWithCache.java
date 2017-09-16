@@ -1,4 +1,4 @@
-package app.morningsignout.com.morningsignoff.util;
+package app.morningsignout.com.morningsignoff.image_loading;
 
 import android.graphics.Bitmap;
 import android.graphics.Point;

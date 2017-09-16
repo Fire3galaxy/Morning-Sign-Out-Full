@@ -19,7 +19,7 @@ import app.morningsignout.com.morningsignoff.image_loading.UnusedBitmapPool;
 import app.morningsignout.com.morningsignoff.image_loading.ImageTaskDrawable;
 import app.morningsignout.com.morningsignoff.image_loading.FetchImageManager;
 import app.morningsignout.com.morningsignoff.image_loading.FetchImageRunnable;
-import app.morningsignout.com.morningsignoff.util.FragmentWithCache;
+import app.morningsignout.com.morningsignoff.image_loading.FragmentWithCache;
 
 /**
  * Created by shinr on 6/1/2017.

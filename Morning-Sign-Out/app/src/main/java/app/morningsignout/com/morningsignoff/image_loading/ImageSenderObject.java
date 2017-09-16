@@ -3,9 +3,6 @@ package app.morningsignout.com.morningsignoff.image_loading;
 import android.graphics.Bitmap;
 import android.widget.ImageView;
 
-import app.morningsignout.com.morningsignoff.image_loading.FetchImageRunnable;
-import app.morningsignout.com.morningsignoff.util.FragmentWithCache;
-
 /**
  * Created by Daniel on 2/24/2017.
  */

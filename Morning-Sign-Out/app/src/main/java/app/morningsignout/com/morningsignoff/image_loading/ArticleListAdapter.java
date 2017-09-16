@@ -61,7 +61,6 @@ public abstract class ArticleListAdapter extends BaseAdapter {
     public void loadMoreItems(List<Article> moreArticles, int pageNum){
         // it prevents the same page from loading twice
         if(moreArticles != null && this.pageNum != pageNum){
-            Log.d("Adapter", "more articles added " + pageNum);
             this.pageNum = pageNum;
 
             for (int i = 0; i < moreArticles.size(); ++i)
@@ -72,7 +71,6 @@ public abstract class ArticleListAdapter extends BaseAdapter {
     }
 
     public void loadNewItems(List<Article> replacementArticles) {
-        Log.d("Adapter", "articles added " + 1);
         pageNum = 1;
         articles = new ArrayList<>(replacementArticles);
         notifyDataSetChanged();

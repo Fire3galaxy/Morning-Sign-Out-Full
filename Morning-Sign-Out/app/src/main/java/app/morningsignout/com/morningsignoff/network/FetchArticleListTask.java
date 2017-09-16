@@ -87,7 +87,7 @@ public class FetchArticleListTask extends AsyncTask<String, Void, List<Article>>
         }
 
         activeTaskLock = true;
-        progReactor.reactToProgress(ProgressReactor.START);
+        progReactor.reactToProgress(ProgressReactor.State.START, false);
     }
 
     // Params are ignored! All values given in constructor.
@@ -124,7 +124,7 @@ public class FetchArticleListTask extends AsyncTask<String, Void, List<Article>>
     protected void onPostExecute(final List<Article> articles) {
         // Loading should only show on first loading list
         // hide progressbar, refresh message, and refresh icon (if loading is successful)
-        progReactor.reactToProgress(ProgressReactor.STOP);
+        progReactor.reactToProgress(ProgressReactor.State.END, articles != null);
 
         // If result is not null, load items into adapter based on requested page number
         if (articles != null) {
