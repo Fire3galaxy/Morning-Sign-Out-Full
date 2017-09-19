@@ -16,7 +16,6 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.WrapperListAdapter;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -28,22 +27,25 @@ import java.io.IOException;
 
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.article.Article;
+import app.morningsignout.com.morningsignoff.network.FetchError;
 import app.morningsignout.com.morningsignoff.network.FetchJSON;
 import app.morningsignout.com.morningsignoff.network.FetchArticleListTask;
 import app.morningsignout.com.morningsignoff.image_loading.FragmentWithCache;
+import app.morningsignout.com.morningsignoff.network.OnFetchErrorListener;
+import app.morningsignout.com.morningsignoff.util.CheckConnection;
 import app.morningsignout.com.morningsignoff.util.PhoneOrientation;
 import app.morningsignout.com.morningsignoff.util.ProgressIndicator;
 import in.srain.cube.views.GridViewWithHeaderAndFooter;
 
 public class CategoryFragment extends FragmentWithCache
-        implements ProgressIndicator, FetchArticleListTask.OnFetchErrorListener {
+        implements ProgressIndicator, OnFetchErrorListener {
     final static String EXTRA_TITLE = "EXTRA_TITLE";
     final static String EXTRA_URL = "EXTRA_URL";
     final static String TAG = "CategoryFragment";
 
     private String category = "";
     private String category_url = "";
-    private FetchArticleListTask.FetchError fetchErrorObject = null;
+    private FetchError fetchErrorObject = null;
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private ProgressBar progressBar;
@@ -160,7 +162,19 @@ public class CategoryFragment extends FragmentWithCache
                 int lastVisibleItem = firstVisibleItem + visibleItemCount - 1;
                 int pageNum = categoryAdapter.getPageNum();
 
-                if (lastVisibleItem == totalItemCount - 1 && !matchesFetchError(pageNum + 1)) {
+                // If we are at the BOTTOM of the gridViewWithHeaderAndFooter, then continue
+                if (lastVisibleItem == totalItemCount - 1) {
+                    // If an error happened for the page we want already (page + 1), check which kind it was
+                    if (fetchErrorObject != null && fetchErrorObject.pageNum == pageNum + 1) {
+                        // There are no more pages. Don't try to make request
+                        if (fetchErrorObject.error.equals(FetchError.Error.NO_RESULTS))
+                            return;
+                        // There was no internet. Is there internet now? If not, don't try.
+                        else if (fetchErrorObject.error.equals(FetchError.Error.DISCONNECTED))
+                            if (!CheckConnection.isConnected(getContext()))
+                                return;
+                    }
+
                     // Which category do we need, latest or something else?
                     FetchJSON.SearchType requestType = FetchJSON.SearchType.JCATLIST;
                     if (category_url.equals("latest"))
@@ -275,16 +289,8 @@ public class CategoryFragment extends FragmentWithCache
     }
 
     @Override
-    public void onFetchError(FetchArticleListTask.FetchError error) {
+    public void onFetchError(FetchError error) {
         fetchErrorObject = error;
-    }
-
-    // This happens if, on this page, an error happened.
-    // Right now, we just assume it's because there are no more pages for this category.
-    // But FetchArticleListTask currently has two possible errors: no internet or no results.
-    // Future FIXME, I guess. Solution would be to notice if this is internet and to allow a retry.
-    private boolean matchesFetchError(int requestedPageNum) {
-        return fetchErrorObject != null && fetchErrorObject.pageNum == requestedPageNum;
     }
 
     private void clearFetchError() {

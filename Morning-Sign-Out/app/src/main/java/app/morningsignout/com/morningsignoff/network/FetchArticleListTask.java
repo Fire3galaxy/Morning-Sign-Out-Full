@@ -10,6 +10,7 @@ import java.util.List;
 
 import app.morningsignout.com.morningsignoff.article.Article;
 import app.morningsignout.com.morningsignoff.image_loading.ArticleListAdapter;
+import app.morningsignout.com.morningsignoff.util.CheckConnection;
 import app.morningsignout.com.morningsignoff.util.ProgressIndicator;
 import app.morningsignout.com.morningsignoff.util.ProgressReactor;
 
@@ -49,7 +50,7 @@ public class FetchArticleListTask extends AsyncTask<String, Void, List<Article>>
     private OnFetchErrorListener errorListener;
     private FetchError errorObject;
 
-    public static boolean activeTaskLock = false;
+    private static boolean activeTaskLock = false;
 
     public FetchArticleListTask(Context context,
                                 ProgressIndicator progressIndicator,
@@ -94,7 +95,7 @@ public class FetchArticleListTask extends AsyncTask<String, Void, List<Article>>
     @Override
     protected List<Article> doInBackground(String... params) {
         isDisconnectedFlag = !CheckConnection.isConnected(context);
-        errorObject.query = requestParam;
+        errorObject.requestParam = requestParam;
         errorObject.pageNum = requestPageNum;
         if (!isCancelled() && !isDisconnectedFlag) {
             try {
@@ -131,19 +132,26 @@ public class FetchArticleListTask extends AsyncTask<String, Void, List<Article>>
             if (requestPageNum != 1)
                 adapter.loadMoreItems(articles, requestPageNum);
             else
-                adapter.loadNewItems(articles);
+                adapter.loadNewItems(articles); // fresh load. Remove old articles and replace with these.
         }
+
+        // Error reporting happens inside these curly braces
         else {
             // Articles is null because no internet
             if (isDisconnectedFlag) {
                 Toast.makeText(context, "We had trouble trying to connect", Toast.LENGTH_SHORT).show();
+                errorObject.error = FetchError.Error.DISCONNECTED;
             }
             // Articles is null because no results in search.
-            // If the search was for a first page, then the adapter should have "no items" for results
-            else if (requestPageNum == 1) {
-                Toast.makeText(context,
-                        "No results for \"" + errorObject.query + "\"",
-                        Toast.LENGTH_LONG).show();
+            else {
+                // If the search was for a first page, then Toast "No Results"
+                if (requestPageNum == 1) {
+                    Toast.makeText(context,
+                            "No results for \"" + errorObject.requestParam + "\"",
+                            Toast.LENGTH_LONG).show();
+                }
+
+                errorObject.error = FetchError.Error.NO_RESULTS;
             }
 
             if (errorListener != null)
@@ -155,13 +163,4 @@ public class FetchArticleListTask extends AsyncTask<String, Void, List<Article>>
 
     @Override
     protected void onCancelled(List<Article> articles) {}
-
-    public interface OnFetchErrorListener {
-        void onFetchError(FetchError error);
-    }
-
-    public class FetchError {
-        public String query;
-        public int pageNum;
-    }
 }

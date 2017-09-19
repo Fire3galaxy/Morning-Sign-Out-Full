@@ -27,8 +27,10 @@ import java.io.IOException;
 import app.morningsignout.com.morningsignoff.R;
 import app.morningsignout.com.morningsignoff.article.Article;
 import app.morningsignout.com.morningsignoff.network.FetchArticleListTask;
+import app.morningsignout.com.morningsignoff.network.FetchError;
 import app.morningsignout.com.morningsignoff.network.FetchJSON;
 import app.morningsignout.com.morningsignoff.image_loading.FragmentWithCache;
+import app.morningsignout.com.morningsignoff.network.OnFetchErrorListener;
 import app.morningsignout.com.morningsignoff.util.ProgressIndicator;
 import in.srain.cube.views.GridViewWithHeaderAndFooter;
 
@@ -37,7 +39,7 @@ import in.srain.cube.views.GridViewWithHeaderAndFooter;
  */
 
 public class SearchFragment extends FragmentWithCache
-        implements ProgressIndicator, FetchArticleListTask.OnFetchErrorListener {
+        implements ProgressIndicator, OnFetchErrorListener {
     // these are the "key" strings for getArguments() and setArguments() and so on.
     final static String SEARCH_PARAM = "SEARCH_PARAM"; // have SearchResultsActivity set this so we can put this as header
     final static String TAG = "SearchFragment";
@@ -53,7 +55,7 @@ public class SearchFragment extends FragmentWithCache
     private GridViewWithHeaderAndFooter gridViewWithHeaderAndFooter; // gridview
 
     private SearchAdapter searchAdapter; // custom adapter for our listview
-    private FetchArticleListTask.FetchError searchErrorObject = null;
+    private FetchError searchErrorObject = null;
     protected static Integer index = null; // marks index of current selection when orientation changes
 
     @Override
@@ -268,7 +270,7 @@ public class SearchFragment extends FragmentWithCache
     }
 
     @Override
-    public void onFetchError(FetchArticleListTask.FetchError error) {
+    public void onFetchError(FetchError error) {
         searchErrorObject = error;
     }
 
@@ -278,7 +280,7 @@ public class SearchFragment extends FragmentWithCache
     // Future FIXME, I guess.
     private boolean matchesSearchError(int requestedPageNum) {
         return searchErrorObject != null
-                && searchErrorObject.query.equals(searchQuery)
+                && searchErrorObject.requestParam.equals(searchQuery)
                 && searchErrorObject.pageNum == requestedPageNum;
     }
 

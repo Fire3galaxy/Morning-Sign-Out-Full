@@ -1,4 +1,4 @@
-package app.morningsignout.com.morningsignoff.network;
+package app.morningsignout.com.morningsignoff.util;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
