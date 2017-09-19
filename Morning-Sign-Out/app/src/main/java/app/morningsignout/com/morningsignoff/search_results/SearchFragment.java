@@ -31,6 +31,7 @@ import app.morningsignout.com.morningsignoff.network.FetchError;
 import app.morningsignout.com.morningsignoff.network.FetchJSON;
 import app.morningsignout.com.morningsignoff.image_loading.FragmentWithCache;
 import app.morningsignout.com.morningsignoff.network.OnFetchErrorListener;
+import app.morningsignout.com.morningsignoff.util.CheckConnection;
 import app.morningsignout.com.morningsignoff.util.ProgressIndicator;
 import in.srain.cube.views.GridViewWithHeaderAndFooter;
 
@@ -144,8 +145,22 @@ public class SearchFragment extends FragmentWithCache
                 int pageNum = searchAdapter.getPageNum();
 
                 // At last item (should be progress bar)
-                if (lastVisibleItem == totalItemCount - 1 && !matchesSearchError(pageNum + 1)) {
-                    // Only make one request per page request
+                if (lastVisibleItem == totalItemCount - 1) {
+                    // If an error happened for the page we want (page + 1) and the query we want,
+                    // check which kind it was
+                    if (searchErrorObject != null
+                            && searchErrorObject.pageNum == pageNum + 1
+                            && searchErrorObject.requestParam.equals(searchQuery)) {
+                        // There are no more pages. Don't try to make request
+                        if (searchErrorObject.error.equals(FetchError.Error.NO_RESULTS))
+                            return;
+                        // There was no internet. Is there internet now? If not, don't try.
+                        else if (searchErrorObject.error.equals(FetchError.Error.DISCONNECTED))
+                            if (!CheckConnection.isConnected(getContext()))
+                                return;
+                    }
+
+                    // Make a request for the next page of articles
                     new FetchArticleListTask(SearchFragment.this.getContext(),
                             SearchFragment.this,
                             Type.LoadingMore,
@@ -196,7 +211,6 @@ public class SearchFragment extends FragmentWithCache
     }
 
     void onNewSearch(String query) {
-        Log.d("SearchFragment", query);
         if (query != null && !query.isEmpty()) {
             clearSearchError();
             new FetchArticleListTask(getContext(),
@@ -272,16 +286,6 @@ public class SearchFragment extends FragmentWithCache
     @Override
     public void onFetchError(FetchError error) {
         searchErrorObject = error;
-    }
-
-    // This happens if, on this page, on this query, an error happened.
-    // Right now, we just assume it's because there are no more pages of the search result.
-    // But FetchArticleListTask currently has two possible errors: no internet or no results.
-    // Future FIXME, I guess.
-    private boolean matchesSearchError(int requestedPageNum) {
-        return searchErrorObject != null
-                && searchErrorObject.requestParam.equals(searchQuery)
-                && searchErrorObject.pageNum == requestedPageNum;
     }
 
     private void clearSearchError() {
