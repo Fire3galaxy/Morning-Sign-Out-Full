@@ -88,15 +88,22 @@ public class CategoryFragment extends FragmentWithCache
 
         TextView categoryHeaderView = rootView.findViewById(R.id.textView_categoryHeader);
         swipeRefreshLayout = rootView.findViewById(R.id.swipeRefresh_category);
-        progressBar = rootView.findViewById(R.id.progressBar);
+        progressBar = rootView.findViewById(R.id.circleProgressBar);
         refreshTextView = rootView.findViewById(R.id.textView_categoryRefresh);
-        footerProgressBar = getFooterProgressBarXml();
+
+        // Load AdMob banner ad
+        AdView mAdView = rootView.findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
+        //footerProgressBar = getFooterProgressBarXml();
+        footerProgressBar = rootView.findViewById(R.id.horizProgressBar);
         gridViewWithHeaderAndFooter = rootView.findViewById(R.id.gridView);
 
         categoryHeaderView.setText(category);
         swipeRefreshLayout.setColorSchemeResources(R.color.mso_blue, android.R.color.white);
         setUpGridView(gridViewWithHeaderAndFooter);
-        gridViewWithHeaderAndFooter.addFooterView(footerProgressBar);
+        //gridViewWithHeaderAndFooter.addFooterView(footerProgressBar);
 
         // Creates and loads new adapter or sets position of existing gridView
         if(categoryAdapter == null) {
@@ -125,11 +132,6 @@ public class CategoryFragment extends FragmentWithCache
             if (index != null)
                 gridViewWithHeaderAndFooter.setSelection(index);
         }
-
-        // Load AdMob banner ad
-        AdView mAdView = rootView.findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
 
         // Setup the click listener for the listView
         gridViewWithHeaderAndFooter.setOnItemClickListener(new AdapterView.OnItemClickListener() {

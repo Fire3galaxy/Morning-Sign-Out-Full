@@ -31,7 +31,7 @@
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <ProgressBar
-        android:id="@+id/progressBar"
+        android:id="@+id/circleProgressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="false"
@@ -68,6 +68,18 @@
         android:paddingBottom="10dp"/>
     <!--paddingTop matches gridview's paddingTop-->
 
+    <ProgressBar
+        android:id="@+id/horizProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:layout_above="@id/adView"
+        android:indeterminate="true"
+        android:max="100"
+        android:progress="50"
+        android:visibility="invisible"
+        />
+
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -76,6 +88,7 @@
         android:background="#73b3e2"
         android:visibility="gone"
         android:contentDescription="@string/splash_contentDescription"/>
+
 
     <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
         android:id="@+id/adView"
